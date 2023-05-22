@@ -1,0 +1,9 @@
+# core
+beautifulsoup4==4.12.2
+requests==2.31.0
+
+# development
+black==23.3.0
+bpython==0.24
+flake8==6.0.0
+isort==5.12.0
