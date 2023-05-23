@@ -1,0 +1,38 @@
+[project]
+name = "zed-news"
+version = "0.0.0"
+description = "news aggregator"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+  {name = "Victor Miti", email = "victormiti@gmail.com"}
+]
+
+[tool.black]
+line-length = 120
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+exclude = '''
+
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+)
+'''
+
+[tool.isort]
+profile = "black"
+skip = ["node_modules", ".git", "__pycache__", "LC_MESSAGES", "venv", ".venv"]
+blocked_extensions = ["rst", "html", "js", "svg", "txt", "css", "scss", "png", "snap", "ts", "tsx"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "LOCALFOLDER"]
+default_section = "THIRDPARTY"
