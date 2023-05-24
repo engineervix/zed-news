@@ -25,28 +25,20 @@ def custom_strftime(format, t):
     return t.strftime(format).replace("{S}", str(t.day) + suffix(t.day))
 
 
-timezone = pytz.timezone("America/Chicago")
+timezone = pytz.timezone("Africa/Lusaka")
 today = datetime.datetime.now(timezone).date().isoformat()
 edition = custom_strftime("%A {S} %B, %Y", datetime.datetime.now(timezone).date())
-intro = f"""Welcome to the {edition} edition of the "Zed News Podcast" —
-your source for a quick and comprehensive roundup of news from across Zambia.
-We've gathered the latest updates from various sources, saving you time and keeping you informed about all that's happening in the country.
+intro = f"""Today is {edition}. Welcome to the second edition of the "Zed News Podcast" —
+I'm your friendly host, Brian, an AI standing in for my colleague Ayanda, who hosted the first edition of the podcast yesterday.
+As usual, we've gathered the latest updates from various sources, saving you time and keeping you informed about all that's happening in the country.
 
-In each episode, we bring you the top stories covering politics, economy, social issues, culture, and more.
-Our auto-curated selection ensures you stay up-to-date without the hassle of scouring multiple news outlets and scrolling endlessly.
-
-Join us as we deliver a concise overview of the significant events shaping our beloved country. Get ready to be informed, engaged, and empowered with the knowledge you need.
-Stay tuned to "Zed News Podcast" for a convenient and informative way to stay connected with the pulse of the nation.
+Without further ado, let's dive in.
 """
 
 outro = f"""
-Ladies and gentlemen, that's a wrap!
+Ladies and gentlemen, that's it for today!
 
-Thank you for joining us on the {edition} of 'Zed News Podcast.' We hope you enjoyed our auto-curated selection of news stories from across the country. Stay informed and stay engaged with the pulse of Zambia by subscribing to our podcast.
-
-Remember, knowledge is power, and being aware of the latest events empowers you to be an active participant in shaping the future of our beloved nation. Share the insights you've gained from this podcast with your friends, family, and colleagues, and let's foster meaningful conversations that drive positive change.
-
-God willing, we'll be back tomorrow with more news. Cheers!
+Thank you for joining us on the second edition of 'Zed News Podcast.' We hope you enjoyed our auto-curated selection of news stories from across the country. Until the next time, goodbye!
 """
 
 
@@ -118,7 +110,7 @@ def create_podcast_content(c):
         if count == 1:
             read += "We are going to start with news from "
         elif count == len(articles_by_source):
-            read += "Lastly, but certainly not the least, we have news from "
+            read += "To wrap up today's edition, let's check out the news from "
         else:
             read += "Next up, we have news from "
 
@@ -126,7 +118,7 @@ def create_podcast_content(c):
 
         article_count = len(articles_by_source[source])
         if article_count > 9:
-            read += f", which has an astonishing {article_count} entries today! Wow! the folks there must have been pretty busy lately!\n\n"
+            read += f", which has an astounding {article_count} entries today! Let's go through them quickly.\n\n"
         else:
             read += f", which has {article_count} entries today.\n\n"
 
@@ -140,7 +132,7 @@ def create_podcast_content(c):
             template = """
             Please provide a concise summary of the following news entry.
             Please make it short and sweet, but also informative and engaging.
-            It should be no more than one paragraph long.
+            It should be no more than three sentences long.
             Please provide your output in a manner suitable for reading as part of a podcast.
 
             {entry}
