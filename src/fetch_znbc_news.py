@@ -5,11 +5,16 @@ Fetches today's news from https://www.znbc.co.zm/news/
 
 import datetime
 import json
+from fake_useragent import UserAgent
 
 import requests
 from bs4 import BeautifulSoup
 
 today = datetime.date.today().isoformat()
+
+ua = UserAgent(
+    fallback="Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.648.204",
+)
 
 
 def get_article_detail(url):
@@ -36,7 +41,8 @@ def fetch_news():
     Fetches today's news from https://www.znbc.co.zm/news/
     """
     url = "https://www.znbc.co.zm/news/"
-    response = requests.get(url)
+    headers = {"User-Agent": ua.random}
+    response = requests.get(url, headers=headers, timeout=60)
     soup = BeautifulSoup(response.text, "html.parser")
     news = soup.find_all("article")
     latest_news = []
