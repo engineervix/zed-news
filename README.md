@@ -61,3 +61,9 @@ eyeD3 -a "Victor Miti" -A "Zed News" -t "Zed News Podcast, Episode 003 (Wednesda
 eyeD3 --genre "Podcast" 2023-05-24.dist.mp3
 eyeD3 --add-image album-art.jpg:FRONT_COVER 2023-05-24.dist.mp3
 ```
+
+## TODO
+
+- [ ] Mention the weather in Lusaka, Livingstone, Kabwe, etc. Even the weather forecast
+- [ ] Also mention exchange rates
+- [ ] Add appropriate error handling on `requests` and `feedparser` jobs as well as all other operations, such connecting to AWS Polly, etc.
