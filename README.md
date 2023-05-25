@@ -1,3 +1,63 @@
 # zed-news
 
 > Powered by python and Chat GPT
+
+## Credits
+
+- <https://pixabay.com/music/beats-classical-hip-hop-143320/>
+- <https://pixabay.com/music/beats-digital-technology-131644/>
+
+## Automated Audio Conversion
+
+Here we assume that the instrumental file is already presentand that it has its **gain** reduced by -20dB.
+
+This can be done as follows:
+
+```bash
+ffmpeg -i instrumental.src.mp3 -af "volume=-20dB" instrumental-20dB.mp3
+```
+
+### 1. convert the AWS Polly file to mp3
+
+```bash
+ffmpeg -i 1652d80b-985d-4ee2-86c6-b8c74620e17a.mpga -c copy 2023-05-24.src.mp3
+```
+
+### 2. Convert audio file from mono to 128 kb/s stereo
+
+```bash
+ffmpeg -i 2023-05-24.src.mp3 -af "pan=stereo|c0=c0|c1=c0" -b:a 128k 2023-05-24.stereo.mp3
+```
+
+### 3. Mix the voice and instrumental(s)
+
+> We want an intro instrumental and an outro
+> We could use the same one, or two separate ones
+> Maybe do some manual editing of the sounds so that:
+> intro starts at normal volume and then fades to -20dB
+> outro starts at low volume and gradually builds up to normal
+
+```bash
+# step 0: core
+ffmpeg -i 2023-05-24.stereo.mp3 -i instrumental-20dB.mp3 -filter_complex amix=inputs=2:duration=longest:dropout_transition=0:weights="1 0.25":normalize=0 2023-05-24.mixed_by_ffmpeg.mp3
+
+# step 1: get the duration of the mixed file
+ffmpeg -i 2023-05-24.mixed_by_ffmpeg.mp3 2>&1 | grep "Duration"
+
+# step 2: pad the instrumental with silence, using duration above and
+# the instrumental's duration
+# adelay = (duration above - instrumental duration) in milliseconds
+ffmpeg -i instrumental-20dB.mp3 2>&1 | grep "Duration"
+ffmpeg -i instrumental-20dB.mp3 -af "adelay=484170|484170" ending.mp3
+
+# mix the file from step 0 and step 2
+ffmpeg -i 2023-05-24.mixed_by_ffmpeg.mp3 -i ending.mp3 -filter_complex amix=inputs=2:duration=longest:dropout_transition=0:weights="1 0.25":normalize=0 2023-05-24.dist.mp3
+```
+
+### 4. Add id3 tags
+
+```bash
+eyeD3 -a "Victor Miti" -A "Zed News" -t "Zed News Podcast, Episode 003 (Wednesday 24 May 2023)" -n 3 -Y 2023 2023-05-24.dist.mp3
+eyeD3 --genre "Podcast" 2023-05-24.dist.mp3
+eyeD3 --add-image album-art.jpg:FRONT_COVER 2023-05-24.dist.mp3
+```
