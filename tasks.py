@@ -11,7 +11,6 @@ import time
 import boto3
 import eyed3
 import pytz
-import requests
 from dotenv import load_dotenv
 from invoke import task
 from langchain import OpenAI, PromptTemplate
@@ -42,7 +41,8 @@ def get_episode_number(initial_date, final_date):
     return count
 
 
-podcast_host = "Emma"
+# https://docs.aws.amazon.com/polly/latest/dg/ph-table-english-za.html
+podcast_host = "Ayanda"
 podcast_start_date = datetime.date(2023, 5, 22)
 
 timezone = pytz.timezone("Africa/Lusaka")
@@ -100,7 +100,7 @@ def random_outro():
         f"That brings us to the end of this remarkable episode of the 'Zed News Podcast'. I trust you found our discussion enlightening and thought-provoking. Until next time, this is {podcast_host}, your host, signing off. Take care and see ypou later!",
         f"And with that, we wrap up another exciting edition of the 'Zed News Podcast'. I hope you enjoyed our time together, staying up to date with the latest news. Until we reconvene, this is {podcast_host}, your friendly voice in the news, saying farewell. Bye for now!",
         f"That concludes our journey through this edition of the 'Zed News Podcast'. I trust you found our exploration of the news landscape insightful and illuminating. Until our paths cross again, this is {podcast_host}, your guide in the realm of information, bidding you adieu. Bye bye for now!",
-        f"And so, we reach the end of another remarkable episode of the 'Zed News Podcast'. I hope you found our analysis and storytelling captivating and informative. Until we meet again, this is {podcast_host}, your companion on the news adventure, signing off. May your day or night be filled with meaningful connections, profound discoveries, and a commitment to positive change. God willing, tizaonana mailo!",
+        f"And so, we reach the end of another remarkable episode of the 'Zed News Podcast'. I hope you found our curation and storytelling captivating and informative. Until we meet again, this is {podcast_host}, your companion on the news adventure, signing off. May your day or night be filled with meaningful connections, profound discoveries, and a commitment to positive change. God willing, tizaonana mailo!",
         f"That brings us to the conclusion of this edition of the 'Zed News Podcast'. I hope you enjoyed our exploration of the news landscape and gained valuable insights. Until our paths cross again, this is {podcast_host}, your friendly host, bidding you farewell. Goodbye folks!",
     ]
     return random.choice(variations)
@@ -354,7 +354,8 @@ def create_audio(c):
     print("Creating an AWS Polly Task ...")
     s3_podcast_dir = "zed-news"
     response = polly.start_speech_synthesis_task(
-        Engine="standard",
+        Engine="neural",
+        LanguageCode="en-ZA",
         VoiceId=podcast_host,
         Text=podcast_content,
         OutputS3BucketName=AWS_BUCKET_NAME,
@@ -401,6 +402,9 @@ def create_audio(c):
     c.run(f"mv -v data/{znbc_news} {dest}/", pty=True)
     c.run(f"mv -v data/{other_news} {dest}/", pty=True)
     c.run(f"mv -v data/{combined_news} {dest}/", pty=True)
+
+    # Delete the generated MP3 file from S3
+    s3.delete_object(Bucket=AWS_BUCKET_NAME, Key=output_key)
 
     # ----------------------------------------------------
     # If we need to upload a file to S3:
