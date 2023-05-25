@@ -422,14 +422,18 @@ def toolchain(c):
     """The toolchain for creating the podcast audio"""
 
     # 1. Download the news
-    # fetch_other_news(c)
-    # fetch_znbc_news(c)
+    fetch_other_news(c)
+    fetch_znbc_news(c)
 
     # 2. Combine the news into a single file
-    # combine_json_files(c)
+    combine_json_files(c)
 
     # 3. Create the podcast content
-    # create_podcast_content(c)
+    create_podcast_content(c)
 
     # 4. Create the audio
     create_audio(c)
+
+    # Play the audio using VLC
+    # TODO: This should run only on local machine
+    c.run(f"vlc data/{today_iso_fmt}_podcast_dist.mp3", pty=True)
