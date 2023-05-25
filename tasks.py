@@ -28,17 +28,20 @@ def custom_strftime(format, t):
 timezone = pytz.timezone("Africa/Lusaka")
 today = datetime.datetime.now(timezone).date().isoformat()
 edition = custom_strftime("%A {S} %B, %Y", datetime.datetime.now(timezone).date())
-intro = f"""Today is {edition}. Welcome to the second edition of the "Zed News Podcast" —
-I'm your friendly host, Brian, an AI standing in for my colleague Ayanda, who hosted the first edition of the podcast yesterday.
-As usual, we've gathered the latest updates from various sources, saving you time and keeping you informed about all that's happening in the country.
+intro = f"""Today is {edition}. Welcome to the third edition of the "Zed News Podcast" —
+I'm your friendly host, Ayanda, and I'm delighted to be back behind the microphone. Oh, what a day it was yesterday! I must admit, I missed you all dearly, and I hope you missed me too. But hey, sometimes life throws us curveballs, and yesterday was no exception.
+
+Now, let's talk about yesterday's episode, shall we? My good friend Brian graciously stepped in to keep the podcast train chugging along. I must say, Brian's enthusiasm and dedication are truly commendable. He took on the challenge with gusto and did his best to bring you the latest news. We all appreciate his efforts, don't we?
+
+However, it seems our listeners have spoken, and their feedback has made it clear that they missed my charming and slightly eccentric presence. Hey, I can't blame them; I have a voice made for radio! But fear not, dear Brian, for this in no way diminishes your value or the wonderful job you did. We all have different styles, and it's the diversity of voices that makes this podcast so special. So, thank you, Brian, for lending your talents and giving me a much-needed breather.
+
+But let's not dwell on the past, my friends. Today is a new day, and we have a fresh lineup of news stories to share with you.
 
 Without further ado, let's dive in.
 """
 
-outro = f"""
-Ladies and gentlemen, that's it for today!
-
-Thank you for joining us on the second edition of 'Zed News Podcast.' We hope you enjoyed our auto-curated selection of news stories from across the country. Until the next time, goodbye!
+outro = """
+And that, dear listeners, brings us to the end of another fantastic edition of the 'Zed News Podcast'.  I hope you enjoyed our time together today, catching up on the latest happenings. Until next time, this is Ayanda signing off, wishing you a wonderful day or night ahead. Take care, stay safe, and keep being awesome. Goodbye, everyone!
 """
 
 
@@ -118,21 +121,22 @@ def create_podcast_content(c):
 
         article_count = len(articles_by_source[source])
         if article_count > 9:
-            read += f", which has an astounding {article_count} entries today! Let's go through them quickly.\n\n"
+            read += (
+                f", which has an astounding {article_count} entries today! Let's try and go through them quickly.\n\n"
+            )
         else:
             read += f", which has {article_count} entries today.\n\n"
 
         # Iterate over each article in the source
         for index, article in enumerate(articles_by_source[source], start=1):
-            count = num2words(index, to="ordinal")
-            title = article["title"]
+            # count = num2words(index, to="ordinal")
+            count = num2words(index)
+            # title = article["title"]
 
             content = article["content"]
 
             template = """
-            Please provide a concise summary of the following news entry.
-            Please make it short and sweet, but also informative and engaging.
-            It should be no more than three sentences long.
+            Please provide a very short, sweet, informative and engaging summary of the following news entry, in not more than two sentences.
             Please provide your output in a manner suitable for reading as part of a podcast.
 
             {entry}
@@ -147,9 +151,9 @@ def create_podcast_content(c):
             summary = llm(summary_prompt)
 
             category = article["category"] if article["category"] else ""
-            read += f"The {count} entry is entitled '{title}' "
+            read += f"Entry number {count}: "
             if category:
-                read += f"and was posted in the {category} category."
+                read += f"posted in the {category} category.\n"
             read += f"\n{summary.strip()}\n\n"
 
     # Write the intro, the read, and the outro to a file
@@ -157,6 +161,42 @@ def create_podcast_content(c):
         f.write(intro)
         f.write(read)
         f.write(outro)
+
+
+# @task
+# def curate_content(c):
+#     data = _read_json_file(f"data/{today}_news.json")
+
+#     # Create a dictionary to store the articles by source
+#     articles_by_source = {}
+
+#     # Iterate over each article in the data
+#     for article in data:
+#         source = article["source"]
+
+#         # If the source is not already a key in the dictionary, create a new list
+#         if source not in articles_by_source:
+#             articles_by_source[source] = []
+
+#         # Add the article to the list for the corresponding source
+#         articles_by_source[source].append(article)
+
+#     template = """
+#     The JSON data below contains today's news articles from various sources. Some articles may be present in multiple sources. Please consolidate the articles, providing a short, sweet, informative and engaging summary of each news item. Please provide your output in the form of a podcast, with the reading time of the whole text not exceeding 8 minutes.
+
+#     {entry}
+#     """
+
+#     prompt = PromptTemplate(input_variables=["entry"], template=template)
+#     summary_prompt = prompt.format(entry=articles_by_source)
+
+#     num_tokens = llm.get_num_tokens(summary_prompt)
+#     print(f"This prompt + data has {num_tokens} tokens")
+
+#     # summary = llm(summary_prompt)
+
+#     # with open(f"data/{today}_podcast-content.txt", "w") as f:
+#     # f.write(summary.strip())
 
 
 @task
