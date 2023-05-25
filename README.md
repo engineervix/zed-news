@@ -67,3 +67,6 @@ eyeD3 --add-image album-art.jpg:FRONT_COVER 2023-05-24.dist.mp3
 - [ ] Mention the weather in Lusaka, Livingstone, Kabwe, etc. Even the weather forecast
 - [ ] Also mention exchange rates
 - [ ] Add appropriate error handling on `requests` and `feedparser` jobs as well as all other operations, such connecting to AWS Polly, etc.
+- [ ] Add task to open the resulting file in a media player if on desktop
+- [ ] Add task to perform substitution so that, for instance, K400 is written as 400 Kwacha. the AWS Polly voices fail to read Zambian money correctly.
+- [ ] Allow for passing of an arg variable for the voice, or dynamically choose a voice from a list, just like the random intros and outros.
