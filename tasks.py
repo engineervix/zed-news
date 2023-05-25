@@ -337,8 +337,7 @@ def create_audio(c):
     3. download the audio file
     """
 
-    # content = f"data/{today_iso_fmt}_podcast-content.txt"
-    content = "data/foo.txt"
+    content = f"data/{today_iso_fmt}_podcast-content.txt"
     with open(content, "r") as f:
         podcast_content = f.read()
 
@@ -395,6 +394,7 @@ def create_audio(c):
     # ----------------------------------------------------
 
 
+@task
 def toolchain(c):
     """The toolchain for creating the podcast audio"""
 
@@ -408,5 +408,5 @@ def toolchain(c):
     # 3. Create the podcast content
     create_podcast_content(c)
 
-    # 3. Create the audio
+    # 4. Create the audio
     create_audio(c)
