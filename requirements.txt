@@ -1,5 +1,6 @@
 # core
 beautifulsoup4==4.12.2
+boto3==1.26.140
 eyed3==0.9.7
 fake-useragent==1.1.3
 feedparser==6.0.10
