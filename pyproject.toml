@@ -1,6 +1,6 @@
 [project]
 name = "zed-news"
-version = "0.0.0"
+version = "0.1.0"
 description = "news podcast on auto-pilot"
 readme = "README.md"
 requires-python = ">=3.8"
