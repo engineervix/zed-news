@@ -30,6 +30,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "black",
+  "commitizen",
   "flake8",
   "isort",
   "pip-tools",
