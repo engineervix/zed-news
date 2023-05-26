@@ -1,6 +1,6 @@
 # zed-news
 
-> Powered by python and Chat GPT
+> automated news podcast
 
 ## Credits
 
