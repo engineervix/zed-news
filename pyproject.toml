@@ -1,12 +1,43 @@
 [project]
 name = "zed-news"
 version = "0.0.0"
-description = "news aggregator"
+description = "news podcast on auto-pilot"
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [
   {name = "Victor Miti", email = "victormiti@gmail.com"}
 ]
+dependencies = [
+  "beautifulsoup4",
+  "boto3",
+  "bpython",
+  "colorama",
+  "eyed3",
+  "fake-useragent",
+  "feedparser",
+  "invoke",
+  "langchain",
+  "num2words",
+  "openai",
+  "python-dateutil",
+  "python-dotenv",
+  "pytz",
+  "requests",
+  "tiktoken",
+  "tomli",
+]
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "flake8",
+  "isort",
+  "pip-tools",
+  "pre-commit",
+]
+
+[tool.setuptools]
+py-modules = []
 
 [tool.black]
 line-length = 120
@@ -36,3 +67,12 @@ skip = ["node_modules", ".git", "__pycache__", "LC_MESSAGES", "venv", ".venv"]
 blocked_extensions = ["rst", "html", "js", "svg", "txt", "css", "scss", "png", "snap", "ts", "tsx"]
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "LOCALFOLDER"]
 default_section = "THIRDPARTY"
+
+[tool.commitizen]
+version_provider = "pep621"
+version_files = [
+    "src/__init__.py",
+]
+tag_format = "v$major.$minor.$patch"
+annotated_tag = true
+update_changelog_on_bump = false
