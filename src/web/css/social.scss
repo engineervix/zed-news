@@ -1,0 +1,55 @@
+.social-fb {
+  color: #1877f2; // Facebook blue
+
+  &:hover {
+    color: #0e5a9c; // Facebook darker blue
+  }
+}
+
+.social-tw {
+  color: #1da1f2; // Twitter blue
+
+  &:hover {
+    color: #0c80b6; // Twitter darker blue
+  }
+}
+
+.social-yt {
+  color: #f00; // YouTube red
+
+  &:hover {
+    color: #b30000; // YouTube darker red
+  }
+}
+
+.social-ig {
+  color: #833ab4; // Instagram purple
+
+  &:hover {
+    color: #5b2e86; // Instagram darker purple
+  }
+}
+
+.social-li {
+  color: #0077b5; // LinkedIn blue
+
+  &:hover {
+    color: #004b70; // LinkedIn darker blue
+  }
+}
+
+.social-rss {
+  color: #f26522; // RSS orange
+
+  &:hover {
+    color: #c94e1e; // RSS darker orange
+  }
+}
+
+.social-gh {
+  color: #333; // GitHub black
+
+  &:hover {
+    color: #000; // GitHub darker black
+  }
+}

@@ -1,0 +1,77 @@
+/* Bootstrap
+ * https: //getbootstrap.com/docs/5.2/customize/sass/
+ * -------------------------------------------------
+ */
+
+// You can override colours here
+// $primary: #203682;
+// $secondary: #f2cb4d;
+// $warning: #f8b563;
+// $danger: #de4a49;
+$success: #188200;
+// $info: #324d5e;
+
+// If you wanna override fonts ...
+// $font-family-sans-serif: "Merriweather Sans", sans-serif !default;
+// $font-family-serif: "Merriweather", serif !default;
+// $font-family-monospace: "Menlo", "Monaco", "Consolas", "Liberation Mono",
+//   "Courier New", monospace !default;
+// $font-family-base: $font-family-sans-serif !default;
+
+// You can also add other overrides
+// $enable-negative-margins: true;
+
+@import "bootstrap/scss/bootstrap";
+
+@import "social";
+
+@import "plyr/src/sass/plyr";
+
+.section__support {
+  background: no-repeat center center;
+  background-color: $gray-600;
+  background-attachment: scroll;
+  position: relative;
+  background-size: cover;
+  z-index: 0;
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: $gray-900;
+    opacity: 0.5;
+    z-index: 1;
+  }
+
+  .text-center {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+.features-icons {
+  .features-icons-item {
+    max-width: 20rem;
+
+    .features-icons-icon {
+      height: 7rem;
+
+      i {
+        font-size: 4.5rem;
+      }
+    }
+  }
+}
+
+// Hide some plyr controls on mobile due to space constraints
+@include media-breakpoint-down(sm) {
+  button.plyr__controls__item[data-plyr="restart"],
+  button.plyr__controls__item[data-plyr="rewind"],
+  button.plyr__controls__item[data-plyr="fast-forward"],
+  div.plyr__controls__item.plyr__menu {
+    display: none;
+  }
+}

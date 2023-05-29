@@ -1,0 +1,172 @@
+{% extends "base.njk" %}
+
+{% block header %}
+<header class="bg-light py-3">
+    <div class="container px-5">
+    <div class="row gx-5 align-items-center justify-content-center">
+        <div class="col">
+        <div class="my-5 text-center text-xl-start">
+            <h1 class="display-5 fw-bolder mb-2">{{ title }}</h1>
+            <p class="lead fw-normal mb-4">Episode {{ episode }}.</p>
+            <div class="mb-5">
+            <audio class="podcast-player" controls>
+                <source src="{{ mp3.url }}" type="audio/mp3" />
+                <code>audio</code> tag is not supported in this browser.
+            </audio>
+            </div>
+            <!-- Buttons: Subscribe, Share -->
+            <div
+            class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start"
+            >
+            <a class="btn btn-warning px-4" href="#!">
+                <i class="fa-brands fa-chromecast me-2"></i>
+                Subscribe</a
+            >
+            <a class="btn btn-outline-success px-4" href="#!">
+                <i class="fa-solid fa-share-nodes me-2"></i>
+                Share</a
+            >
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section py-5">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-5 justify-content-center">
+            <div class="col-lg-10">
+                <h2 class="pb-3">Show Notes 📋</h2>
+
+                <h3 class="fs-4 mb-3 border-bottom">Overview 📈</h3>
+                <div class="row features-icons text-center pb-3">
+                    <!-- presenter -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                        <div class="features-icons-icon d-flex">
+                            <i
+                            class="fa-regular fa-circle-user m-auto text-primary"
+                            ></i>
+                        </div>
+                        <h4 class="fs-5">Presenter</h4>
+                        <p class="lead mb-0">
+                            Today's episode was presented by {{ presenter }}.
+                        </p>
+                        </div>
+                    </div>
+                    <!-- locale -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                        <div class="features-icons-icon d-flex">
+                            <i class="fa-solid fa-language m-auto text-primary"></i>
+                        </div>
+                        <h4 class="fs-5">Locale</h4>
+                        <p class="lead mb-0">{{ locale.name }}</p>
+                        </div>
+                    </div>
+                    <!-- time to produce -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                        <div class="features-icons-icon d-flex">
+                            <i class="fa-solid fa-stopwatch m-auto text-primary"></i>
+                        </div>
+                        <h4 class="fs-5">Production time</h4>
+                        <p class="lead mb-0">
+                            It took {{ production_time }} to produce today's
+                            episode.
+                        </p>
+                        </div>
+                    </div>
+                    <!-- audio file -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                        <div class="features-icons-icon d-flex">
+                            <i
+                            class="fa-solid fa-circle-play m-auto text-primary"
+                            ></i>
+                        </div>
+                        <h4 class="fs-5">Audio file</h4>
+                        <p class="lead mb-0">
+                            The size of the audio file is {{ mp3.size }}. Running time is {{ mp3.length }}.
+                        </p>
+                        </div>
+                    </div>
+                    <!-- number of words -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+                        <div class="features-icons-icon d-flex">
+                            <i class="fa-solid fa-keyboard m-auto text-primary"></i>
+                        </div>
+                        <h4 class="fs-5">Word count</h4>
+                        <p class="lead mb-0">
+                            {{ words.count }}. This means that the presenter spoke at a rate of {{ words.rate }} words per minute.
+                        </p>
+                        </div>
+                    </div>
+                    <!-- number of articles -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+                        <div class="features-icons-icon d-flex">
+                            <i
+                            class="fa-regular fa-newspaper m-auto text-primary"
+                            ></i>
+                        </div>
+                        <h4 class="fs-5">Article count</h4>
+                        <p class="lead mb-0">
+                            {{ references.count }} articles from {{ references.sources }} sources. See below for more details.
+                        </p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="fs-4 mb-3 border-bottom">News sources 📰</h3>
+
+                <div class="accordion" id="news-sources">
+                {%- for source, articles in site.articlesBySource(articles) -%}
+                    <div class="accordion-item">
+                        <p class="accordion-header">
+                        <button
+                            class="accordion-button"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse{{ loop.index }}"
+                            aria-expanded="true"
+                            aria-controls="collapse{{ loop.index }}"
+                        >
+                            {{ source }}
+                        </button>
+                        </p>
+                        <div
+                        id="collapse{{ loop.index }}"
+                        class="accordion-collapse collapse {%- if loop.index == 1 -%} show{%- endif -%}"
+                        data-bs-parent="#news-sources"
+                        >
+                        <div class="accordion-body">
+                            <ul class="fa-ul">
+                            {%- for article in articles -%}
+                                <li>
+                                    <span class="fa-li">
+                                    <i class="text-success fa-solid fa-caret-right"></i>
+                                    </span>
+                                    <a
+                                    href="{{ article.url }}"
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                    >{{ article.title }}</a
+                                    >
+                                </li>
+                            {%- endfor -%}
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                {%- endfor -%}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

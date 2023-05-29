@@ -1,0 +1,142 @@
+{% extends "base.njk" %}
+
+{% block header %}
+<header class="bg-light py-3">
+  <div class="container px-5">
+    <div class="row gx-5 align-items-center justify-content-center">
+      <div class="col-lg-8 col-xl-7 col-xxl-6">
+        <div class="my-5 text-center text-xl-start">
+          <h1 class="display-5 fw-bolder mb-2">Episodes</h1>
+          <p class="lead fw-normal mb-4">
+            All the episodes of the Zed News Podcast, from Monday 22nd May
+            2023 to date. That's 5 episodes and counting.
+          </p>
+        </div>
+      </div>
+      <div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center">
+        <img
+          class="img-fluid rounded-3 my-5"
+          src="/img/podcast-illustration-mirrored.svg"
+          alt="Zed News Podcast"
+        />
+      </div>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section py-5">
+  <div class="container px-4 px-lg-5">
+    <div class="row gx-5 justify-content-center">
+      <div class="col-lg-10">
+        <!-- Episode -->
+        <div class="d-flex mb-4 border-bottom">
+          <div class="flex-shrink-0">
+            <img src="/img/zed-news-podcast-icon.svg" alt="Episode 4" />
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <div class="small text-muted">Thursday, May 12, 2023</div>
+            <a class="link-dark" href="#"
+              >Episode 004
+            </a>
+            <audio class="podcast-player" controls>
+              <source src="https://res.cloudinary.com/engineervix/video/upload/v1685358411/sound/example.mp3" type="audio/mp3" />
+              <code>audio</code> tag is not supported in this browser.
+            </audio>
+          </div>
+        </div>
+        <!-- Episode -->
+        <div class="d-flex mb-4 border-bottom">
+          <div class="flex-shrink-0">
+            <img
+              src="/img/zed-news-podcast-icon.svg"
+              alt="Episode 003"
+            />
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <div class="small text-muted">Wednesday, May 11, 2023</div>
+            <a class="link-dark" href="#"
+              >Episode 003
+            </a>
+            <audio class="podcast-player" controls>
+              <source src="https://res.cloudinary.com/engineervix/video/upload/v1685358411/sound/example.mp3" type="audio/mp3" />
+              <code>audio</code> tag is not supported in this browser.
+            </audio>
+          </div>
+        </div>
+        <!-- Episode -->
+        <div class="d-flex mb-4 border-bottom">
+          <div class="flex-shrink-0">
+            <img
+              src="/img/zed-news-podcast-icon.svg"
+              alt="Episode 002"
+            />
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <div class="small text-muted">Tuesday, May 10, 2023</div>
+            <a class="link-dark" href="#"
+              >Episode 002
+            </a>
+            <audio class="podcast-player" controls>
+              <source src="https://res.cloudinary.com/engineervix/video/upload/v1685358411/sound/example.mp3" type="audio/mp3" />
+              <code>audio</code> tag is not supported in this browser.
+            </audio>
+          </div>
+        </div>
+        <!-- Episode -->
+        <div class="d-flex mb-5 border-bottom">
+          <div class="flex-shrink-0">
+            <img
+              src="/img/zed-news-podcast-icon.svg"
+              alt="Episode 001"
+            />
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <div class="small text-muted">Monday, May 09, 2023</div>
+            <a class="link-dark" href="#"
+              >Episode 001
+            </a>
+            <audio class="podcast-player" controls>
+              <source src="https://res.cloudinary.com/engineervix/video/upload/v1685358411/sound/example.mp3" type="audio/mp3" />
+              <code>audio</code> tag is not supported in this browser.
+            </audio>
+          </div>
+        </div>
+        <div class="mb-5 mb-xl-0">
+          Add pagination here, if episodes more than 10
+
+          <nav aria-label="Episode Navigation">
+            <ul class="pagination">
+              <li class="page-item active">
+                <a href="?page=1" class="page-link">
+                  1 <span class="sr-only">(current)</span>
+                </a>
+              </li>
+
+              <li class="page-item">
+                <a href="?page=2" class="page-link">2</a>
+              </li>
+
+              <li class="page-item">
+                <a href="?page=3" class="page-link">3</a>
+              </li>
+
+              <li class="page-item">
+                <a href="?page=4" class="page-link">4</a>
+              </li>
+
+              <li class="page-item">
+                <a class="page-link" href="?page=2" aria-label="Next">
+                  <span aria-hidden="true">»</span>
+                  <span class="sr-only">Next</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

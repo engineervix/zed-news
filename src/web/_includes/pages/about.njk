@@ -1,0 +1,282 @@
+{% extends "base.njk" %}
+
+{% block header %}
+<header class="bg-light py-3">
+  <div class="container px-5">
+    <div class="row gx-5 align-items-center justify-content-center">
+      <div class="col-lg-8 col-xl-7 col-xxl-6">
+        <div class="my-5 text-center text-xl-start">
+          <h1 class="display-5 fw-bolder mb-2">What's this all about❓</h1>
+          <p class="lead fw-normal mb-4">
+            Thanks for asking. Well, this project arose from a personal need
+            to stay up to date with what's happening in my country 🇿🇲. I'm
+            generally terrible at keeping up with current affairs, so I
+            figured I'd put my programming skills to good use and take
+            advantage of the recent AI developments to build a tool that
+            would help me stay informed. This is the result. I hope you find
+            it useful too.
+          </p>
+          <div
+            class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start"
+          >
+            <a class="px-4 me-sm-3" href="#">
+              <img
+                src="/img/apple-podcasts-badge.svg"
+                alt="Listen on Apple Podcasts"
+                height="40"
+              />
+            </a>
+            <!-- <a class="px-4" href="#">
+              <img
+                src="img/google-podcasts-badge.svg"
+                alt="Listen on Google Podcasts"
+                height="38"
+              />
+            </a> -->
+            <a class="btn btn-outline-dark px-4" href="#!">
+              <i class="fa-solid fa-headphones me-2"></i>
+              Listen & Subscribe</a
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center">
+        <img
+          class="img-fluid rounded-3 my-5"
+          src="/img/questions-illustration.svg"
+          alt="Zed News Podcast"
+        />
+      </div>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section bg-dark py-5">
+  <div class="container px-4 px-lg-5">
+    <div class="row gx-5">
+      <div class="col">
+        <div class="text-white">
+          <h2 class="fw-bolder text-white mb-3">How does this work❔</h2>
+          <p class="lead text-white">
+            Every Monday to Friday in the afternoon, a
+            <a
+              href="https://en.wikipedia.org/wiki/Cron"
+              class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+              target="_blank"
+              rel="noopener noreferrer"
+              >cron</a
+            >
+            job runs
+            <a
+              href="https://www.cloudflare.com/en-gb/learning/cloud/what-is-the-cloud/"
+              class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+              target="_blank"
+              rel="noopener noreferrer"
+              >"in the cloud"</a
+            >
+            to fetch the latest news from a number of sources (which are
+            mentioned in each podcast episode).
+          </p>
+          <p class="lead text-white">
+            Each news item is then summarized using a
+            <a
+              href="https://en.wikipedia.org/wiki/Natural_language_processing"
+              class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Natural Language Processing (NLP)</a
+            >
+            algorithm, and a python script compiles everything into some
+            kind of transcript for the podcast episode.
+          </p>
+          <p class="lead text-white">
+            The transcript is then converted into an audio file using
+            <a
+              href="https://aws.amazon.com/polly/"
+              class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+              target="_blank"
+              rel="noopener noreferrer"
+              >text-to-speech technology from AWS</a
+            >.
+          </p>
+          <p class="lead text-white">
+            Next, some basic audio mixing is done to add an opening and
+            closing jingle. Podcast metadata is then added to the audio
+            file. At this point, the episode is ready to be published.
+          </p>
+          <p class="lead text-white">
+            All of the above processes are handled automatically, without
+            any human intervention. I think the animation below does
+            pretty sums it up. It's kinda like a
+            <a
+              href="https://en.wikipedia.org/wiki/Rube_Goldberg_machine"
+              class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Rube Goldberg machine</a
+            >
+            😄!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section pt-5">
+  <div class="container px-4 px-lg-5">
+    <div class="row gx-5">
+      <div class="col">
+        <div
+          style="
+            width: 100%;
+            height: 0;
+            padding-bottom: 75%;
+            position: relative;
+          "
+        >
+          <iframe
+            src="https://giphy.com/embed/xUA7b7pPIVE1p4j3Og"
+            width="100%"
+            height="100%"
+            style="position: absolute"
+            frameborder="0"
+            class="giphy-embed"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <p>
+          <a
+            href="https://giphy.com/gifs/birthday-hand-animated-gif-xUA7b7pPIVE1p4j3Og"
+            >via GIPHY</a
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section py-5">
+  <div class="container px-4 px-lg-5">
+    <div class="row gx-5">
+      <div class="col">
+        <div>
+          <h2 class="fw-bolder mb-3">And now, some fun facts❗</h2>
+          <ul class="fa-ul">
+            <li>
+              <span class="fa-li">
+                <i class="text-success fa-solid fa-caret-right"></i>
+              </span>
+              Only news items published on the same day are included in
+              each episode.
+            </li>
+            <li>
+              <span class="fa-li">
+                <i class="text-success fa-solid fa-caret-right"></i>
+              </span>
+              The same news item can be on multiple news platforms.
+              Because each news item is summarized independently, the same
+              news item can be repeated in the same episode, though using
+              different words. This is still a work in progress.
+              Hopefully, I'll figure out a way to detect duplicates and
+              consolidate them into a single news item.
+            </li>
+            <li>
+              <span class="fa-li">
+                <i class="text-success fa-solid fa-caret-right"></i>
+              </span>
+              No opinions are expressed in the podcast. The news items are
+              presented as they are, without any commentary.
+            </li>
+            <li>
+              <span class="fa-li">
+                <i class="text-success fa-solid fa-caret-right"></i>
+              </span>
+              The text to speech technology is not perfect. Sometimes, the
+              pronunciation of certain words (especially Zambian words,
+              names, places, etc.) is not correct. After some experiment,
+              I found that, of all the English voices available, the one
+              with better pronunciation is
+              <a
+                href="https://docs.aws.amazon.com/polly/latest/dg/voicelist.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Ayanda from South Africa</a
+              >. I think there's work that needs to be done towards having
+              a Zambian English
+              <a
+                href="https://www.science.co.il/language/Locale-codes.php"
+                target="_blank"
+                rel="noopener noreferrer"
+                >locale</a
+              >, just as we have South African English, Australian
+              English, etc. Perhaps you and I can do something about this?
+              🤔
+            </li>
+            <li>
+              <span class="fa-li">
+                <i class="text-success fa-solid fa-caret-right"></i>
+              </span>
+              Because the news items are presented as summaries, the
+              podcast episodes are usually short, between 8 and 16 minutes
+              long, depending on the number of news items on that day.
+            </li>
+            <li>
+              <span class="fa-li">
+                <i class="text-success fa-solid fa-caret-right"></i>
+              </span>
+              Links to the original news articles are included in the show
+              notes, so you can read the full articles if you want to know
+              more.
+            </li>
+            <li>
+              <span class="fa-li">
+                <i class="text-success fa-solid fa-caret-right"></i>
+              </span>
+              This whole thing is an experiment in automation and
+              artificial intelligence. The best way to learn a craft is by
+              building things, and that's what I'm doing here. I'm
+              learning as I go, and I'm having a lot of fun doing it. I
+              hope you enjoy listening to the podcast as much as I enjoy
+              tinkering with the technology behind it.
+            </li>
+            <li>
+              <span class="fa-li">
+                <i class="text-success fa-solid fa-caret-right"></i>
+              </span>
+              The idea for this project was actually inspired by
+              <a
+                href="https://camrobjones.com/hackercast/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Hackercast</a
+              >, an AI-generated podcast summary of
+              <a
+                href="https://news.ycombinator.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Hacker News</a
+              >.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="py-5 section__support" style="background-image: url('/img/support.jpg')" >
+  <div class="overlay"></div>
+  <div class="text-center my-5">
+    <h1 class="text-white fs-3 fw-bolder">Need a helping hand?</h1>
+    <p class="text-white-50 lead mb-0">
+      Perhaps you need someone with technical expertise to help you solve
+      a problem? <br />Or maybe you want us to collaborate on some cool
+      stuff?
+    </p>
+    <a class="btn btn-warning btn-lg mt-3" href="mailto:foo@example.net">
+      <i class="fa-regular fa-comments me-2"></i>
+      Let's talk
+    </a>
+  </div>
+</section>
+{% endblock %}

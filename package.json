@@ -3,23 +3,97 @@
   "version": "0.1.0",
   "description": "news podcast on auto-pilot",
   "author": "Victor Miti <victormiti@gmail.com>",
-  "license": "UNLICENSED",
+  "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
+    "build:dev:webpack": "webpack --mode development --progress",
+    "build:prod:webpack": "webpack --mode production",
+    "build:prod:eleventy": "npx @11ty/eleventy",
+    "build": "cross-env ELEVENTY_ENV=production npm-run-all -l clean build:prod:*",
+    "clean": "rimraf ./public",
     "commit": "git-cz",
-    "release": "standard-version"
+    "css-fix": "npx stylelint src/web/css/ --fix",
+    "debug": "cross-env DEBUG=Eleventy* npx @11ty/eleventy",
+    "lint:js": "eslint --ext \".js\" --ignore-path .gitignore .",
+    "lint:style": "stylelint \"**/*.{scss,css}\" --ignore-path .gitignore",
+    "lint": "npm run lint:js && npm run lint:style",
+    "release": "standard-version",
+    "start:webpack": "webpack --mode development --progress --watch",
+    "start:eleventy": "npx @11ty/eleventy --serve",
+    "start": "cross-env ELEVENTY_ENV=development npm-run-all -l clean --parallel start:*"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.4.0",
+    "@popperjs/core": "^2.11.8",
+    "animate.css": "^4.1.1",
+    "aos": "^2.3.4",
+    "bootstrap": "^5.2.3",
+    "elasticlunr-dev": "^0.9.6",
+    "plyr": "^3.7.8"
   },
   "devDependencies": {
+    "@11ty/eleventy": "^2.0.1",
+    "@11ty/eleventy-plugin-rss": "^1.2.0",
+    "@babel/cli": "^7.21.5",
+    "@babel/core": "^7.22.1",
+    "@babel/eslint-parser": "^7.21.8",
+    "@babel/preset-env": "^7.22.2",
+    "babel-loader": "^9.1.2",
     "commitizen": "^4.3.0",
+    "core-js": "^3.30.2",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.8.1",
+    "cssnano": "^6.0.1",
     "cz-conventional-changelog": "^3.3.0",
+    "date-fns": "^2.30.0",
+    "del": "^7.0.0",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.41.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-webpack-plugin": "^4.0.1",
+    "file-loader": "^6.2.0",
+    "he": "^1.2.0",
+    "html-minifier": "^4.0.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "mustache": "^4.2.0",
+    "node-sass": "^9.0.0",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.24",
+    "postcss-custom-properties": "^13.1.5",
+    "postcss-loader": "^7.3.2",
+    "postcss-preset-env": "^8.4.1",
     "prettier": "^2.8.8",
-    "standard-version": "^9.5.0"
+    "rimraf": "^5.0.1",
+    "sass": "^1.62.1",
+    "sass-loader": "^13.3.1",
+    "standard-version": "^9.5.0",
+    "stylelint": "^15.6.2",
+    "stylelint-config-standard": "^33.0.0",
+    "stylelint-config-standard-scss": "^9.0.0",
+    "stylelint-webpack-plugin": "^4.1.1",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.84.1",
+    "webpack-cli": "^5.1.1"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
   },
+  "stylelint": {
+    "extends": [
+      "stylelint-config-standard-scss"
+    ],
+    "ignoreFiles": [
+      "**/public/**/*.*"
+    ]
+  },
+  "browserslist": [
+    "defaults",
+    "cover 99.5%",
+    "not ie < 8"
+  ],
   "standard-version": {
     "header": "# Changelog\n\nAll notable changes to this project will be documented here.\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n",
     "types": [
@@ -84,9 +158,9 @@
   },
   "engines": {
     "npm": ">=8",
-    "node": ">=18.0.0 <19.0.0"
+    "node": ">=16.0.0 <17.0.0"
   },
   "volta": {
-    "node": "18.16.0"
+    "node": "16.20.0"
   }
 }

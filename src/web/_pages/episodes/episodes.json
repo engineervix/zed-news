@@ -1,0 +1,4 @@
+{
+  "layout": "pages/episodes/single.njk",
+  "permalink": "/episode/{{ page.fileSlug }}/index.html"
+}
