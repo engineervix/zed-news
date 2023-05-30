@@ -19,6 +19,7 @@
             <div
             class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start"
             >
+            {# TODO: if user on apple device, add Apple podcasts URL, else, Google podcasts #}
             <a class="px-4 me-sm-3" href="#">
                 <img
                 src="/img/apple-podcasts-badge.svg"
@@ -26,13 +27,14 @@
                 height="40"
                 />
             </a>
-            <!-- <a class="px-4" href="#">
+            {# <a class="px-4" href="#">
                 <img
-                src="img/google-podcasts-badge.svg"
+                src="/img/google-podcasts-badge.svg"
                 alt="Listen on Google Podcasts"
                 height="38"
                 />
-            </a> -->
+            </a> #}
+            {# TODO: Add popup here so that people can choose multiple services #}
             <a class="btn btn-outline-dark px-4" href="#!">
                 <i class="fa-solid fa-headphones me-2"></i>
                 Listen & Subscribe</a
@@ -64,11 +66,15 @@
                 Latest Episode
                 </div>
                 <div class="mb-3">
-                <span class="display-4 fw-bold">Friday</span>
-                <span class="text-muted">26th May 2023</span>
+                {%- set latestEpisode = collections.episode | reverse | first -%}
+                {%- set episodeTitle = latestEpisode.data.title -%}
+                {%- set episodeTitleParts = episodeTitle.split(", ") -%}
+                {%- set episodeDayOfWeek = episodeTitleParts[0] -%}
+                <span class="display-4 fw-bold">{{ episodeDayOfWeek }}</span>
+                <span class="text-muted">{{ episodeTitleParts[1] }}, {{ episodeTitleParts[2] }}</span>
                 </div>
                 <audio class="podcast-player" controls>
-                <source src="https://res.cloudinary.com/engineervix/video/upload/v1685358411/sound/example.mp3" type="audio/mp3" />
+                <source src="{{ collections.episode[0].data.mp3.url }}" type="audio/mp3" />
                 <code>audio</code> tag is not supported in this browser.
                 </audio>
             </div>
@@ -82,72 +88,27 @@
         <div class="row gx-5">
         <div class="col">
             <h2 class="fw-bolder fs-5 mb-4">Recent Episodes</h2>
-            <!-- Episode -->
+            {%- set episodes = collections.episode | reverse -%}
+            {%- for episode in episodes.slice(1, 5) -%}
+            {# Episode #}
             <div class="d-flex mb-4 border-bottom">
-            <div class="flex-shrink-0">
-                <img src="/img/zed-news-podcast-icon.svg" alt="Episode 4" />
+                <div class="flex-shrink-0">
+                    <img src="/img/zed-news-podcast-icon.svg" alt="Episode {{ episode.data.episode }}" />
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <div class="small text-muted">{{ episode.data.title }}</div>
+                    <a class="link-dark" href="{{ episode.url }}"
+                    >Episode {{ episode.data.episode }}
+                    </a>
+                    <audio class="podcast-player" controls>
+                    <source src="{{ episode.data.mp3.url }}" type="audio/mp3" />
+                    <code>audio</code> tag is not supported in this browser.
+                    </audio>
+                </div>
             </div>
-            <div class="flex-grow-1 ms-3">
-                <div class="small text-muted">Thursday, May 12, 2023</div>
-                <a class="link-dark" href="#"
-                >Episode 004
-                </a>
-                <audio class="podcast-player" controls>
-                <source src="https://res.cloudinary.com/engineervix/video/upload/v1685358411/sound/example.mp3" type="audio/mp3" />
-                <code>audio</code> tag is not supported in this browser.
-                </audio>
-            </div>
-            </div>
-            <!-- Episode -->
-            <div class="d-flex mb-4 border-bottom">
-            <div class="flex-shrink-0">
-                <img src="/img/zed-news-podcast-icon.svg" alt="Episode 003" />
-            </div>
-            <div class="flex-grow-1 ms-3">
-                <div class="small text-muted">Wednesday, May 11, 2023</div>
-                <a class="link-dark" href="#"
-                >Episode 003
-                </a>
-                <audio class="podcast-player" controls>
-                <source src="https://res.cloudinary.com/engineervix/video/upload/v1685358411/sound/example.mp3" type="audio/mp3" />
-                <code>audio</code> tag is not supported in this browser.
-                </audio>
-            </div>
-            </div>
-            <!-- Episode -->
-            <div class="d-flex mb-4 border-bottom">
-            <div class="flex-shrink-0">
-                <img src="/img/zed-news-podcast-icon.svg" alt="Episode 002" />
-            </div>
-            <div class="flex-grow-1 ms-3">
-                <div class="small text-muted">Tuesday, May 10, 2023</div>
-                <a class="link-dark" href="#"
-                >Episode 002
-                </a>
-                <audio class="podcast-player" controls>
-                <source src="https://res.cloudinary.com/engineervix/video/upload/v1685358411/sound/example.mp3" type="audio/mp3" />
-                <code>audio</code> tag is not supported in this browser.
-                </audio>
-            </div>
-            </div>
-            <!-- Episode -->
-            <div class="d-flex mb-5 border-bottom">
-            <div class="flex-shrink-0">
-                <img src="/img/zed-news-podcast-icon.svg" alt="Episode 001" />
-            </div>
-            <div class="flex-grow-1 ms-3">
-                <div class="small text-muted">Monday, May 09, 2023</div>
-                <a class="link-dark" href="#"
-                >Episode 001
-                </a>
-                <audio class="podcast-player" controls>
-                <source src="https://res.cloudinary.com/engineervix/video/upload/v1685358411/sound/example.mp3" type="audio/mp3" />
-                <code>audio</code> tag is not supported in this browser.
-                </audio>
-            </div>
-            </div>
+            {%- endfor -%}
             <div class="text-end mb-5 mb-xl-0">
-            <a class="text-decoration-none" href="#">
+            <a class="text-decoration-none" href="/episodes/">
                 View all episodes
                 <i class="fa-solid fa-arrow-right"></i>
             </a>
@@ -164,8 +125,8 @@
         Enjoy listening to the podcast? Consider supporting the developer!
         </p>
         <a class="btn btn-warning btn-lg mt-3" href="#">
-        <i class="fa-solid fa-mug-hot me-2"></i>
-        Buy me a coffee
+        <i class="fa-solid text-danger fa-heart me-2"></i>
+        Show some love
         </a>
     </div>
 </section>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="h-100">
   <head>
+    {# TODO: add correct analytics URL here #}
     <!-- <script async
                 defer
                 data-website-id="your-id"
@@ -82,10 +83,10 @@
               <a class="nav-link {{ 'active' if page.url == '/' }}" aria-current="page" href="/">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {{ 'active' if page.url == '/episodes/' }}" href="/episodes">Episodes</a>
+              <a class="nav-link {{ 'active' if page.url == '/about/' }}" href="/about/">About</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {{ 'active' if page.url == '/about/' }}" href="/about/">About</a>
+              <a class="nav-link {{ 'active' if page.url == '/episodes/' }}" href="/episodes">Episodes</a>
             </li>
           </ul>
           {# TODO: add search #}
@@ -131,8 +132,6 @@
                 <a
                   class="social-rss"
                   href="/feed.xml"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   aria-label="RSS Feed"
                   data-bs-toggle="tooltip"
                   data-bs-placement="bottom"
@@ -166,15 +165,25 @@
           </div>
           <ul class="list-inline list-unstyled mb-0">
             <li class="list-inline-item">
-              <a
-                href="https://twitter.com/engineervix"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Follow me on Twitter"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                data-bs-title="Follow me on Twitter"
+              <a class="social-tw"
+                 href="https://twitter.com/engineervix"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 aria-label="Follow me on Twitter"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Follow me on Twitter"
                 ><i class="fa-brands fa-twitter fa-2x"></i
+              ></a>
+            </li>
+            <li class="list-inline-item">
+              <a class="social-rss"
+                 href="/feed.xml"
+                 aria-label="RSS Feed"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="RSS Feed"
+                ><i class="fa-solid fa-rss fa-2x"></i
               ></a>
             </li>
           </ul>

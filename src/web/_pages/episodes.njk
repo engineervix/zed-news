@@ -1,5 +1,12 @@
 ---
+eleventyImport:
+    collections: ["episode"]
 title: Episodes
-permalink: /episodes/
+permalink: /episodes/{% if pagination.pageNumber > 0 %}page-{{ pagination.pageNumber + 1 }}/{% endif %}
 layout: pages/episodes/listing.njk
+pagination:
+    data: collections.episode
+    size: 10
+    alias: episodes
+    reverse: true
 ---
