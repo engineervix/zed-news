@@ -1,0 +1,48 @@
+---json
+{
+  "permalink": "feed.xml",
+  "eleventyExcludeFromCollections": true,
+  "metadata": {
+    "title": "Zed News Podcast",
+    "description": "Your weekday source for the latest happenings in Zambia (and beyond).",
+    "url": "https://example.com",
+    "feedUrl": "https://example.com/feed.xml",
+    "author": {
+      "name": "Victor Miti",
+      "email": "victormiti@gmail.com"
+    }
+  }
+}
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/">
+    <channel>
+        <title>{{ metadata.title }}</title>
+        <description>{{ metadata.description }}</description>
+        <itunes:owner>
+            <itunes:name>{{ metadata.author.name }}</itunes:name>
+            <itunes:email>{{ metadata.author.email }}</itunes:email>
+        </itunes:owner>
+        <itunes:author>{{ metadata.author.name }}</itunes:author>
+        <itunes:image href="{{ site.base_url }}/img/zed-news-podcast-album-art.jpg"/>
+        <itunes:category text="News &amp; Politics" />
+        <itunes:explicit>no</itunes:explicit>
+        <language>en</language>
+        <link href="{{ site.base_url }}" rel="self"/>
+        {%- for episode in collections.episode | reverse -%}
+        {% set absolutePostUrl %}{{ episode.url | url | absoluteUrl(site.base_url) }}{% endset %}
+        <item>
+            <title>{{ episode.data.title }}</title>
+            <description>Episode № {{ episode.data.episode }}</description>
+            <pubDate>{{ episode.date | dateToRfc822 }}</pubDate>
+            <enclosure url="{{ episode.data.mp3.url }}"
+                       type="audio/mpeg" length="{{ episode.data.rss.enclosure_length }}"/>
+            <itunes:duration>{{ episode.data.rss.itunes_duration }}</itunes:duration>
+            <guid>{{ absolutePostUrl }}</guid>
+            <itunes:explicit>no</itunes:explicit>
+        </item>
+        {%- endfor %}
+    </channel>
+</rss>
