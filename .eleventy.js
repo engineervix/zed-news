@@ -1,12 +1,12 @@
 const path = require("path");
 const htmlmin = require("html-minifier");
-// const pluginRss = require("@11ty/eleventy-plugin-rss");
+const pluginRss = require("@11ty/eleventy-plugin-rss");
 
 // const searchFilter = require("./src/utils/searchFilter.js");
 
 module.exports = (eleventyConfig) => {
   // Plugins
-  // eleventyConfig.addPlugin(pluginRss);
+  eleventyConfig.addPlugin(pluginRss);
 
   // TODO: Add Search Filter
   // eleventyConfig.addFilter("search", searchFilter);
