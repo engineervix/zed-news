@@ -62,6 +62,16 @@ eyeD3 --genre "Podcast" 2023-05-24.dist.mp3
 eyeD3 --add-image album-art.jpg:FRONT_COVER 2023-05-24.dist.mp3
 ```
 
+## RSS
+
+- <https://rss.com/blog/how-to-create-an-rss-feed-for-a-podcast/>
+- <https://riverside.fm/blog/podcast-rss-feed>
+- <https://www.podcastinsights.com/podcast-rss-feed/>
+- <https://help.spotifyforpodcasters.com/hc/en-us/articles/12515678291995-Your-RSS-feed>
+- <https://podcasters.apple.com/support/823-podcast-requirements>
+- <https://support.google.com/podcast-publishers/answer/9889544?hl=en>
+- <https://castos.com/podcast-rss-feed/>
+
 ## TODO
 
 ### Tasks
