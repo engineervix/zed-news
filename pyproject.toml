@@ -3,11 +3,14 @@ name = "zed-news"
 version = "0.1.0"
 description = "news podcast on auto-pilot"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = "~=3.11"
 authors = [
   {name = "Victor Miti", email = "victormiti@gmail.com"}
 ]
 dependencies = [
+  "aerich",
+  "asyncpg",
+  "Babel",
   "beautifulsoup4",
   "boto3",
   "bpython",
@@ -19,6 +22,8 @@ dependencies = [
   "langchain",
   "num2words",
   "openai",
+  "tortoise-orm",
+  # "psycopg2",
   "python-dateutil",
   "python-dotenv",
   "pytz",
@@ -31,6 +36,7 @@ dependencies = [
 dev = [
   "black",
   "commitizen",
+  "DSLR",
   "flake8",
   "isort",
   "pip-tools",
@@ -72,8 +78,13 @@ default_section = "THIRDPARTY"
 [tool.commitizen]
 version_provider = "pep621"
 version_files = [
-    "src/__init__.py",
+    "app/__init__.py",
 ]
 tag_format = "v$major.$minor.$patch"
 annotated_tag = true
 update_changelog_on_bump = false
+
+[tool.aerich]
+tortoise_orm = "app.core.db.config.TORTOISE_ORM"
+location = "./aerich/migrations"
+src_folder = "./."
