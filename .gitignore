@@ -5,6 +5,7 @@ data/
 public/
 node_modules/
 *.egg-info/
+*.log
 
 ### macOS ###
 # General
