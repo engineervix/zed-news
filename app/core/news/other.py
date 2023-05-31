@@ -5,9 +5,9 @@ import traceback
 from urllib.parse import urlparse, urlunparse
 
 import dateutil.parser
+import feedparser
 import requests
 from bs4 import BeautifulSoup
-import feedparser
 from fake_useragent import UserAgent
 
 logger = logging.getLogger(__name__)
@@ -19,9 +19,9 @@ ua = UserAgent(
 )
 
 URLs = [
-    "http://www.daily-mail.co.zm/rss/",
-    "https://www.mwebantu.com/rss",
-    "https://www.muvitv.com/rss",
+    "http://www.daily-mail.co.zm/feed/",
+    "https://www.mwebantu.com/rss/",
+    "https://www.muvitv.com/rss/",
     "https://diggers.news/rss/",
 ]
 
@@ -69,15 +69,18 @@ def get_mwebantu_article_detail(url):
         soup = BeautifulSoup(response.text, "html.parser")
 
         article = soup.find("article")
-        content_element = article.select_one("div.theiaPostSlider_preloadedSlide")
-        paragraphs = content_element.find_all("p")
+        if article:
+            content_element = article.select_one("div.theiaPostSlider_preloadedSlide")
+            paragraphs = content_element.find_all("p")
 
-        # Remove "(Mwebantu ...)" from the content
-        content_lines = [p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True)]
-        if content_lines and content_lines[-1].startswith("(Mwebantu, "):
-            content_lines.pop()
+            # Remove "(Mwebantu ...)" from the content
+            content_lines = [p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True)]
+            if content_lines and content_lines[-1].startswith("(Mwebantu, "):
+                content_lines.pop()
 
-        content = "\n".join(content_lines)
+            content = "\n".join(content_lines)
+        else:
+            content = None
 
         return content
 
@@ -180,11 +183,11 @@ def get_rss_feed_entries():
         return [
             {
                 "source": get_feed_title(i["link"]),
+                "url": i["link"],
                 "title": i["title"],
                 "content": get_description(i["link"]),
                 "category": "",
                 # "published": i["published"],
-                # "link": i["link"],
             }
             for i in feed
             if i.get("published")
@@ -196,6 +199,6 @@ def get_rss_feed_entries():
         return []
 
 
-if __name__ == "__main__":
-    with open(f"data/_other_news_{today}.json", "w") as json_file:
-        json.dump(get_rss_feed_entries(), json_file, indent=2, ensure_ascii=False)
+# if __name__ == "__main__":
+#     with open(f"data/_other_news_{today}.json", "w") as json_file:
+#         json.dump(get_rss_feed_entries(), json_file, indent=2, ensure_ascii=False)

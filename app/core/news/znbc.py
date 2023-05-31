@@ -5,10 +5,10 @@ Fetches today's news from https://www.znbc.co.zm/news/
 
 import datetime
 import json
-from fake_useragent import UserAgent
 
 import requests
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 
 today = datetime.date.today().isoformat()
 
@@ -74,6 +74,7 @@ def fetch_news():
                 latest_news.append(
                     {
                         "source": "Zambia National Broadcasting Corporation (ZNBC)",
+                        "url": detail_url,
                         "title": title,
                         "content": content,
                         "category": category,
@@ -87,6 +88,6 @@ def fetch_news():
     return latest_news[::-1]
 
 
-if __name__ == "__main__":
-    with open(f"data/_znbc_news_{today}.json", "w") as json_file:
-        json.dump(fetch_news(), json_file, indent=2, ensure_ascii=False)
+# if __name__ == "__main__":
+#     with open(f"data/_znbc_news_{today}.json", "w") as json_file:
+#         json.dump(fetch_news(), json_file, indent=2, ensure_ascii=False)
