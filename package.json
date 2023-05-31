@@ -12,7 +12,7 @@
     "build": "cross-env ELEVENTY_ENV=production npm-run-all -l clean build:prod:*",
     "clean": "rimraf ./public",
     "commit": "git-cz",
-    "css-fix": "npx stylelint src/web/css/ --fix",
+    "css-fix": "npx stylelint app/web/css/ --fix",
     "debug": "cross-env DEBUG=Eleventy* npx @11ty/eleventy",
     "lint:js": "eslint --ext \".js\" --ignore-path .gitignore .",
     "lint:style": "stylelint \"**/*.{scss,css}\" --ignore-path .gitignore",

@@ -7,7 +7,7 @@ const sass = require("sass");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const StylelintPlugin = require("stylelint-webpack-plugin");
 
-const projectRoot = "src/web";
+const projectRoot = "app/web";
 
 const options = {
   entry: {

@@ -2,7 +2,7 @@ const path = require("path");
 const htmlmin = require("html-minifier");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
 
-// const searchFilter = require("./src/utils/searchFilter.js");
+// const searchFilter = require("./app/utils/searchFilter.js");
 
 module.exports = (eleventyConfig) => {
   // Plugins
@@ -19,8 +19,8 @@ module.exports = (eleventyConfig) => {
   eleventyConfig.setTemplateFormats(["md", "njk", "html"]);
 
   // Copy favicons & images
-  eleventyConfig.addPassthroughCopy({ "src/web/ico": "ico" });
-  eleventyConfig.addPassthroughCopy({ "src/web/img": "img" });
+  eleventyConfig.addPassthroughCopy({ "app/web/ico": "ico" });
+  eleventyConfig.addPassthroughCopy({ "app/web/img": "img" });
 
   // Tell 11ty to use the .eleventyignore and ignore our .gitignore file
   eleventyConfig.setUseGitIgnore(false);
@@ -58,7 +58,7 @@ module.exports = (eleventyConfig) => {
   // You can return your Config object (optional).
   return {
     dir: {
-      input: "src/web",
+      input: "app/web",
       output: "public",
     },
     markdownTemplateEngine: "njk",
