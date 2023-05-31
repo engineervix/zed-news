@@ -32,21 +32,142 @@ llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
 
 @task(
     help={
+        "base": "run pip-compile to pin core dependencies",
         "dev": "run pip-compile to pin dev dependencies",
     }
 )
-def pip_compile(c, dev=False):
+def pip_compile(c, base=False, dev=False):
     """run pip-compile to pin dependencies"""
+    if all(option is False for option in [base, dev]):
+        base = dev = True
+
+    if base:
+        c.run(
+            "python -m piptools compile -o requirements.txt pyproject.toml",
+            pty=True,
+        )
     if dev:
         c.run(
             "python -m piptools compile --all-extras -o requirements-dev.txt pyproject.toml",
             pty=True,
         )
-    else:
+
+
+@task
+def db_snapshot(c, filename_prefix):
+    """Create a Database snapshot using DSLR"""
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    c.run(
+        "dslr snapshot {filename_prefix}_{timestamp}".format(
+            filename_prefix=filename_prefix,
+            timestamp=timestamp,
+        ),
+        pty=True,
+    ),
+
+
+@task(help={"build": "Build images before starting containers."})
+def up(c, build=False):
+    """docker-compose up -d"""
+    if build:
         c.run(
-            "python -m piptools compile -o requirements.txt pyproject.toml",
+            "docker-compose -f docker-compose.yml up -d --build 2>&1 | tee build.log",
             pty=True,
         )
+    else:
+        c.run("docker-compose -f docker-compose.yml up -d", pty=True)
+
+
+@task
+def exec(c, container, command):
+    """docker-compose exec [container] [command(s)]"""
+    c.run(f"docker-compose exec {container} {command}", pty=True)
+
+
+@task(help={"follow": "Follow log output"})
+def logs(c, container, follow=False):
+    """docker-compose logs [container] [-f]"""
+    if follow:
+        c.run(f"docker-compose logs {container} -f", pty=True)
+    else:
+        c.run(f"docker-compose logs {container}", pty=True)
+
+
+@task
+def stop(c):
+    """docker-compose stop"""
+    c.run("docker-compose stop", pty=True)
+
+
+@task(
+    help={
+        "volumes": "Remove named volumes declared in the `volumes` section of the Compose file and anonymous volumes attached to containers."
+    }
+)
+def down(c, volumes=False):
+    """docker-compose down"""
+    if volumes:
+        c.run("docker-compose down -v", pty=True)
+    else:
+        c.run("docker-compose down", pty=True)
+
+
+@task(help={"dump_file": "The name of the dump file to import"})
+def import_db_dump(c, dump_file):
+    """
+    Import a database dump into the database container
+
+    1. Copy the dump file into the db container
+    2. drop existing database
+    3. create new database
+    4. import dump file into database
+    5. clean up
+    """
+    # copy dump file into db container
+    c.run(f"docker cp {dump_file} zednews-db-1:/tmp/{dump_file}", pty=True)
+    # drop existing database
+    c.run(
+        'inv exec "db" "dropdb --if-exists --host db --username=django_dev_user django_dev_db"',
+        pty=True,
+    )
+    # create new database
+    c.run(
+        'inv exec "db" "createdb --host db --username=django_dev_user django_dev_db"',
+        pty=True,
+    )
+    # import dump file into database
+    c.run(
+        f'inv exec "db" "pg_restore --clean --no-acl --if-exists --no-owner --host db --username=django_dev_user -d django_dev_db /tmp/{dump_file}"',
+        pty=True,
+    )
+    # clean up
+    c.run(f'inv exec "db" "rm -vf /tmp/{dump_file}"', pty=True)
+
+
+@task
+def fix_path(c):
+    """fix the PYTHON_PATH"""
+    # export PYTHONPATH="${PYTHONPATH}":`pwd`
+    cwd = os.path.abspath(__file__)
+    c.run(f'export PYTHONPATH="${{PYTHONPATH}}:{cwd}"', pty=True)
+
+
+@task
+def init_db(c):
+    """use aerich to generate schema and generate app migrate location"""
+    c.run("aerich init-db", pty=True)
+
+
+@task
+def migrate(c):
+    """use aerich to update models and generate migrate changes file"""
+    c.run("aerich migrate", pty=True)
+
+
+@task
+def upgrade(c):
+    """use aerich to upgrade db to latest version"""
+    c.run("aerich upgrade", pty=True)
 
 
 def get_first_commit():
@@ -345,13 +466,13 @@ outro = random_outro()
 @task
 def fetch_znbc_news(c):
     """Fetch news from ZNBC"""
-    c.run("python src/fetch_znbc_news.py", pty=True)
+    c.run("python app/core/news/fetch_znbc_news.py", pty=True)
 
 
 @task
 def fetch_other_news(c):
     """Fetch news from other sources"""
-    c.run("python src/fetch_other_news.py", pty=True)
+    c.run("python app/core/news/fetch_other_news.py", pty=True)
 
 
 @task
@@ -668,4 +789,4 @@ def toolchain(c):
 
     # Play the audio using VLC
     # TODO: This should run only on local machine
-    c.run(f"vlc data/{today_iso_fmt}_podcast_dist.mp3", pty=True)
+    # c.run(f"vlc data/{today_iso_fmt}_podcast_dist.mp3", pty=True)
