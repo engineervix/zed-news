@@ -14,6 +14,7 @@ COMMENT ON COLUMN "mp3"."duration" IS 'The duration of the MP3 file in seconds';
 COMMENT ON TABLE "mp3" IS 'MP3 files for podcast episodes';
 CREATE TABLE IF NOT EXISTS "episode" (
     "number" SERIAL NOT NULL PRIMARY KEY,
+    "live" BOOL NOT NULL  DEFAULT False,
     "date" DATE NOT NULL,
     "title" VARCHAR(255) NOT NULL,
     "description" VARCHAR(255) NOT NULL,
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS "episode" (
     "mp3_id" INT NOT NULL UNIQUE REFERENCES "mp3" ("id") ON DELETE CASCADE
 );
 COMMENT ON COLUMN "episode"."number" IS 'Episode number';
+COMMENT ON COLUMN "episode"."live" IS 'Is the episode live?';
 COMMENT ON COLUMN "episode"."date" IS 'Episode date';
 COMMENT ON COLUMN "episode"."title" IS 'Episode title';
 COMMENT ON COLUMN "episode"."description" IS 'Episode description';
