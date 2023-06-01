@@ -29,5 +29,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
+  pgweb:
+    image: sosedoff/pgweb:0.14.0
+    ports:
+      - 8081:8081
+    environment:
+      - PGWEB_DATABASE_URL=postgres://zednews_dev_user:zednews_dev_password@db:5432/zednews_dev_db?sslmode=disable
+    depends_on:
+      - db
+
 volumes:
   postgres_data:
