@@ -1,0 +1,30 @@
+---
+title: "{{ title }}"
+description: {{ description }}
+tags: episode
+episode: "{{ episode }}"
+mp3:
+    url: {{ mp3_url }}
+    length: {{ mp3_duration }}
+    size: {{ mp3_size }}
+rss:
+    enclosure_length: {{ enclosure_length }}
+    itunes_duration: {{ itunes_duration }}
+presenter: {{ presenter }}
+locale:
+    id: {{ locale_id }}
+    name: {{ locale_name }}
+production_time: {{ production_time }}
+words:
+    count: {{ word_count }}
+    rate: {{ speaking_rate }}
+references:
+    count: {{ num_articles }}
+    sources: {{ num_sources }}
+articles:
+    {%- for article in articles %}
+    - source: {{ article.source }}
+      url: {{ article.url }}
+      title: {{ article.title }}
+    {%- endfor %}
+---

@@ -35,6 +35,6 @@ async def add_articles_to_episode():
 
     articles = await Article.filter(date=episode.date).all()
     for article in articles:
-        await article.update(episode=episode)
+        await Article.filter(id=article.id).update(episode=episode)
 
-    await episode.update(live=True)
+    await Episode.filter(number=episode.number).update(live=True)

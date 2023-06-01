@@ -127,7 +127,9 @@ iso8601==1.1.0
 isort==5.12.0
     # via zed-news (pyproject.toml)
 jinja2==3.1.2
-    # via commitizen
+    # via
+    #   commitizen
+    #   zed-news (pyproject.toml)
 jmespath==1.0.1
     # via
     #   boto3

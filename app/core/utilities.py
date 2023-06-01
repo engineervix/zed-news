@@ -19,6 +19,7 @@ LOG_COLORS = {
 }
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
+EPISODE_TEMPLATE_DIR = PROJECT_ROOT / "app" / "web" / "_pages" / "episodes"
 DATABASE_URL = os.getenv("DATABASE_URL")
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -75,6 +76,60 @@ def delete_file(file_path: str):
         logging.info(f"File '{file_path}' deleted successfully.")
     except OSError as e:
         logging.error(f"Error occurred while deleting file '{file_path}': {e}")
+
+
+def format_duration(seconds: int):
+    """Format the duration in seconds to a human readable string"""
+    minutes, seconds = divmod(seconds, 60)
+    duration_string = ""
+
+    if minutes > 0:
+        duration_string += f"{minutes} {'minute' if minutes == 1 else 'minutes'}"
+
+    if seconds > 0:
+        if duration_string:
+            duration_string += ", "
+
+        duration_string += f"{seconds} {'second' if seconds == 1 else 'seconds'}"
+
+    return duration_string
+
+
+def words_per_minute(duration: int, word_count: int):
+    if duration == 0:
+        return "0 words per minute"  # Avoid division by zero
+    duration_minutes = duration / 60
+    rate = word_count / duration_minutes
+    rate_int = int(round(rate))  # Convert rate to nearest integer
+    return f"{rate_int} words per minute"
+
+
+def convert_seconds_to_mmss(duration: int):
+    minutes, seconds = divmod(duration, 60)
+    return "{:02d}:{:02d}".format(minutes, seconds)
+
+
+def format_filesize(filesize: int):
+    """Format the file size in bytes to a human readable string"""
+    units = ["B", "KB", "MB", "GB", "TB"]
+
+    # Iterate through units until the file size is smaller than 1024
+    for unit in units:
+        if filesize < 1024:
+            return f"{filesize:.2f} {unit}"
+        filesize /= 1024
+
+    # If the file size is larger than the largest unit (TB), return in that unit
+    return f"{filesize:.2f} {units[-1]}"
+
+
+def is_valid_date(datestring: str) -> bool:
+    try:
+        if datestring != datetime.strptime(datestring, "%Y-%m-%d").strftime("%Y-%m-%d"):
+            raise ValueError("Incorrect date format, should be YYYY-MM-DD")
+        return True
+    except ValueError:
+        return False
 
 
 def suffix(d):

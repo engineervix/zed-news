@@ -91,12 +91,16 @@ invoke==2.1.2
     # via zed-news (pyproject.toml)
 iso8601==1.1.0
     # via tortoise-orm
+jinja2==3.1.2
+    # via zed-news (pyproject.toml)
 jmespath==1.0.1
     # via
     #   boto3
     #   botocore
 langchain==0.0.177
     # via zed-news (pyproject.toml)
+markupsafe==2.1.2
+    # via jinja2
 marshmallow==3.19.0
     # via
     #   dataclasses-json

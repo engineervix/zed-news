@@ -20,6 +20,7 @@ dependencies = [
   "fake-useragent",
   "feedparser",
   "invoke",
+  "jinja2",
   "langchain",
   "num2words",
   "openai",
