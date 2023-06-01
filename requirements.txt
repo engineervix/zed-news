@@ -135,7 +135,7 @@ psycopg-binary==3.0.12
     # via psycopg
 psycopg-pool==3.1.7
     # via psycopg
-psycopg2==2.9.6
+psycopg2-binary==2.9.6
     # via zed-news (pyproject.toml)
 pydantic==1.10.8
     # via

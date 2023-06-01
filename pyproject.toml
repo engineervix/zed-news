@@ -25,7 +25,7 @@ dependencies = [
   "num2words",
   "openai",
   "tortoise-orm[psycopg]",
-  "psycopg2",
+  "psycopg2-binary",
   "python-dateutil",
   "python-dotenv",
   "pytz",
