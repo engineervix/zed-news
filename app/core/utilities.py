@@ -158,4 +158,4 @@ today = datetime.datetime.now(timezone).date()
 
 today_iso_fmt = today.isoformat()
 today_human_readable = custom_strftime("%A, %B {S}, %Y", today)
-podcast_start_date = datetime.date(2023, 5, 22)
+podcast_start_date = datetime.date(2023, 6, 1)

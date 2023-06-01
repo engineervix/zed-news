@@ -149,34 +149,34 @@ async def create_transcript(news: list[dict[str, str]], dest: str):
             content = article["content"]
 
             # =============== Summarize using OpenAI ===============
-            # template = """
-            # Please provide a very short, sweet, informative and engaging summary of the following news entry, in not more than two sentences.
-            # Please provide your output in a manner suitable for reading as part of a podcast.
+            template = """
+            Please provide a very short, sweet, informative and engaging summary of the following news entry, in not more than two sentences.
+            Please provide your output in a manner suitable for reading as part of a podcast.
 
-            # {entry}
-            # """
+            {entry}
+            """
 
-            # prompt = PromptTemplate(input_variables=["entry"], template=template)
-            # summary_prompt = prompt.format(entry=content)
+            prompt = PromptTemplate(input_variables=["entry"], template=template)
+            summary_prompt = prompt.format(entry=content)
 
-            # num_tokens = llm.get_num_tokens(summary_prompt)
-            # logging.info(f"'{title}' and its prompt has {num_tokens} tokens")
+            num_tokens = llm.get_num_tokens(summary_prompt)
+            logging.info(f"'{title}' and its prompt has {num_tokens} tokens")
 
-            # summary = llm(summary_prompt)
+            summary = llm(summary_prompt)
 
             # =============== Summarize using OpenAI ===============
-            logging.info(f"Summarizing '{title}' via Cohere ...")
-            # https://docs.cohere.com/reference/summarize-2
-            response = co.summarize(
-                text=content,
-                model="summarize-xlarge",
-                temperature=0.5,
-                length="auto",
-                format="paragraph",
-                extractiveness="auto",
-                additional_command="in a manner suitable for reading as part of a podcast",
-            )
-            summary = response.summary
+            # logging.info(f"Summarizing '{title}' via Cohere ...")
+            # # https://docs.cohere.com/reference/summarize-2
+            # response = co.summarize(
+            #     text=content,
+            #     model="summarize-xlarge",
+            #     temperature=0.5,
+            #     length="auto",
+            #     format="paragraph",
+            #     extractiveness="auto",
+            #     additional_command="in a manner suitable for reading as part of a podcast",
+            # )
+            # summary = response.summary
 
             await update_article_with_summary(title, article["url"], today, summary)
 
