@@ -160,13 +160,19 @@ def init_db(c):
 
 @task
 def migrate(c):
-    """use aerich to update models and generate migrate changes file"""
+    """use aerich to update models and generate migrate changes file
+
+    This is like django's makemigrations command
+    """
     c.run("aerich migrate", pty=True)
 
 
 @task
 def upgrade(c):
-    """use aerich to upgrade db to latest version"""
+    """use aerich to upgrade db to latest version
+
+    This is like django's migrate command
+    """
     c.run("aerich upgrade", pty=True)
 
 
