@@ -3,14 +3,11 @@
 Fetches today's news from https://www.znbc.co.zm/news/
 """
 
-import datetime
-import json
-
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-today = datetime.date.today().isoformat()
+from app.core.utilities import today_iso_fmt
 
 ua = UserAgent(
     fallback="Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.648.204",
@@ -36,7 +33,7 @@ def get_article_detail(url):
     return content
 
 
-def fetch_news():
+def get_news():
     """
     Fetches today's news from https://www.znbc.co.zm/news/
     """
@@ -51,7 +48,7 @@ def fetch_news():
     # all the news articles wrapped in an article tag
     for article in reversed(news[1:]):
         time_element = article.find("time", class_="entry-date")
-        if time_element and time_element.get("datetime") and time_element.get("datetime").startswith(today):
+        if time_element and time_element.get("datetime") and time_element.get("datetime").startswith(today_iso_fmt):
             # Extract article title
             title_element = article.select_one("h3.entry-title a")
             title = title_element.text.strip()
@@ -89,5 +86,5 @@ def fetch_news():
 
 
 # if __name__ == "__main__":
-#     with open(f"data/_znbc_news_{today}.json", "w") as json_file:
+#     with open(f"data/_znbc_news_{today_iso_fmt}.json", "w") as json_file:
 #         json.dump(fetch_news(), json_file, indent=2, ensure_ascii=False)

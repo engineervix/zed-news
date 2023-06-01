@@ -1,5 +1,3 @@
-import datetime
-import json
 import logging
 import traceback
 from urllib.parse import urlparse, urlunparse
@@ -10,9 +8,9 @@ import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-logger = logging.getLogger(__name__)
+from app.core.utilities import today_iso_fmt
 
-today = datetime.date.today().isoformat()
+logger = logging.getLogger(__name__)
 
 ua = UserAgent(
     fallback="Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.648.204",
@@ -191,7 +189,7 @@ def get_rss_feed_entries():
             }
             for i in feed
             if i.get("published")
-            and dateutil.parser.parse(i["published"]).date().isoformat() == today
+            and dateutil.parser.parse(i["published"]).date().isoformat() == today_iso_fmt
             and get_description(i["link"])
         ]
     except Exception:
@@ -200,5 +198,5 @@ def get_rss_feed_entries():
 
 
 # if __name__ == "__main__":
-#     with open(f"data/_other_news_{today}.json", "w") as json_file:
+#     with open(f"data/_other_news_{today_iso_fmt}.json", "w") as json_file:
 #         json.dump(get_rss_feed_entries(), json_file, indent=2, ensure_ascii=False)

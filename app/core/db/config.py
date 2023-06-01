@@ -1,14 +1,9 @@
-import os
-
-from dotenv import load_dotenv
 from tortoise import Tortoise
 
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL")
+from app.core.utilities import DATABASE_URL
 
 TORTOISE_ORM = {
-    "connections": {"default": DATABASE_URL},
+    "connections": {"default": DATABASE_URL.replace("postgres://", "psycopg://")},
     "apps": {
         "models": {
             "models": [
@@ -21,6 +16,10 @@ TORTOISE_ORM = {
 }
 
 
-async def init():
-    await Tortoise.init(config=TORTOISE_ORM)
-    await Tortoise.generate_schemas()
+async def init_db():
+    """Initializes the database"""
+    await Tortoise.init(
+        db_url=DATABASE_URL.replace("postgres://", "psycopg://"),
+        modules={"models": ["app.core.db.models"]},
+    )
+    await Tortoise.generate_schemas(safe=True)
