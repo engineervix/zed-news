@@ -3,7 +3,7 @@ name = "zed-news"
 version = "0.1.0"
 description = "news podcast on auto-pilot"
 readme = "README.md"
-requires-python = "~=3.11"
+requires-python = "~=3.10"
 authors = [
   {name = "Victor Miti", email = "victormiti@gmail.com"}
 ]
@@ -14,6 +14,7 @@ dependencies = [
   "beautifulsoup4",
   "boto3",
   "bpython",
+  "cohere",
   "colorama",
   "eyed3",
   "fake-useragent",
@@ -22,8 +23,8 @@ dependencies = [
   "langchain",
   "num2words",
   "openai",
-  "tortoise-orm",
-  # "psycopg2",
+  "tortoise-orm[psycopg]",
+  "psycopg2",
   "python-dateutil",
   "python-dotenv",
   "pytz",
@@ -62,6 +63,7 @@ exclude = '''
     | \.venv
     | _build
     | buck-out
+    | node_modules
     | build
     | dist
   )/
@@ -72,7 +74,8 @@ exclude = '''
 profile = "black"
 skip = ["node_modules", ".git", "__pycache__", "LC_MESSAGES", "venv", ".venv"]
 blocked_extensions = ["rst", "html", "js", "svg", "txt", "css", "scss", "png", "snap", "ts", "tsx"]
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "LOCALFOLDER"]
+known_first_party = "app"
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 default_section = "THIRDPARTY"
 
 [tool.commitizen]
