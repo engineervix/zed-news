@@ -15,7 +15,7 @@ COMMENT ON TABLE "mp3" IS 'MP3 files for podcast episodes';
 CREATE TABLE IF NOT EXISTS "episode" (
     "number" SERIAL NOT NULL PRIMARY KEY,
     "live" BOOL NOT NULL  DEFAULT False,
-    "date" DATE NOT NULL,
+    "date" DATE NOT NULL UNIQUE,
     "title" VARCHAR(255) NOT NULL,
     "description" VARCHAR(255) NOT NULL,
     "presenter" VARCHAR(255) NOT NULL,

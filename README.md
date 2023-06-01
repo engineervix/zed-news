@@ -97,7 +97,8 @@ eyeD3 --add-image album-art.jpg:FRONT_COVER 2023-05-24.dist.mp3
 
 #### Core
 
-- [ ] Store retrieved data in a database
+- [x] Store retrieved data in a database
+- [ ] Add a separate module for summarization backends so we can choose which one to work with
 - [ ] Create data to be passed to 11ty
 - [ ] write a script to generate a single episode nunjucks file with the correct info, in the correct location
 - [ ] Add appropriate error handling on `requests` and `feedparser` jobs as well as all other operations, such connecting to AWS Polly, etc.

@@ -11,6 +11,7 @@ from app.core.db.models import Article, Episode
 from app.core.utilities import (
     COHERE_API_KEY,
     OPENAI_API_KEY,
+    podcast_host,
     today,
     today_human_readable,
 )
@@ -30,11 +31,6 @@ async def update_article_with_summary(title: str, url: HttpUrl, date: datetime.d
     article = await Article.get(title=title, url=url, date=date)
     article.summary = summary
     await article.save()
-
-
-# https://docs.aws.amazon.com/polly/latest/dg/ph-table-english-za.html
-podcast_host = "Ayanda"
-podcast_start_date = datetime.date(2023, 5, 22)
 
 
 async def random_opening():

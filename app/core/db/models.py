@@ -48,7 +48,7 @@ class Episode(Model):
 
     number = fields.IntField(pk=True, description="Episode number")
     live = fields.BooleanField(default=False, description="Is the episode live?")
-    date = fields.DateField(default=datetime.date.today, description="Episode date")
+    date = fields.DateField(default=datetime.date.today, unique=True, description="Episode date")
     title = fields.CharField(max_length=255, description="Episode title")
     description = fields.CharField(max_length=255, description="Episode description")
     presenter = fields.CharField(max_length=255, description="Episode presenter")

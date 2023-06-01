@@ -9,6 +9,7 @@ import eyed3
 from botocore.exceptions import BotoCoreError, ClientError
 from pydantic import FilePath
 
+from app.core.db.models import MP3
 from app.core.podcast.content import get_episode_number
 from app.core.utilities import (
     AWS_ACCESS_KEY_ID,
@@ -136,3 +137,17 @@ def upload_to_s3(src: FilePath, dest_folder: str, dest_filename: str):
         error_message = f"Error occurred during S3 upload: {str(e)}"
         logging.error(error_message)
         return ""
+
+
+def get_mp3_info(mp3_file: FilePath) -> dict:
+    """Get the filesize and duration of an MP3 file"""
+    audiofile = eyed3.load(mp3_file)
+    return {"filesize": audiofile.info.size_bytes, "duration": audiofile.info.time_secs}
+
+
+async def add_to_db(url: str, f: FilePath):
+    """Create an mp3 podcast entry in the database"""
+
+    logging.info(f"Adding MP3 {f} to database ...")
+    mp3_info = get_mp3_info(f)
+    await MP3.create(url=url, **mp3_info)

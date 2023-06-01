@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytz
 from colorama import Fore, Style
+from pydantic import FilePath
 
 # specify colors for different logging levels
 LOG_COLORS = {
@@ -84,13 +85,22 @@ def custom_strftime(format, t):
     return t.strftime(format).replace("{S}", str(t.day) + suffix(t.day))
 
 
+def count_words(filename: FilePath) -> int:
+    """Count the number of words in a file"""
+    with open(filename, "r") as file:
+        content = file.read()
+        word_count = len(content.split())
+    return word_count
+
+
+# https://docs.aws.amazon.com/polly/latest/dg/ph-table-english-za.html
+podcast_host = "Ayanda"
+lingo = "en-ZA"
+engine = "neural"
+
 timezone = pytz.timezone("Africa/Lusaka")
 today = datetime.datetime.now(timezone).date()
 
 today_iso_fmt = today.isoformat()
-today_human_readable = custom_strftime("%A {S} %B, %Y", today)
-
-
-if __name__ == "__main__":
-    print(f"Project root: {PROJECT_ROOT}")
-    print(f"Data Directory: {DATA_DIR}")
+today_human_readable = custom_strftime("%A, %B {S}, %Y", today)
+podcast_start_date = datetime.date(2023, 5, 22)

@@ -11,11 +11,14 @@ from app.core.utilities import (
     AWS_REGION_NAME,
     AWS_SECRET_ACCESS_KEY,
     DATA_DIR,
+    engine,
+    lingo,
+    podcast_host,
     today_iso_fmt,
 )
 
 
-def create_audio(transcript: FilePath, podcast_host: str, lingo: str = "en-ZA"):
+def create_audio(transcript: FilePath, podcast_host: str = podcast_host, lingo: str = lingo):
     """Create audio from the podcast transcript,
     with the specified podcast host voice and lingo (language code).
 
@@ -41,7 +44,7 @@ def create_audio(transcript: FilePath, podcast_host: str, lingo: str = "en-ZA"):
     logging.info("Creating an AWS Polly Task ...")
     s3_podcast_dir = "zed-news"
     response = polly.start_speech_synthesis_task(
-        Engine="neural",
+        Engine=engine,
         LanguageCode=lingo,
         VoiceId=podcast_host,
         Text=podcast_content,
@@ -75,11 +78,11 @@ def create_audio(transcript: FilePath, podcast_host: str, lingo: str = "en-ZA"):
     logging.info(output_key)
     s3.download_file(AWS_BUCKET_NAME, output_key, f"{src_mp3}")
 
+    return output_key
+
 
 def delete_source_mp3(output_key: str):
     """Delete the AWS Polly generated MP3 file from S3"""
-
-    # TODO: figure out how to retrieve the output_key
 
     s3 = boto3.client(
         "s3",
