@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bullseye
+FROM python:3.10-slim-bullseye
 
 # Add user that will be used in the container
 RUN groupadd zednews && \
