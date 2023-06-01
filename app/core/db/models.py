@@ -1,9 +1,10 @@
-import datetime
 import re
 
 from tortoise import fields
 from tortoise.models import Model
 from tortoise.validators import RegexValidator
+
+from app.core.utilities import today
 
 
 class Article(Model):
@@ -17,7 +18,7 @@ class Article(Model):
     category = fields.CharField(max_length=255, required=False, null=True)
 
     # additional fields
-    date = fields.DateField(default=datetime.date.today, description="The date the article was published")
+    date = fields.DateField(default=today, description="The date the article was published")
     summary = fields.TextField(required=False, null=True, description="The AI generated summary of the article")
     episode = fields.ForeignKeyField("models.Episode", related_name="articles", null=True, required=False)
 
@@ -48,7 +49,7 @@ class Episode(Model):
 
     number = fields.IntField(pk=True, description="Episode number")
     live = fields.BooleanField(default=False, description="Is the episode live?")
-    date = fields.DateField(default=datetime.date.today, unique=True, description="Episode date")
+    date = fields.DateField(default=today, unique=True, description="Episode date")
     title = fields.CharField(max_length=255, description="Episode title")
     description = fields.CharField(max_length=255, description="Episode description")
     presenter = fields.CharField(max_length=255, description="Episode presenter")

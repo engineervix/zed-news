@@ -15,7 +15,7 @@ COMMENT ON TABLE "mp3" IS 'MP3 files for podcast episodes';
 CREATE TABLE IF NOT EXISTS "episode" (
     "number" SERIAL NOT NULL PRIMARY KEY,
     "live" BOOL NOT NULL  DEFAULT False,
-    "date" DATE NOT NULL UNIQUE,
+    "date" DATE NOT NULL UNIQUE DEFAULT '2023-05-22',
     "title" VARCHAR(255) NOT NULL,
     "description" VARCHAR(255) NOT NULL,
     "presenter" VARCHAR(255) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS "article" (
     "title" VARCHAR(511) NOT NULL,
     "content" TEXT NOT NULL,
     "category" VARCHAR(255),
-    "date" DATE NOT NULL,
+    "date" DATE NOT NULL  DEFAULT '2023-05-22',
     "summary" TEXT,
     "episode_id" INT REFERENCES "episode" ("number") ON DELETE CASCADE
 );
