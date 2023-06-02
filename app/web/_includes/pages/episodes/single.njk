@@ -18,14 +18,15 @@
             <div
             class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start"
             >
-            <a class="btn btn-warning px-4" href="#!">
-                <i class="fa-brands fa-chromecast me-2"></i>
-                Subscribe</a
-            >
-            <a class="btn btn-outline-success px-4" href="#!">
-                <i class="fa-solid fa-share-nodes me-2"></i>
-                Share</a
-            >
+                <a class="btn btn-warning px-4" href="#!">
+                    <i class="fa-brands fa-chromecast me-2"></i>
+                    Subscribe
+                </a>
+
+                <button type="button" class="btn btn-outline-danger px-4" data-bs-toggle="modal" data-bs-target="#share">
+                    <i class="fa-solid fa-share-nodes me-2"></i>
+                    Share
+                </button>
             </div>
         </div>
         </div>
@@ -133,7 +134,7 @@
                             type="button"
                             data-bs-toggle="collapse"
                             data-bs-target="#collapse{{ loop.index }}"
-                            aria-expanded="true"
+                            aria-expanded="{%- if loop.index == 1 %}true{% else %}false{% endif -%}"
                             aria-controls="collapse{{ loop.index }}"
                         >
                             {{ source }}
@@ -169,4 +170,70 @@
         </div>
     </div>
 </section>
+
+{# Modal #}
+<div class="modal fade" id="share" tabindex="-1" aria-labelledby="shareLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <p class="modal-title fs-5" id="shareLabel">Share this episode</p>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <button
+                    class="btn btn-social-tw px-4"
+                    data-sharer="twitter"
+                    data-title="Checkout Episode {{ episode }} of the Zed News Podcast!!"
+                    data-hashtags="Zambia, paZed, news, podcast, AI"
+                    data-url="{{ site.base_url }}{{ page.url }}"
+                >
+                    <i class="fa-brands fa-twitter me-2"></i>
+                    Share on Twitter
+                </button>
+                <button
+                    class="btn btn-social-fb px-4"
+                    data-sharer="facebook"
+                    data-hashtag="Zambia"
+                    data-url="{{ site.base_url }}{{ page.url }}"
+                >
+                    <i class="fa-brands fa-facebook me-2"></i>
+                    Share on Facebook
+                </button>
+                <button
+                    class="btn btn-social-whatsapp px-4"
+                    data-sharer="whatsapp"
+                    data-title="Checkout Episode {{ episode }} of the Zed News Podcast!!"
+                    data-url="{{ site.base_url }}{{ page.url }}"
+                >
+                    <i class="fa-brands fa-whatsapp me-2"></i>
+                    Share on Whatsapp
+                </button>
+                <button
+                    class="btn btn-social-telegram px-4"
+                    data-sharer="telegram"
+                    data-title="Checkout Episode {{ episode }} of the Zed News Podcast!!"
+                    data-url="{{ site.base_url }}{{ page.url }}"
+                >
+                    <i class="fa-brands fa-telegram me-2"></i>
+                    Share on Telegram
+                </button>
+                <button
+                    class="btn btn-social-email px-4"
+                    data-sharer="email"
+                    data-title="Zed News Podcast - Episode {{ episode }}"
+                    data-url="{{ site.base_url }}{{ page.url }}" data-subject="Hey! Check out Episode {{ episode }} of the Zed News Podcast!"
+                    data-to="somebody@email.com"
+                >
+                    <i class="fa-solid fa-envelope-open-text me-2"></i>
+                    Share via Email
+                </button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

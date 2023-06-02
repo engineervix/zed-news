@@ -53,3 +53,153 @@
     color: #000; // GitHub darker black
   }
 }
+
+.btn-social-fb {
+  @include button-variant(
+    #1877f2,
+    #0e5a9c,
+    #fff,
+    darken(#1877f2, 10%),
+    darken(#1877f2, 10%),
+    darken(#1877f2, 12.5%)
+  );
+
+  &:hover {
+    color: #fff; // Adjusted hover text color
+  }
+}
+
+.btn-social-tw {
+  @include button-variant(
+    #1da1f2,
+    #0c80b6,
+    #fff,
+    darken(#1da1f2, 10%),
+    darken(#1da1f2, 10%),
+    darken(#1da1f2, 12.5%)
+  );
+
+  &:hover {
+    color: #fff; // Adjusted hover text color
+  }
+}
+
+.btn-social-yt {
+  @include button-variant(
+    #f00,
+    #b30000,
+    #fff,
+    darken(#f00, 10%),
+    darken(#f00, 10%),
+    darken(#f00, 12.5%)
+  );
+
+  &:hover {
+    color: #fff; // Adjusted hover text color
+  }
+}
+
+.btn-social-ig {
+  @include button-variant(
+    #833ab4,
+    #5b2e86,
+    #fff,
+    darken(#833ab4, 10%),
+    darken(#833ab4, 10%),
+    darken(#833ab4, 12.5%)
+  );
+
+  &:hover {
+    color: #fff; // Adjusted hover text color
+  }
+}
+
+.btn-social-li {
+  @include button-variant(
+    #0077b5,
+    #004b70,
+    #fff,
+    darken(#0077b5, 10%),
+    darken(#0077b5, 10%),
+    darken(#0077b5, 12.5%)
+  );
+
+  &:hover {
+    color: #fff; // Adjusted hover text color
+  }
+}
+
+.btn-social-rss {
+  @include button-variant(
+    #f26522,
+    #c94e1e,
+    #fff,
+    darken(#f26522, 10%),
+    darken(#f26522, 10%),
+    darken(#f26522, 12.5%)
+  );
+
+  &:hover {
+    color: #fff; // Adjusted hover text color
+  }
+}
+
+.btn-social-gh {
+  @include button-variant(
+    #333,
+    #000,
+    #fff,
+    darken(#333, 10%),
+    darken(#333, 10%),
+    darken(#333, 12.5%)
+  );
+
+  &:hover {
+    color: #fff; // Adjusted hover text color
+  }
+}
+
+.btn-social-telegram {
+  @include button-variant(
+    #0088cc,
+    #005f86,
+    #fff,
+    darken(#0088cc, 10%),
+    darken(#0088cc, 10%),
+    darken(#0088cc, 12.5%)
+  );
+
+  &:hover {
+    color: #fff; // Adjusted hover text color
+  }
+}
+
+.btn-social-whatsapp {
+  @include button-variant(
+    #25d366,
+    #1da851,
+    #fff,
+    darken(#25d366, 10%),
+    darken(#25d366, 10%),
+    darken(#25d366, 12.5%)
+  );
+
+  &:hover {
+    color: #fff; // Adjusted hover text color
+  }
+}
+
+.btn-social-email {
+  @include button-variant(
+    #ffc107,
+    #ffa000,
+    #000,
+    darken(#ffc107, 10%),
+    darken(#ffc107, 10%),
+    darken(#ffc107, 12.5%)
+  );
+
+  &:hover {
+    color: #000; // Adjusted hover text color
+  }
+}

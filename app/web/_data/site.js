@@ -14,7 +14,7 @@ module.exports = {
     year: "numeric",
     hour: "numeric",
     minute: "numeric",
-    timeZone: "Europe/London",
+    timeZone: "Africa/Lusaka",
     timeZoneName: "short",
   }).format(new Date()),
   articlesBySource: function (articles) {
