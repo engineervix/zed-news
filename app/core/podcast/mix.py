@@ -17,6 +17,7 @@ from app.core.utilities import (
     AWS_REGION_NAME,
     AWS_SECRET_ACCESS_KEY,
     DATA_DIR,
+    IMAGE_DIR,
     delete_file,
     today,
     today_human_readable,
@@ -54,6 +55,7 @@ async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{to
     voice_track_file_name = os.path.splitext(voice_track)[0]
     voice_track_in_stereo = f"{voice_track_file_name}.stereo.mp3"
     initial_mix = f"{voice_track_file_name}.mix-01.mp3"
+    eq_mix = f"{voice_track_file_name}.eq-mix.mp3"
 
     # convert voice track from mono to 128 kb/s stereo
     subprocess.run(
@@ -61,9 +63,16 @@ async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{to
         shell=True,
     )
 
+    # adjust the treble (high-frequency).
+    # The g=10 parameter specifies the gain in decibels (dB) to be applied to the treble frequencies.
+    subprocess.run(
+        f'ffmpeg -i {voice_track_in_stereo} -af "treble=g=10" {eq_mix}',
+        shell=True,
+    )
+
     # initial mix: the intro + voice track
     subprocess.run(
-        f'ffmpeg -i {voice_track_in_stereo} -i {intro_track} -filter_complex amix=inputs=2:duration=longest:dropout_transition=0:weights="1 0.25":normalize=0 {initial_mix}',
+        f'ffmpeg -i {eq_mix} -i {intro_track} -filter_complex amix=inputs=2:duration=longest:dropout_transition=0:weights="1 0.25":normalize=0 {initial_mix}',
         shell=True,
     )
 
@@ -101,16 +110,15 @@ async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{to
         tag.track_num = episode
         tag.release_date = eyed3.core.Date(today.year, today.month, today.day)
         tag.genre = "Podcast"
+        album_art_file = f"{IMAGE_DIR}/album-art.jpg"
+        with open(album_art_file, "rb") as cover_art:
+            # The value 3 indicates that the front cover shall be set
+            # # https://eyed3.readthedocs.io/en/latest/eyed3.id3.html#eyed3.id3.frames.ImageFrame
+            tag.images.set(3, cover_art.read(), "image/jpeg")
         tag.save()
 
-        # TODO: Add album art
-        # album_art_file = "album-art.jpg"
-        # audio = eyed3.load(audio_file)
-        # audio.tag.images.set(3, open(album_art_file, "rb").read(), "image/jpeg")
-        # audio.tag.save()
-
         # Clean up
-        for f in [voice_track_in_stereo, initial_mix, padded_outro]:
+        for f in [voice_track_in_stereo, eq_mix, initial_mix, padded_outro]:
             delete_file(f)
 
 
