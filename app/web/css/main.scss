@@ -9,6 +9,7 @@
 // $warning: #f8b563;
 // $danger: #de4a49;
 $success: #188200;
+
 // $info: #324d5e;
 
 // If you wanna override fonts ...
@@ -22,12 +23,11 @@ $success: #188200;
 // $enable-negative-margins: true;
 
 @import "bootstrap/scss/bootstrap";
-
 @import "social";
-
 @import "plyr/src/sass/plyr";
 
 .section__support {
+  /* stylelint-disable-line selector-class-pattern */
   background: no-repeat center center;
   background-color: $gray-600;
   background-attachment: scroll;
@@ -67,6 +67,7 @@ $success: #188200;
 }
 
 // Hide some plyr controls on mobile due to space constraints
+/* stylelint-disable selector-class-pattern */
 @include media-breakpoint-down(sm) {
   button.plyr__controls__item[data-plyr="restart"],
   button.plyr__controls__item[data-plyr="rewind"],
@@ -75,3 +76,4 @@ $success: #188200;
     display: none;
   }
 }
+/* stylelint-enable selector-class-pattern */
