@@ -2,6 +2,40 @@
 
 > automated news podcast
 
+[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
+
+[![CI/CD](https://github.com/engineervix/zed-news/actions/workflows/main.yml/badge.svg)](https://github.com/engineervix/zed-news/actions/workflows/main.yml)
+
+[![python3](https://img.shields.io/badge/python-3.10-brightgreen.svg)](https://www.python.org/downloads/)
+[![Node v16](https://img.shields.io/badge/Node-v16-teal.svg)](https://nodejs.org/en/blog/release/v16.0.0)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![code style: prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)](https://prettier.io/)
+
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![Conventional Changelog](https://img.shields.io/badge/changelog-conventional-brightgreen.svg)](http://conventional-changelog.github.io)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Credits](#credits)
+- [Automated Audio Conversion](#automated-audio-conversion)
+  - [1. convert the AWS Polly file to mp3](#1-convert-the-aws-polly-file-to-mp3)
+  - [2. Convert audio file from mono to 128 kb/s stereo](#2-convert-audio-file-from-mono-to-128-kbs-stereo)
+  - [3. Sound equalization](#3-sound-equalization)
+  - [4. Mix the voice and instrumental(s)](#4-mix-the-voice-and-instrumentals)
+  - [5. Add id3 tags](#5-add-id3-tags)
+- [RSS](#rss)
+- [TODO](#todo)
+  - [Tasks](#tasks)
+    - [Dev](#dev)
+    - [Web](#web)
+    - [Core](#core)
+    - [Features for future releases](#features-for-future-releases)
+    - [Podcast URLs](#podcast-urls)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Credits
 
 - <https://pixabay.com/music/beats-classical-hip-hop-143320/>
