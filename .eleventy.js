@@ -1,7 +1,6 @@
 const path = require("path");
 const htmlmin = require("html-minifier");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
-const { format } = require("timeago.js");
 
 // const searchFilter = require("./app/utils/searchFilter.js");
 
@@ -11,11 +10,6 @@ module.exports = (eleventyConfig) => {
 
   // TODO: Add Search Filter
   // eleventyConfig.addFilter("search", searchFilter);
-
-  // Add timeago filter
-  eleventyConfig.addFilter("timeago", (date) => {
-    return format(date);
-  });
 
   // Add Shortcodes
   // Get the current year - super useful for copyright dates.

@@ -5,6 +5,7 @@ import AOS from "aos";
 import Plyr from "plyr";
 import UAParser from "ua-parser-js";
 import sharer from "sharer.js";
+import { format } from "timeago.js";
 import "aos/dist/aos.css";
 import "animate.css/animate.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -107,3 +108,7 @@ const container = document.querySelector(".podcast-listen-btn-container");
 if (container) {
   container.replaceWith(htmlToElement(podcastListenButton));
 }
+
+const buildDateElement = document.getElementById("build-date");
+const buildDate = buildDateElement.textContent;
+buildDateElement.textContent = format(buildDate);
