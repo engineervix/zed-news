@@ -102,20 +102,12 @@ eyeD3 --add-image album-art.jpg:FRONT_COVER 2023-05-24.dist.mp3
 
 ### Tasks
 
-#### High level
+#### Dev
 
-- [x] create web app (static site generator)
-- [x] register with podcast providers
-- [x] deployment
+- [ ] Write tests
 
 #### Web
 
-- [x] Implement episode listing template (loop through collection)
-- [x] Add pagination on listing template
-- [x] [Incremental builds](https://11ty.rocks/posts/smart-incremental-rebuilds-with-eleventy-import/)
-- [x] Implement RSS. Use <https://podba.se/> to validate
-- [x] if user on apple device, add Apple podcasts URL, else, Google podcasts
-- [x] Add analytics when not in development
 - [ ] Add popup on **Listen and Subscribe button** so that people can choose multiple services
 - [ ] Implement search on the web app
 - [ ] Dark mode
@@ -123,10 +115,6 @@ eyeD3 --add-image album-art.jpg:FRONT_COVER 2023-05-24.dist.mp3
 
 #### Core
 
-- [x] Store retrieved data in a database
-- [x] Create data to be passed to 11ty
-- [x] write a script to generate a single episode nunjucks file with the correct info, in the correct location
-- [x] Delete the Generated file from S3 after downloading it
 - [ ] Add a separate module for summarization backends so we can choose which one to work with
 - [ ] Add appropriate error handling on `requests` and `feedparser` jobs as well as all other operations, such connecting to AWS Polly, etc.
 - [ ] Add task to perform substitution so that, for instance, K400 is written as 400 Kwacha. the AWS Polly voices fail to read Zambian money correctly.
