@@ -1,6 +1,6 @@
 # zed-news
 
-> automated news podcast
+> automated news podcast consisting of AI-powered updates from various Zambian sources
 
 [![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
 
