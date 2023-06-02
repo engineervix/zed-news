@@ -67,7 +67,7 @@ def random_dig_in():
         "Let's not wait any longer, it's time to delve in.",
         "Without further ado, let's dive in.",
         "Without prolonging the anticipation, let's begin our exploration.",
-        "Time to embark on our news journey. Let's dive right in.",
+        "Time to embark on our news journey. Let's get to it.",
     ]
 
     return random.choice(variations)
@@ -77,10 +77,10 @@ def random_outro():
     variations = [
         f"And that, dear listeners, brings us to the end of another fantastic edition of the 'Zed News Podcast'. I hope you enjoyed our time together today, catching up on the latest happenings. Until next time, this is {podcast_host} signing off, wishing you a wonderful day or night ahead. Take care, stay safe, and keep being awesome. Later!",
         f"And with that, we come to the conclusion of another captivating edition of the 'Zed News Podcast'. I hope you found our exploration of the news landscape insightful and illuminating. Until we meet again, this is {podcast_host} bidding you farewell, wishing you a remarkable day or night. Stay informed, and keep making a difference. Goodbye, everyone!",
-        f"That brings us to the end of this remarkable episode of the 'Zed News Podcast'. I trust you found our discussion enlightening and thought-provoking. Until next time, this is {podcast_host}, your host, signing off. Take care and see ypou later!",
+        f"That brings us to the end of this remarkable episode of the 'Zed News Podcast'. I trust you found our discussion enlightening and thought-provoking. Until next time, this is {podcast_host}, your host, signing off. Take care and see you later!",
         f"And with that, we wrap up another exciting edition of the 'Zed News Podcast'. I hope you enjoyed our time together, staying up to date with the latest news. Until we reconvene, this is {podcast_host}, your friendly voice in the news, saying farewell. Bye for now!",
         f"That concludes our journey through this edition of the 'Zed News Podcast'. I trust you found our exploration of the news landscape insightful and illuminating. Until our paths cross again, this is {podcast_host}, your guide in the realm of information, bidding you adieu. Bye bye for now!",
-        f"And so, we reach the end of another remarkable episode of the 'Zed News Podcast'. I hope you found our curation and storytelling captivating and informative. Until we meet again, this is {podcast_host}, your companion on the news adventure, signing off. May your day or night be filled with meaningful connections, profound discoveries, and a commitment to positive change. God willing, tizaonana mailo!",
+        f"And so, we reach the end of another remarkable episode of the 'Zed News Podcast'. I hope you found our curation and storytelling captivating and informative. Until we meet again, this is {podcast_host}, your companion on the news adventure, signing off. May your day or night be filled with meaningful connections, profound discoveries, and a commitment to positive change. God willing, see you in the next episode!",
         f"That brings us to the conclusion of this edition of the 'Zed News Podcast'. I hope you enjoyed our exploration of the news landscape and gained valuable insights. Until our paths cross again, this is {podcast_host}, your friendly host, bidding you farewell. Goodbye folks!",
     ]
     return random.choice(variations)
@@ -128,10 +128,27 @@ async def create_transcript(news: list[dict[str, str]], dest: str):
         read += source
 
         article_count = len(articles_by_source[source])
+        many_articles_adjectives = [
+            "an astounding",
+            "a remarkable",
+            "an incredible",
+            "a massive",
+            "a staggering",
+        ]
+        dive_in_choices = [
+            "explore the stories",
+            "delve into the content",
+            "dig into them",
+            "uncover what's inside",
+            "take a quick look at each one",
+            "get immersed in the news",
+            "checck them out",
+            "navigate through them",
+            "journey through the stories",
+            "examine the details",
+        ]
         if article_count > 9:
-            read += (
-                f", which has an astounding {article_count} entries today! Let's try and go through them quickly.\n\n"
-            )
+            read += f", which has {random.choice([many_articles_adjectives])} {article_count} entries today! Let's {random.choice([dive_in_choices])}.\n\n"
         else:
             read += f", which has {article_count} entries today.\n\n"
 
