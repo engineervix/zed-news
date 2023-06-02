@@ -26,8 +26,8 @@ $success: #188200;
 @import "social";
 @import "plyr/src/sass/plyr";
 
+/* stylelint-disable selector-class-pattern */
 .section__support {
-  /* stylelint-disable-line selector-class-pattern */
   background: no-repeat center center;
   background-color: $gray-600;
   background-attachment: scroll;
@@ -51,6 +51,7 @@ $success: #188200;
     z-index: 2;
   }
 }
+/* stylelint-enable selector-class-pattern */
 
 .features-icons {
   .features-icons-item {
