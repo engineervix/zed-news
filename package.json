@@ -31,6 +31,7 @@
     "elasticlunr-dev": "^0.9.6",
     "plyr": "^3.7.8",
     "sharer.js": "^0.5.1",
+    "timeago.js": "^4.0.2",
     "ua-parser-js": "^1.0.35"
   },
   "devDependencies": {
