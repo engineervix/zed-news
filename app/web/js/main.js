@@ -64,8 +64,20 @@ document.querySelectorAll(".podcast-player").forEach((playPodcast) => {
 });
 
 /* ***** ----------------------------------------------- ***** **
-/* ***** Custom
+/* ***** Podcast Listen Buttons
 /* ***** ----------------------------------------------- ***** */
+
+/**
+ * @param {String} HTML representing a single element
+ * @return {Element}
+ */
+function htmlToElement(html) {
+  // https://stackoverflow.com/a/35385518
+  var template = document.createElement("template");
+  html = html.trim(); // Never return a text node of whitespace as the result
+  template.innerHTML = html;
+  return template.content.firstChild;
+}
 
 function generatePodcastListenButton() {
   const parser = new UAParser();
@@ -91,24 +103,37 @@ function generatePodcastListenButton() {
   return buttonHTML;
 }
 
-/**
- * @param {String} HTML representing a single element
- * @return {Element}
- */
-function htmlToElement(html) {
-  // https://stackoverflow.com/a/35385518
-  var template = document.createElement("template");
-  html = html.trim(); // Never return a text node of whitespace as the result
-  template.innerHTML = html;
-  return template.content.firstChild;
-}
-
 const podcastListenButton = generatePodcastListenButton();
 const container = document.querySelector(".podcast-listen-btn-container");
 if (container) {
   container.replaceWith(htmlToElement(podcastListenButton));
 }
 
+/* ***** ----------------------------------------------- ***** **
+/* ***** Format Build Date to Timeago
+/* ***** ----------------------------------------------- ***** */
+
 const buildDateElement = document.getElementById("build-date");
 const buildDate = buildDateElement.textContent;
 buildDateElement.textContent = format(buildDate);
+
+/* ***** ----------------------------------------------- ***** **
+/* ***** Trigger Play Button on Home Page
+/* ***** ----------------------------------------------- ***** */
+
+const homePlayButton = document.getElementById("home-play-btn");
+const audioPlayer = document.querySelector("#audio-player .podcast-player");
+
+if (homePlayButton && audioPlayer) {
+  homePlayButton.addEventListener("click", () => {
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+      homePlayButton.classList.add("playing");
+      homePlayButton.innerHTML = `<i class="fa-solid fa-circle-pause me-2"></i>Pause`;
+    } else {
+      audioPlayer.pause();
+      homePlayButton.classList.remove("playing");
+      homePlayButton.innerHTML = `<i class="fa-solid fa-circle-play me-2"></i>Play`;
+    }
+  });
+}

@@ -19,10 +19,14 @@
             <div
             class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start"
             >
-            <a class="btn btn-outline-danger px-4" href="https://deezer.com/show/6126025" target="_blank" rel="noopener noreferrer">
+            <button id="home-play-btn" class="btn btn-outline-danger px-4">
+                <i class="fa-solid fa-circle-play me-2"></i>
+                Listen
+            </button>
+            {# <a class="btn btn-outline-danger px-4" href="https://deezer.com/show/6126025" target="_blank" rel="noopener noreferrer">
                 <i class="fa-brands fa-deezer me-2"></i>
                 Listen on Deezer
-            </a>
+            </a> #}
             {# <div class="podcast-listen-btn-container"></div>
             <!-- TODO: Add popup here so that people can choose multiple services -->
             <a class="btn btn-outline-dark px-4" href="#!">
@@ -51,7 +55,7 @@
         <div class="row gx-5 justify-content-center">
         <div class="col-lg-10">
             <div class="card mb-5 mb-xl-0">
-            <div class="card-body p-5">
+            <div id="audio-player" class="card-body p-5">
                 <div class="small text-uppercase fw-bold">
                 <i class="fa-solid fa-star text-warning"></i>
                 Latest Episode
