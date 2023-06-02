@@ -86,6 +86,27 @@ def random_outro():
     return random.choice(variations)
 
 
+many_articles_adjectives = [
+    "an astounding",
+    "a remarkable",
+    "an incredible",
+    "a massive",
+    "a staggering",
+]
+dive_in_choices = [
+    "explore the stories",
+    "delve into the content",
+    "dig into them",
+    "uncover what's inside",
+    "take a quick look at each one",
+    "get immersed in the news",
+    "checck them out",
+    "navigate through them",
+    "journey through the stories",
+    "examine the details",
+]
+
+
 async def create_transcript(news: list[dict[str, str]], dest: str):
     """Create a podcast transcript from the news, and write it to a file
 
@@ -128,27 +149,8 @@ async def create_transcript(news: list[dict[str, str]], dest: str):
         read += source
 
         article_count = len(articles_by_source[source])
-        many_articles_adjectives = [
-            "an astounding",
-            "a remarkable",
-            "an incredible",
-            "a massive",
-            "a staggering",
-        ]
-        dive_in_choices = [
-            "explore the stories",
-            "delve into the content",
-            "dig into them",
-            "uncover what's inside",
-            "take a quick look at each one",
-            "get immersed in the news",
-            "checck them out",
-            "navigate through them",
-            "journey through the stories",
-            "examine the details",
-        ]
         if article_count > 9:
-            read += f", which has {random.choice([many_articles_adjectives])} {article_count} entries today! Let's {random.choice([dive_in_choices])}.\n\n"
+            read += f", which has {random.choice(many_articles_adjectives)} {article_count} entries today! Let's {random.choice(dive_in_choices)}.\n\n"
         else:
             read += f", which has {article_count} entries today.\n\n"
 
