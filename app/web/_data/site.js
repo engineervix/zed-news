@@ -7,6 +7,9 @@ const isProd = environment === PROD_ENV;
 module.exports = {
   isProd,
   base_url: process.env.BASE_URL,
+  contact_email: process.env.CONTACT_EMAIL,
+  analytics_id: process.env.UMAMI_SITE_ID,
+  analytics_url: process.env.UMAMI_URL,
   builtAt: new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     day: "numeric",

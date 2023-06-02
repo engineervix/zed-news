@@ -19,11 +19,15 @@
           <div
             class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start"
           >
-            <div class="podcast-listen-btn-container"></div>
+            {# <div class="podcast-listen-btn-container"></div>
             <a class="btn btn-outline-dark px-4" href="#!">
               <i class="fa-solid fa-headphones me-2"></i>
-              Listen & Subscribe</a
-            >
+              Listen & Subscribe
+            </a> #}
+            <a class="btn btn-danger px-4" href="https://deezer.com/show/6126025" target="_blank" rel="noopener noreferrer">
+                <i class="fa-brands fa-deezer me-2"></i>
+                Listen on Deezer
+            </a>
           </div>
         </div>
       </div>
@@ -67,15 +71,7 @@
             mentioned in each podcast episode).
           </p>
           <p class="lead text-white">
-            Each news item is then summarized using a
-            <a
-              href="https://en.wikipedia.org/wiki/Natural_language_processing"
-              class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
-              target="_blank"
-              rel="noopener noreferrer"
-              >Natural Language Processing (NLP)</a
-            >
-            algorithm, and a python script compiles everything into some
+            Each news item is then summarized using a <a href="https://www.deepset.ai/blog/what-is-a-language-model"class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"target="_blank"rel="noopener noreferrer">language model</a>, and a python script compiles everything into some
             kind of transcript for the podcast episode.
           </p>
           <p class="lead text-white">
@@ -89,13 +85,13 @@
             >.
           </p>
           <p class="lead text-white">
-            Next, some basic audio mixing is done to add an opening and
+            Next, some <em>basic</em> <a href="https://online.berklee.edu/takenote/mixing-music-what-is-sound-audio-mixing/"class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"target="_blank"rel="noopener noreferrer">sound mixing</a> is done, which includes addition of an opening and
             closing jingle. Podcast metadata is then added to the audio
             file. At this point, the episode is ready to be published.
           </p>
           <p class="lead text-white">
             All of the above processes are handled automatically, without
-            any human intervention. I think the animation below does
+            any human intervention. I think the animation below
             pretty sums it up. It's kinda like a
             <a
               href="https://en.wikipedia.org/wiki/Rube_Goldberg_machine"
@@ -181,7 +177,7 @@
               </span>
               The text to speech technology is not perfect. Sometimes, the
               pronunciation of certain words (especially Zambian words,
-              names, places, etc.) is not correct. After some experiment,
+              names, places, etc.) is not correct. After some experimenting,
               I found that, of all the English voices available, the one
               with better pronunciation is
               <a
@@ -205,7 +201,7 @@
                 <i class="text-success fa-solid fa-caret-right"></i>
               </span>
               Because the news items are presented as summaries, the
-              podcast episodes are usually short, between 8 and 16 minutes
+              podcast episodes are usually short, between 8 and 20 minutes
               long, depending on the number of news items on that day.
             </li>
             <li>
@@ -260,7 +256,7 @@
       a problem? <br />Or maybe you want us to collaborate on some cool
       stuff?
     </p>
-    <a class="btn btn-warning btn-lg mt-3" href="mailto:foo@example.net">
+    <a class="btn btn-warning btn-lg mt-3" href="mailto:{{ site.contact_email }}?subject=Inquiry%20from%20Zed%20News%20Podcast&body=Hi%20there%20%F0%9F%91%8B%2C%20I%20have%20a%20question%2Frequest%20and%20would%20like%20to%20discuss%20it%20further%20... ">
       <i class="fa-regular fa-comments me-2"></i>
       Let's talk
     </a>

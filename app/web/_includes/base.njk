@@ -4,12 +4,13 @@
     {% if site.isProd %}
     <script async
             defer
-            data-website-id="c7aebad2-add4-4ca3-bbd0-ed63442ca9b3"
-            src="https://analytics.umusebo.com/umami.js"></script>
+            data-website-id="{{ site.analytics_id }}"
+            src="{{ site.analytics_url }}"></script>
     {% endif %}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="generator" content="{{ eleventy.generator }}">
 
     <meta name="description" content="{{ description|default("Your weekday source for the latest happenings in Zambia (and beyond)", true) }}" />
     <meta name="author" content="Victor Miti" />
@@ -161,8 +162,7 @@
           <div class="text-emphasis-light">
             © {% year %}
             <a href="https://twitter.com/engineervix">Victor Miti</a>.<br />Last
-            updated on
-            <span class="fw-semibold">{{ site.builtAt }}</span>
+            updated <span class="fw-semibold">{{ site.builtAt | timeago }}</span>
           </div>
           <ul class="list-inline list-unstyled mb-0">
             <li class="list-inline-item">

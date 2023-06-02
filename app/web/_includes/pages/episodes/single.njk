@@ -18,11 +18,14 @@
             <div
             class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start"
             >
-                <a class="btn btn-warning px-4" href="#!">
+                {# <a class="btn btn-warning px-4" href="#!">
                     <i class="fa-brands fa-chromecast me-2"></i>
                     Subscribe
-                </a>
-
+                </a> #}
+                {# <a class="btn btn-outline-danger px-4" href="https://deezer.com/show/6126025" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-deezer me-2"></i>
+                    Listen on Deezer
+                </a> #}
                 <button type="button" class="btn btn-outline-danger px-4" data-bs-toggle="modal" data-bs-target="#share">
                     <i class="fa-solid fa-share-nodes me-2"></i>
                     Share
@@ -40,9 +43,9 @@
     <div class="container px-4 px-lg-5">
         <div class="row gx-5 justify-content-center">
             <div class="col-lg-10">
-                <h2 class="pb-3">Show Notes 📋</h2>
+                <h2 class="pb-3">Show notes 📋</h2>
 
-                <h3 class="fs-4 mb-3 border-bottom">Overview 📈</h3>
+                <h3 class="fs-4 pb-3 border-bottom">Overview 📈</h3>
                 <div class="row features-icons text-center pb-3">
                     <!-- presenter -->
                     <div class="col-lg-4 col-md-6">
@@ -54,7 +57,7 @@
                         </div>
                         <h4 class="fs-5">Presenter</h4>
                         <p class="lead mb-0">
-                            Today's episode was presented by {{ presenter }}.
+                            This episode was presented by {{ presenter }}.
                         </p>
                         </div>
                     </div>
@@ -76,7 +79,7 @@
                         </div>
                         <h4 class="fs-5">Production time</h4>
                         <p class="lead mb-0">
-                            It took {{ production_time }} to produce today's
+                            It took {{ production_time }} to produce this
                             episode.
                         </p>
                         </div>
@@ -123,18 +126,18 @@
                     </div>
                 </div>
 
-                <h3 class="fs-4 mb-3 border-bottom">News sources 📰</h3>
+                <h3 class="fs-4 pb-3 border-bottom">News sources 📰</h3>
 
-                <div class="accordion" id="news-sources">
+                <div class="accordion pt-3" id="news-sources">
                 {%- for source, articles in site.articlesBySource(articles) -%}
                     <div class="accordion-item">
                         <p class="accordion-header">
                         <button
-                            class="accordion-button"
+                            class="accordion-button collapsed"
                             type="button"
                             data-bs-toggle="collapse"
                             data-bs-target="#collapse{{ loop.index }}"
-                            aria-expanded="{%- if loop.index == 1 %}true{% else %}false{% endif -%}"
+                            aria-expanded="false"
                             aria-controls="collapse{{ loop.index }}"
                         >
                             {{ source }}
@@ -142,7 +145,7 @@
                         </p>
                         <div
                         id="collapse{{ loop.index }}"
-                        class="accordion-collapse collapse {%- if loop.index == 1 %} show{% endif -%}"
+                        class="accordion-collapse collapse"
                         data-bs-parent="#news-sources"
                         >
                         <div class="accordion-body">
