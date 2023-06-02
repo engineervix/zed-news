@@ -1,0 +1,154 @@
+name: CI/CD
+
+# Enable Buildkit and let compose use it to speed up image building
+env:
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths-ignore: ["docs/**"]
+
+  push:
+    branches: ["main"]
+    paths-ignore: ["docs/**"]
+    tags:
+      - "v*"
+
+jobs:
+  # Runs the isort, black & flake8 linting steps inside the specified containers rather than on the VM host.
+  # Because of this the network configuration changes from host based network to a container network.
+  linter_isort:
+    runs-on: ubuntu-20.04
+    container: python:3.10-slim-bullseye
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          pip install -q isort==5.12.0
+      - name: isort
+        run: |
+          isort . --check-only --profile black
+
+  linter_black:
+    runs-on: ubuntu-20.04
+    container: python:3.10-slim-bullseye
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          pip install -q black==23.3.0
+      - name: black
+        run: |
+          black . --check
+
+  linter_flake8:
+    runs-on: ubuntu-20.04
+    container: python:3.10-slim-bullseye
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          pip install -q flake8==6.0.0
+      - name: flake8
+        run: |
+          flake8 app/core
+
+  # Runs the frontend linting steps on the VM
+  linter_stylelint:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Stylelint
+        run: |
+          npm run lint:style
+
+  linter_eslint:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: ESLint
+        run: |
+          npm run lint:js
+
+  # Runs the next steps on the VM
+  # Creates a GitHub Release when the lint & test jobs succeeds, and only on pushes to tags.
+  release:
+    needs:
+      [
+        linter_isort,
+        linter_black,
+        linter_flake8,
+        linter_stylelint,
+        linter_eslint,
+      ]
+
+    permissions:
+      contents: write
+
+    if: startsWith( github.ref, 'refs/tags/v' )
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install invoke colorama tomli
+      - name: Get the version
+        id: get_version
+        run: |
+          echo "${{ github.ref }}"
+          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Generate Release Title
+        id: get_release_title
+        shell: bash
+        run: |
+          export TODAY="($(TZ=Africa/Lusaka date --iso))"
+          echo ::set-output name=RELEASE_NAME::"${{ steps.get_version.outputs.VERSION }} $TODAY"
+      - name: Extract Release Notes
+        # This creates a file LATEST_RELEASE_NOTES.md in the parent directory (../)
+        shell: bash
+        run: |
+          invoke get-release-notes
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.get_release_title.outputs.RELEASE_NAME }}
+          body_path: ../LATEST_RELEASE_NOTES.md
