@@ -158,34 +158,31 @@
     {# footer #}
     <footer class="footer mt-auto py-3 bg-light">
       <div class="container">
-        <div class="d-flex justify-content-between align-items-center py-3">
-          <div class="text-emphasis-light">
-            © {% year %}
-            <a href="https://twitter.com/engineervix">Victor Miti</a>.<br />Last
-            updated <span class="fw-semibold">{{ site.builtAt | timeago }}</span>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
+          <div class="text-emphasis-light text-center text-md-start mb-3 mb-md-0">
+            © {% year %} <a href="https://twitter.com/engineervix">Victor Miti</a><br />
+            Site powered by <a href="https://www.11ty.dev/" target="_blank" rel="noopener noreferrer">11ty</a>. Last rebuilt <span class="fw-semibold">{{ site.builtAt | timeago }}</span>.
           </div>
-          <ul class="list-inline list-unstyled mb-0">
+          <ul class="list-inline list-unstyled mb-0 text-center text-md-end">
             <li class="list-inline-item">
               <a class="social-tw"
-                 href="https://twitter.com/engineervix"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 aria-label="Follow me on Twitter"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-title="Follow me on Twitter"
-                ><i class="fa-brands fa-twitter fa-2x"></i
-              ></a>
+                href="https://twitter.com/engineervix"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow me on Twitter"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-title="Follow me on Twitter"
+              ><i class="fa-brands fa-twitter fa-2x"></i></a>
             </li>
             <li class="list-inline-item">
               <a class="social-rss"
-                 href="/feed.xml"
-                 aria-label="RSS Feed"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-title="RSS Feed"
-                ><i class="fa-solid fa-rss fa-2x"></i
-              ></a>
+                href="/feed.xml"
+                aria-label="RSS Feed"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-title="RSS Feed"
+              ><i class="fa-solid fa-rss fa-2x"></i></a>
             </li>
           </ul>
         </div>
