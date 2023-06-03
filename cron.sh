@@ -45,7 +45,9 @@ source "${HOME}/Env/zed-news/bin/activate" || { echo "Failed to activate virtual
 git pull || { echo "Failed to pull changes from Git."; send_healthcheck_failure; exit 1; }
 
 # 4. Run script inside docker container
+inv up --build || { echo "Failed to build Docker container."; send_healthcheck_failure; exit 1; }
 docker-compose run --rm app invoke toolchain || { echo "Failed to run script inside Docker container."; send_healthcheck_failure; exit 1; }
+inv down || { echo "Failed to stop Docker container."; send_healthcheck_failure; exit 1; }
 
 # 5. commit changes
 today_iso=$(date --iso)
