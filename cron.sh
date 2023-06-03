@@ -50,10 +50,16 @@ docker-compose run --rm app invoke toolchain || { echo "Failed to run script ins
 # 5. commit changes
 today_iso=$(date --iso)
 git add . || { echo "Failed to stage changes for commit."; send_healthcheck_failure; exit 1; }
-git commit --no-verify -m "chore: ✨ new episode 🎙️ - ${today_iso}" || { echo "Failed to commit changes."; send_healthcheck_failure; exit 1; }
+git commit --no-verify -m "chore: ✨ new episode 🎙️ » ${today_iso}" || { echo "Failed to commit changes."; send_healthcheck_failure; exit 1; }
 
 # 6. push changes to remote
 git push origin main || { echo "Failed to push changes to remote repository."; send_healthcheck_failure; exit 1; }
 
 # Send success signal to healthchecks.io
 send_healthcheck_success
+
+# Notify Admin via Telegram
+today_human_readable=$(date +"%a %d %b %Y")
+apprise -vv -t "🎙️ New Episode » ${today_human_readable}" \
+  -b "📻 Listen now at ${BASE_URL}/episode/${today_iso}/" \
+  tgram://"${TELEGRAM_BOT_TOKEN}"

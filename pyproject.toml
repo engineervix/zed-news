@@ -9,6 +9,7 @@ authors = [
 ]
 dependencies = [
   "aerich",
+  "apprise",
   "asyncpg",
   "Babel",
   "beautifulsoup4",

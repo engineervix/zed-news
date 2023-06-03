@@ -15,6 +15,8 @@ aiosignal==1.3.1
     # via aiohttp
 aiosqlite==0.17.0
     # via tortoise-orm
+apprise==1.4.0
+    # via zed-news (pyproject.toml)
 async-timeout==4.0.2
     # via
     #   aiohttp
@@ -40,13 +42,17 @@ botocore==1.29.142
 bpython==0.24
     # via zed-news (pyproject.toml)
 certifi==2023.5.7
-    # via requests
+    # via
+    #   apprise
+    #   requests
 charset-normalizer==3.1.0
     # via
     #   aiohttp
     #   requests
 click==8.1.3
-    # via aerich
+    # via
+    #   aerich
+    #   apprise
 cohere==4.6.1
     # via zed-news (pyproject.toml)
 colorama==0.4.6
@@ -99,6 +105,8 @@ jmespath==1.0.1
     #   botocore
 langchain==0.0.177
     # via zed-news (pyproject.toml)
+markdown==3.4.3
+    # via apprise
 markupsafe==2.1.2
     # via jinja2
 marshmallow==3.19.0
@@ -121,6 +129,8 @@ numpy==1.24.3
     # via
     #   langchain
     #   numexpr
+oauthlib==3.2.2
+    # via requests-oauthlib
 openai==0.27.7
     # via zed-news (pyproject.toml)
 openapi-schema-pydantic==1.2.4
@@ -159,17 +169,23 @@ pytz==2023.3
 pyxdg==0.28
     # via bpython
 pyyaml==6.0
-    # via langchain
+    # via
+    #   apprise
+    #   langchain
 regex==2023.5.5
     # via tiktoken
 requests==2.31.0
     # via
+    #   apprise
     #   bpython
     #   cohere
     #   langchain
     #   openai
+    #   requests-oauthlib
     #   tiktoken
     #   zed-news (pyproject.toml)
+requests-oauthlib==1.3.1
+    # via apprise
 s3transfer==0.6.1
     # via boto3
 sgmllib3k==1.0.0
