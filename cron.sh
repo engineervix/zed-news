@@ -23,20 +23,37 @@ set -e  # Exit immediately if any command fails
 # 1. cd to project directory
 cd "${HOME}/SITES/zed-news" || { echo "Failed to change directory."; exit 1; }
 
+# Source the .env file so we can retrieve healthchecks.io ping URL
+# shellcheck source=/dev/null
+source .env
+
+# Function to send success signal to healthchecks.io
+function send_healthcheck_success() {
+  curl -fsS --retry 3 "${HEALTHCHECKS_PING_URL}" > /dev/null
+}
+
+# Function to send failure signal to healthchecks.io
+function send_healthcheck_failure() {
+  curl -fsS --retry 3 "${HEALTHCHECKS_PING_URL}/fail" > /dev/null
+}
+
 # 2. Activate virtual environment
 # shellcheck source=/dev/null
-source "${HOME}/Env/zed-news/bin/activate" || { echo "Failed to activate virtual environment."; exit 1; }
+source "${HOME}/Env/zed-news/bin/activate" || { echo "Failed to activate virtual environment."; send_healthcheck_failure; exit 1; }
 
 # 3. git pull
-git pull || { echo "Failed to pull changes from Git."; exit 1; }
+git pull || { echo "Failed to pull changes from Git."; send_healthcheck_failure; exit 1; }
 
 # 4. Run script inside docker container
-docker-compose run --rm app invoke toolchain || { echo "Failed to run script inside Docker container."; exit 1; }
+docker-compose run --rm app invoke toolchain || { echo "Failed to run script inside Docker container."; send_healthcheck_failure; exit 1; }
 
 # 5. commit changes
 today_iso=$(date --iso)
-git add . || { echo "Failed to stage changes for commit."; exit 1; }
-git commit --no-verify -m "chore: ✨ new episode 🎙️ - ${today_iso}" || { echo "Failed to commit changes."; exit 1; }
+git add . || { echo "Failed to stage changes for commit."; send_healthcheck_failure; exit 1; }
+git commit --no-verify -m "chore: ✨ new episode 🎙️ - ${today_iso}" || { echo "Failed to commit changes."; send_healthcheck_failure; exit 1; }
 
 # 6. push changes to remote
-git push origin main || { echo "Failed to push changes to remote repository."; exit 1; }
+git push origin main || { echo "Failed to push changes to remote repository."; send_healthcheck_failure; exit 1; }
+
+# Send success signal to healthchecks.io
+send_healthcheck_success
