@@ -20,7 +20,7 @@ jobs:
   # Runs the isort, black & flake8 linting steps inside the specified containers rather than on the VM host.
   # Because of this the network configuration changes from host based network to a container network.
   linter_isort:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container: python:3.10-slim-bullseye
 
     steps:
@@ -35,7 +35,7 @@ jobs:
           isort . --check-only --profile black
 
   linter_black:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container: python:3.10-slim-bullseye
 
     steps:
@@ -50,7 +50,7 @@ jobs:
           black . --check
 
   linter_flake8:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container: python:3.10-slim-bullseye
 
     steps:
@@ -86,7 +86,7 @@ jobs:
           npm run lint:style
 
   linter_eslint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout Code Repository
@@ -123,6 +123,55 @@ jobs:
           echo "${{ github.ref }}"
           bash -c 'shopt -s globstar; shellcheck ./*.sh;'
 
+  # Runs the python test suite on the VM
+  test:
+    runs-on: ubuntu-22.04
+    needs:
+      [
+        linter_isort,
+        linter_black,
+        linter_flake8,
+        linter_djlint,
+        linter_stylelint,
+        linter_eslint,
+        shellcheck,
+      ]
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+          cache: "pip" # caching pip dependencies
+
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          apt update -y && apt upgrade -y
+          export DEBIAN_FRONTEND=noninteractive
+          ln -fs /usr/share/zoneinfo/Africa/Lusaka /etc/localtime
+          dpkg-reconfigure --frontend noninteractive tzdata
+          apt install -y build-essential libssl-dev libffi-dev python3-venv ffmpeg
+          python -m venv ~/venv
+          source ~/venv/bin/activate
+          export LC_ALL=C.UTF-8
+          export LANG=C.UTF-8
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Test with unittest
+        shell: bash
+        run: |
+          # Note that you have to activate the virtualenv in every step
+          # because GitHub actions doesn't preserve the environment
+          source ~/venv/bin/activate
+
+          # Run tests
+          invoke test
+
   # Runs the next steps on the VM
   # Creates a GitHub Release when the lint & test jobs succeeds, and only on pushes to tags.
   release:
@@ -134,12 +183,13 @@ jobs:
         linter_stylelint,
         linter_eslint,
         shellcheck,
+        test,
       ]
 
     permissions:
       contents: write
 
-    if: needs.shellcheck.result == 'success' && startsWith( github.ref, 'refs/tags/v' )
+    if: needs.test.result == 'success' && startsWith( github.ref, 'refs/tags/v' )
 
     runs-on: ubuntu-22.04
 
