@@ -236,6 +236,7 @@ htmlcov/
 .coverage.*
 nosetests.xml
 coverage.xml
+coverage.json
 *.cover
 *.py,cover
 .hypothesis/

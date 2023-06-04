@@ -39,6 +39,7 @@ dependencies = [
 dev = [
   "black",
   "commitizen",
+  "coverage[toml]",
   "DSLR",
   "flake8",
   "isort",
@@ -79,6 +80,14 @@ blocked_extensions = ["rst", "html", "js", "svg", "txt", "css", "scss", "png", "
 known_first_party = "app"
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 default_section = "THIRDPARTY"
+
+[tool.coverage.run]
+include = ["app/core/*"]
+branch = true   # Measure branch coverage
+
+[tool.coverage.report]
+skip_covered = true
+show_missing = true
 
 [tool.commitizen]
 version_provider = "pep621"

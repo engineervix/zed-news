@@ -367,4 +367,6 @@ def toolchain(c):
 @task
 def test(c):
     """Run tests"""
-    c.run("python -m unittest discover app/tests", pty=True)
+    c.run("coverage run -m unittest discover app/tests", pty=True)
+    c.run("coverage json", pty=True)
+    c.run("coverage report -m", pty=True)
