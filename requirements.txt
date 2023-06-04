@@ -103,7 +103,7 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-langchain==0.0.177
+langchain==0.0.189
     # via zed-news (pyproject.toml)
 markdown==3.4.3
     # via apprise
