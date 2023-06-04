@@ -362,3 +362,9 @@ def get_release_notes(c):
 def toolchain(c):
     """The toolchain for creating the podcast"""
     c.run("python app/core/run.py", pty=True)
+
+
+@task
+def test(c):
+    """Run tests"""
+    c.run("python -m unittest discover app/tests", pty=True)

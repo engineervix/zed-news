@@ -19,6 +19,7 @@ LOG_COLORS = {
 }
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
+TEST_DIR = PROJECT_ROOT / "app" / "tests"
 EPISODE_TEMPLATE_DIR = PROJECT_ROOT / "app" / "web" / "_pages" / "episodes"
 IMAGE_DIR = PROJECT_ROOT / "app" / "web" / "img"
 DATABASE_URL = os.getenv("DATABASE_URL")
