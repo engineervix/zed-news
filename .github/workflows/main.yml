@@ -151,13 +151,17 @@ jobs:
         run: |
           apt update -y && apt upgrade -y
           export DEBIAN_FRONTEND=noninteractive
+          export TZ=Africa/Lusaka
+          apt install -y build-essential tzdata locales libssl-dev libffi-dev python3-venv ffmpeg
+          sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
+          locale-gen
           ln -fs /usr/share/zoneinfo/Africa/Lusaka /etc/localtime
-          dpkg-reconfigure --frontend noninteractive tzdata
-          apt install -y build-essential libssl-dev libffi-dev python3-venv ffmpeg
+          dpkg-reconfigure tzdata
+          export LANG=en_US.UTF-8
+          export LANGUAGE=en_US:en
+          export LC_ALL=en_US.UTF-8
           python -m venv ~/venv
           source ~/venv/bin/activate
-          export LC_ALL=C.UTF-8
-          export LANG=C.UTF-8
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
 
