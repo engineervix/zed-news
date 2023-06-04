@@ -214,7 +214,7 @@ tortoise-orm[psycopg]==0.19.3
     #   zed-news (pyproject.toml)
 tqdm==4.65.0
     # via openai
-typing-extensions==4.6.2
+typing-extensions==4.6.3
     # via
     #   aiosqlite
     #   psycopg-pool
