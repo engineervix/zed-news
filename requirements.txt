@@ -33,7 +33,7 @@ beautifulsoup4==4.12.2
     # via zed-news (pyproject.toml)
 blessed==1.20.0
     # via curtsies
-boto3==1.26.140
+boto3==1.26.146
     # via zed-news (pyproject.toml)
 botocore==1.29.142
     # via
