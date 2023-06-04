@@ -131,7 +131,6 @@ jobs:
         linter_isort,
         linter_black,
         linter_flake8,
-        linter_djlint,
         linter_stylelint,
         linter_eslint,
         shellcheck,
