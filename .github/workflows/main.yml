@@ -149,14 +149,14 @@ jobs:
       - name: Install Dependencies
         shell: bash
         run: |
-          apt update -y && apt upgrade -y
+          sudo apt update -y && sudo apt upgrade -y
           export DEBIAN_FRONTEND=noninteractive
           export TZ=Africa/Lusaka
-          apt install -y build-essential tzdata locales libssl-dev libffi-dev python3-venv ffmpeg
-          sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
-          locale-gen
-          ln -fs /usr/share/zoneinfo/Africa/Lusaka /etc/localtime
-          dpkg-reconfigure tzdata
+          sudo apt install -y build-essential tzdata locales libssl-dev libffi-dev python3-venv ffmpeg
+          sudo sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
+          sudo locale-gen
+          sudo ln -fs /usr/share/zoneinfo/Africa/Lusaka /etc/localtime
+          sudo dpkg-reconfigure tzdata
           export LANG=en_US.UTF-8
           export LANGUAGE=en_US:en
           export LC_ALL=en_US.UTF-8
