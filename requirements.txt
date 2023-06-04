@@ -107,7 +107,7 @@ langchain==0.0.189
     # via zed-news (pyproject.toml)
 markdown==3.4.3
     # via apprise
-markupsafe==2.1.2
+markupsafe==2.1.3
     # via jinja2
 marshmallow==3.19.0
     # via
