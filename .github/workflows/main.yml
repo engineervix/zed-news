@@ -149,10 +149,10 @@ jobs:
       - name: Install Dependencies
         shell: bash
         run: |
-          sudo apt update -y
+          sudo apt update --yes --quiet
           export DEBIAN_FRONTEND=noninteractive
           export TZ=Africa/Lusaka
-          sudo apt install --yes --quiet --no-install-recommends build-essential tzdata locales libssl-dev libffi-dev python3-venv ffmpeg
+          sudo apt install --yes --quiet --no-install-recommends tzdata libssl-dev ffmpeg
           sudo sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
           sudo locale-gen
           sudo ln -fs /usr/share/zoneinfo/Africa/Lusaka /etc/localtime
