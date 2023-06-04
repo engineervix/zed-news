@@ -145,6 +145,7 @@ jobs:
         with:
           python-version: "3.10"
           cache: "pip" # caching pip dependencies
+          cache-dependency-path: "requirements*.txt"
 
       - name: Install Dependencies
         shell: bash
@@ -194,6 +195,7 @@ jobs:
         with:
           python-version: "3.10"
           cache: "pip" # caching pip dependencies
+          cache-dependency-path: "requirements*.txt"
 
       - name: "Download coverage data"
         uses: actions/download-artifact@v3
