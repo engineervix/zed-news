@@ -105,6 +105,26 @@ jobs:
         run: |
           npm run lint:js
 
+  linter_prettier:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Prettier
+        run: |
+          npm run lint:format
+
   shellcheck:
     runs-on: ubuntu-22.04
 
@@ -133,6 +153,7 @@ jobs:
         linter_flake8,
         linter_stylelint,
         linter_eslint,
+        linter_prettier,
         shellcheck,
       ]
 
@@ -232,6 +253,7 @@ jobs:
         linter_flake8,
         linter_stylelint,
         linter_eslint,
+        linter_prettier,
         shellcheck,
         test,
       ]

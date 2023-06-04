@@ -14,6 +14,7 @@
     "commit": "git-cz",
     "css-fix": "npx stylelint app/web/css/ --fix",
     "debug": "cross-env DEBUG=Eleventy* npx @11ty/eleventy",
+    "lint:format": "prettier --check 'app/**/?(.)*.{md,css,scss,js,json,yaml,yml}'",
     "lint:js": "eslint --ext \".js\" --ignore-path .gitignore .",
     "lint:style": "stylelint \"**/*.{scss,css}\" --ignore-path .gitignore",
     "lint": "npm run lint:js && npm run lint:style",
