@@ -204,7 +204,7 @@ jobs:
 
       - name: "Extract total coverage"
         run: |
-          export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
+          export TOTAL=$(python -c "import json;print(round(json.load(open('coverage.json'))['totals']['percent_covered']))")
           echo "total=$TOTAL" >> $GITHUB_ENV
           echo "### Total coverage: ${TOTAL}%" >> $GITHUB_STEP_SUMMARY
 
