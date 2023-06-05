@@ -24,6 +24,7 @@
 - [Development](#development)
   - [Core](#core)
   - [Web](#web)
+- [Deployment](#deployment)
 - [Contributing](#contributing)
 - [TODO](#todo)
   - [Docs](#docs)
@@ -122,15 +123,6 @@ The project uses [pgweb](https://github.com/sosedoff/pgweb) to help visualize da
 
 ### Web
 
-- update environment variables.
-
-  ```bash
-  # copy .env.sample to .env
-  cp -v .env.sample .env
-
-  # Now you can update the relevant values in the .env file
-  ```
-
 - install frontend dependencies
 
   ```bash
@@ -144,6 +136,31 @@ The project uses [pgweb](https://github.com/sosedoff/pgweb) to help visualize da
   ```
 
 See other available scripts in `package.json`.
+
+## Deployment
+
+The final outputs of this project are:
+
+- **mp3 files**, hosted on [AWS S3](https://aws.amazon.com/s3/) (or similar platforms like [Backblaze](https://www.backblaze.com/)).
+- **a static site**, which can be hosted anywhere. I use [Cloudflare Pages](https://pages.cloudflare.com/), but you have various options such as [GitGub Pages](https://pages.github.com/), [Netlify](https://www.netlify.com/), [Vercel](https://vercel.com/), [Render](https://render.com/), etc. You can even choose to host it on your own server.
+
+> **Warning**
+> Ensure that environment variables are updated accordingly for both **core** and **web**.
+
+For a smooth, unattended setup, please follow these steps:
+
+1.  Set up a Linux server with a Python virtual environment for the project, and make sure `docker` and `docker-compose` are installed.
+
+2.  Configure a cron job on the Linux server to run the `cron.sh` script located in the repository root. This script will handle the automated generation and deployment process.
+
+3.  Ensure that the Linux server has `git` properly configured. This is necessary for the `cron.sh` script to push the generated content to the repository, triggering the build and deployment.
+
+By following these steps, you can automate the deployment process and keep your project up to date without manual intervention.
+
+> **Note**
+> The `cron.sh` script uses [apprise](https://github.com/caronc/apprise) to notify the owner when a new episode is ready. You'll need to check the apprise docs on how to configure Telegram.
+>
+> Feel free to adapt the deployment setup to your specific requirements and preferred hosting platforms.
 
 ## Contributing
 
