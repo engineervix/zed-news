@@ -240,6 +240,7 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 - [ ] Find a way of training the voice to learn how to pronounce Zambian words.
 - [ ] Find a way to summarize for free!
 - [ ] Find a way to make a closing statement based on the news. Something like, "Don't forget to register yor sim card before the ZICTA deadline ..."
+- [ ] Keep the background music running throughout the show
 - [ ] Allow for passing of an arg variable for the voice, or dynamically choose a voice from a list, just like the random intros and outros.
 
 ## Credits
