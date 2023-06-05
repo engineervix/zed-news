@@ -100,7 +100,7 @@ dive_in_choices = [
     "uncover what's inside",
     "take a quick look at each one",
     "get immersed in the news",
-    "checck them out",
+    "check them out",
     "navigate through them",
     "journey through the stories",
     "examine the details",
