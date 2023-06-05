@@ -215,6 +215,8 @@ async def create_transcript(news: list[dict[str, str]], dest: str):
 
     # Write the intro, the read, and the outro to a file
     with open(dest, "w") as f:
+        f.write("<speak>")
         f.write(intro)
         f.write(read)
         f.write(random_outro())
+        f.write("</speak>")
