@@ -53,13 +53,20 @@ async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{to
     """
 
     voice_track_file_name = os.path.splitext(voice_track)[0]
+    mix_44100 = f"{voice_track_file_name}.44.1kHz.mp3"
     voice_track_in_stereo = f"{voice_track_file_name}.stereo.mp3"
-    initial_mix = f"{voice_track_file_name}.mix-01.mp3"
     eq_mix = f"{voice_track_file_name}.eq-mix.mp3"
+    initial_mix = f"{voice_track_file_name}.mix-01.mp3"
+
+    # change the voice track sample rate to 44.1 kHz
+    subprocess.run(
+        f"ffmpeg -i {voice_track} -ar 44100 {mix_44100}",
+        shell=True,
+    )
 
     # convert voice track from mono to 128 kb/s stereo
     subprocess.run(
-        f'ffmpeg -i {voice_track} -af "pan=stereo|c0=c0|c1=c0" -b:a 128k {voice_track_in_stereo}',
+        f'ffmpeg -i {mix_44100} -af "pan=stereo|c0=c0|c1=c0" -b:a 128k {voice_track_in_stereo}',
         shell=True,
     )
 
@@ -118,7 +125,7 @@ async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{to
         tag.save()
 
         # Clean up
-        for f in [voice_track_in_stereo, eq_mix, initial_mix, padded_outro]:
+        for f in [voice_track_in_stereo, mix_44100, eq_mix, initial_mix, padded_outro]:
             delete_file(f)
 
 
