@@ -1,5 +1,7 @@
 import logging
+from datetime import datetime, timedelta, timezone
 
+import pytz
 from babel import Locale
 from jinja2 import Environment, PackageLoader, select_autoescape
 from num2words import num2words
@@ -38,12 +40,15 @@ async def render_jinja_template(production_time, word_count):
     for article in articles:
         sources.append(article.source)
     lc = Locale.parse(lingo.replace("-", "_"))
+    utc_dt = datetime.now(timezone.utc) + timedelta(minutes=5)
+    LSK = pytz.timezone("Africa/Lusaka")
     print(
         base_template.render(
             {
                 "title": today_human_readable,
                 "description": f"This is the {number_ordinal} episode of the podcast.",
                 "episode": f"{number:03}",
+                "date": utc_dt.astimezone(LSK).isoformat(),
                 "mp3_url": mp3.url,
                 "mp3_duration": format_duration(mp3.duration),
                 "mp3_size": format_filesize(mp3.filesize),
