@@ -64,9 +64,9 @@ async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{to
     )
 
     # adjust the treble (high-frequency).
-    # The g=6 parameter specifies the gain in decibels (dB) to be applied to the treble frequencies.
+    # The g=3 parameter specifies the gain in decibels (dB) to be applied to the treble frequencies.
     subprocess.run(
-        f'ffmpeg -i {voice_track_in_stereo} -af "treble=g=6" {eq_mix}',
+        f'ffmpeg -i {voice_track_in_stereo} -af "treble=g=3" {eq_mix}',
         shell=True,
     )
 
