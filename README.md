@@ -61,9 +61,13 @@ It consists primarily of two parts / components:
 
 ### Core
 
-> You need to have docker and docker-compose on your machine
+> **Note**
+>
+> You need to have `docker` and `docker-compose` on your machine
 
-- create a python virtual environment
+On your machine:
+
+- create a python [virtual environment](https://realpython.com/python-virtual-environments-a-primer/)
 - upgrade pip to latest version
 
   ```bash
@@ -145,6 +149,7 @@ The final outputs of this project are:
 - **a static site**, which can be hosted anywhere. I use [Cloudflare Pages](https://pages.cloudflare.com/), but you have various options such as [GitGub Pages](https://pages.github.com/), [Netlify](https://www.netlify.com/), [Vercel](https://vercel.com/), [Render](https://render.com/), etc. You can even choose to host it on your own server.
 
 > **Warning**
+>
 > Ensure that environment variables are updated accordingly for both **core** and **web**.
 
 For a smooth, unattended setup, please follow these steps:
@@ -158,6 +163,7 @@ For a smooth, unattended setup, please follow these steps:
 By following these steps, you can automate the deployment process and keep your project up to date without manual intervention.
 
 > **Note**
+>
 > The `cron.sh` script uses [apprise](https://github.com/caronc/apprise) to notify the owner when a new episode is ready. You'll need to check the apprise docs on how to configure Telegram.
 >
 > Feel free to adapt the deployment setup to your specific requirements and preferred hosting platforms.
@@ -188,7 +194,9 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 ### Dev
 
-- [ ] Write tests
+- [ ] Switch to [Poetry](https://python-poetry.org/)
+- [ ] Replace [flake8](https://pypi.org/project/flake8/), [pycodestyle](https://pypi.org/project/pydocstyle/) and [isort](https://pypi.org/project/isort/) with [ruff](https://github.com/charliermarsh/ruff)
+- [ ] Test all the things
 
 ### More ways to listen
 
@@ -196,7 +204,7 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 - [ ] Google: <https://podcasts.google.com/feed/aHR0cHM6Ly96ZWRuZXdzLnBhZ2VzLmRldi9mZWVkLnhtbA>
 - [ ] Spotify: <https://open.spotify.com/show/14vv6liB2y2EWgJGRsNWVa>
 - [ ] Deezer: <https://deezer.com/show/6126025>
-- [ ] RSS: <{{ site.base_url }}/feed.xml>
+- [ ] RSS: `{{ site.base_url }}/feed.xml`
 - [ ] PocketCast: <https://pca.st/riwx8tbc>
 - [ ] Overast: <https://overcast.fm/itunes1690709989>
 - [ ] Castro: <https://castro.fm/itunes/1690709989>
