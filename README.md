@@ -163,16 +163,20 @@ eyeD3 --add-image album-art.jpg:FRONT_COVER 2023-05-24.dist.mp3
 
 #### Podcast URLs
 
+TODO: Add button "More ways to listen"
+
 - Apple: <https://podcasts.apple.com/us/podcast/zed-news-podcast/id1690709989>
 - Google: <https://podcasts.google.com/feed/aHR0cHM6Ly96ZWRuZXdzLnBhZ2VzLmRldi9mZWVkLnhtbA>
 - Spotify: <https://open.spotify.com/show/14vv6liB2y2EWgJGRsNWVa>
 - Deezer: <https://deezer.com/show/6126025>
 - RSS: <{{ site.base_url }}/feed.xml>
+- PocketCast: <https://pca.st/riwx8tbc>
+- Overast: <https://overcast.fm/itunes1690709989>
+- Castro: <https://castro.fm/itunes/1690709989>
 - PlayerFM: <>
 - Tune In: <>
 - JioSaavn: <>
 - Sticher: <>
 - iheartRadio: <>
-- PocketCast: <https://pca.st/riwx8tbc>
 - RadioPublic: <>
 - Gaana: <>
