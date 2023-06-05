@@ -93,6 +93,7 @@ show_missing = true
 version_provider = "pep621"
 version_files = [
     "app/__init__.py",
+    "cron.sh",
 ]
 tag_format = "v$major.$minor.$patch"
 annotated_tag = true
