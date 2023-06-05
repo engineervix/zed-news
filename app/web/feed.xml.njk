@@ -4,7 +4,7 @@
   "eleventyExcludeFromCollections": true,
   "metadata": {
     "title": "Zed News Podcast",
-    "description": "Your weekday source for the latest happenings in Zambia (and beyond).",
+    "description": "Your weekday source for the latest happenings in Zambia (and beyond), the Zed News Podcast is an automated news podcast consisting of AI-powered updates from various Zambian sources. New episodes Monday to Friday between 16:45 and 17:00 CAT.",
     "url": "https://example.com",
     "feedUrl": "https://example.com/feed.xml",
     "author": {
@@ -31,11 +31,12 @@
         <itunes:explicit>no</itunes:explicit>
         <language>en</language>
         <link href="{{ site.base_url }}" rel="self"/>
+        <link href="{{ site.base_url }}"/>
         {%- for episode in collections.episode | reverse -%}
         {% set absolutePostUrl %}{{ episode.url | url | absoluteUrl(site.base_url) }}{% endset %}
         <item>
             <title>{{ episode.data.title }}</title>
-            <description>{{ episode.data.description }} It is presented by {{ episode.data.presenter }} in {{ episode.data.locale.name }} and consists of {{ episode.data.references.count }} articles from {{ episode.data.references.sources }} sources. The size of the audio file is {{ episode.data.mp3.size }}. Running time is {{ episode.data.mp3.length }}.</description>
+            <description>{{ episode.data.description }} It is presented by {{ episode.data.presenter }} in {{ episode.data.locale.name }} and consists of {{ episode.data.references.count }} articles from {{ episode.data.references.sources }} sources. The size of the audio file is {{ episode.data.mp3.size }}. Running time is {{ episode.data.mp3.length }}.<br />Check out the <a href="{{ absolutePostUrl }}" target="_blank" rel="noopener noreferrer">episode notes</a> for more information, including links to the news sources.</description>
             <pubDate>{{ episode.date | dateToRfc822 }}</pubDate>
             <enclosure url="{{ episode.data.mp3.url }}"
                        type="audio/mpeg" length="{{ episode.data.rss.enclosure_length }}"/>
