@@ -15,7 +15,7 @@ def get_latest_news():
     logging.info("Fetching feeds from the other sources ...")
     feeds = get_rss_feed_entries()
 
-    return news + feeds
+    return feeds + news
 
 
 async def save_news_to_db(news: list[dict[str, str]]):

@@ -18,9 +18,9 @@ ua = UserAgent(
 
 URLs = [
     "http://www.daily-mail.co.zm/feed/",
-    "https://www.mwebantu.com/rss/",
-    "https://www.muvitv.com/rss/",
     "https://diggers.news/rss/",
+    "https://www.muvitv.com/rss/",
+    "https://www.mwebantu.com/rss/",
 ]
 
 
