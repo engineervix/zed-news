@@ -1,6 +1,6 @@
 # zed-news
 
-> automated news podcast consisting of AI-powered updates from various Zambian sources
+> Automated news podcast consisting of AI-powered updates from various Zambian sources.
 
 [![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
 
@@ -20,163 +20,209 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [Credits](#credits)
-- [Automated Audio Conversion](#automated-audio-conversion)
-  - [1. convert the AWS Polly file to mp3](#1-convert-the-aws-polly-file-to-mp3)
-  - [2. Convert audio file from mono to 128 kb/s stereo](#2-convert-audio-file-from-mono-to-128-kbs-stereo)
-  - [3. Sound equalization](#3-sound-equalization)
-  - [4. Mix the voice and instrumental(s)](#4-mix-the-voice-and-instrumentals)
-  - [5. Add id3 tags](#5-add-id3-tags)
-- [RSS](#rss)
+- [Introduction](#introduction)
+- [Development](#development)
+  - [Core](#core)
+  - [Web](#web)
+- [Contributing](#contributing)
 - [TODO](#todo)
-  - [Tasks](#tasks)
-    - [Dev](#dev)
-    - [Web](#web)
-    - [Core](#core)
-    - [Features for future releases](#features-for-future-releases)
-    - [Podcast URLs](#podcast-urls)
+  - [Docs](#docs)
+  - [Dev](#dev)
+  - [More ways to listen](#more-ways-to-listen)
+  - [Web](#web-1)
+  - [Core](#core-1)
+  - [Features for future releases](#features-for-future-releases)
+- [Credits](#credits)
+  - [Music](#music)
+  - [Icon](#icon)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Credits
+## Introduction
 
-- <https://pixabay.com/music/beats-classical-hip-hop-143320/>
-- <https://pixabay.com/music/beats-digital-technology-131644/>
+This is a tool that gathers news from various Zambian sources, summarizes the news items and presents the news as a podcast.
 
-## Automated Audio Conversion
+It consists primarily of two parts / components:
 
-Here we assume that the instrumental file is already presentand that it has its **gain** reduced by -20dB.
+- **core** -- this is primarily python code, where the following tasks are handled:
+  - gather the news using [requests](https://pypi.org/project/requests/), [feedparser](https://pypi.org/project/feedparser/) and [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
+  - summarise the news using LLMs, via [LangChain](https://python.langchain.com/),
+  - create the podcast transcript,
+  - convert text to speech using [AWS Polly](https://aws.amazon.com/polly/),
+  - process the audio using [ffmpeg](https://ffmpeg.org/), and
+  - generate content for the website.
+- **web** -- this is an [11ty](https://www.11ty.dev/) project, consisting of logic to build a static site for the podcast, including an RSS feed.
 
-This can be done as follows:
+## Development
+
+- clone / fork the project
+- `cd` into the project directory
+
+### Core
+
+> You need to have docker and docker-compose on your machine
+
+- create a python virtual environment
+- upgrade pip to latest version
+
+  ```bash
+  pip install --upgrade pip
+  ```
+
+- install dependencies
+
+  ```bash
+  pip install -r requirements.txt -r requirements-dev.txt
+  ```
+
+- update environment variables.
+
+  ```bash
+  # copy .env.sample to .env
+  cp -v .env.sample .env
+
+  # Now you can update the relevant values in the .env file
+  ```
+
+- build images and spin up docker containers
+
+  ```bash
+  inv up --build
+  ```
+
+- access the `app` container
+
+  ```bash
+  inv exec app "bash"
+  ```
+
+In the container:
+
+- you can use [aerich](https://github.com/tortoise/aerich) to apply database migrations version
+
+  ```bash
+  inv upgrade
+  ```
+
+- you can run tests
+
+  ```bash
+  inv test
+  ```
+
+- you can run the program
+
+  ```bash
+  inv toolchain
+  ```
+
+See available [invoke](https://www.pyinvoke.org/) tasks with `invoke -l`
+
+The project uses [pgweb](https://github.com/sosedoff/pgweb) to help visualize database changes. You can access this in your browser at <http://127.0.0.1:8081>
+
+### Web
+
+- update environment variables.
+
+  ```bash
+  # copy .env.sample to .env
+  cp -v .env.sample .env
+
+  # Now you can update the relevant values in the .env file
+  ```
+
+- install frontend dependencies
+
+  ```bash
+  npm install
+  ```
+
+- start the dev server
+
+  ```bash
+  npm start
+  ```
+
+See other available scripts in `package.json`.
+
+## Contributing
+
+Contributions, issues and feature requests are most welcome! A good place to start is by helping out with the unchecked items in the [TODO](#todo) section of this README!
+
+Feel free to check the [issues page](https://github.com/engineervix/zed-news/issues) and take a look at the [contributing guide](https://github.com/engineervix/zed-news/blob/main/CONTRIBUTING.md) before you get started.
+
+To maintain code quality and formatting consistency, we utilize pre-commit hooks. These hooks automatically check and format your code before each commit. This helps ensure that the codebase remains clean and consistent throughout the development process. Set up the Git pre-commit hooks by running the following
 
 ```bash
-ffmpeg -i instrumental.src.mp3 -af "volume=-20dB" instrumental-20dB.mp3
+pre-commit install && pre-commit install --hook-type commit-msg
 ```
 
-### 1. convert the AWS Polly file to mp3
+See `pre-commit-config.yaml` for more details. In addition, please note the following:
 
-```bash
-ffmpeg -i 1652d80b-985d-4ee2-86c6-b8c74620e17a.mpga -c copy 2023-05-24.src.mp3
-```
-
-### 2. Convert audio file from mono to 128 kb/s stereo
-
-```bash
-ffmpeg -i 2023-05-24.src.mp3 -af "pan=stereo|c0=c0|c1=c0" -b:a 128k 2023-05-24.stereo.mp3
-```
-
-### 3. Sound equalization
-
-The sound is too 'muffled', we need to increase the treble frequencies and reduce the bass a little.
-
-Here's an approach, based on <https://stackoverflow.com/questions/39607741/ffmpeg-how-to-reduce-bass-and-increase-treble-like-audacity>
-
-Notes:
-
-- The gain for **0 Hz** should be the _bass_ value you used.
-- **250 Hz** gain should be half the bass value.
-- **1000 Hz** remains as is - no gain.
-- **4000** Hz value should be half the treble value.
-- The gain for **16000 Hz** should be the _treble_ value.
-
-```bash
-ffmpeg -y -i original.mp3 -af "firequalizer=gain_entry='entry(0,-23);entry(250,-11.5);entry(1000,0);entry(4000,8);entry(16000,16)'" test1.mp3
-```
-
-Or we could just simply
-
-```bash
-ffmpeg -i input.mp3 -af "treble=g=10" output.mp3
-```
-
-The ffmpeg filter `-af "treble=g=10"` adjusts the treble (high-frequency) audio component of the input audio file. The `g=10` parameter specifies the gain in decibels (dB) to be applied to the treble frequencies.
-
-### 4. Mix the voice and instrumental(s)
-
-> We want an intro instrumental and an outro
-> We could use the same one, or two separate ones
-> Maybe do some manual editing of the sounds so that:
-> intro starts at normal volume and then fades to -20dB
-> outro starts at low volume and gradually builds up to normal
-
-```bash
-# step 0: core
-ffmpeg -i 2023-05-24.stereo.mp3 -i instrumental-20dB.mp3 -filter_complex amix=inputs=2:duration=longest:dropout_transition=0:weights="1 0.25":normalize=0 2023-05-24.mixed_by_ffmpeg.mp3
-
-# step 1: get the duration of the mixed file
-ffmpeg -i 2023-05-24.mixed_by_ffmpeg.mp3 2>&1 | grep "Duration"
-
-# step 2: pad the instrumental with silence, using duration above and
-# the instrumental's duration
-# adelay = (duration above - instrumental duration) in milliseconds
-ffmpeg -i instrumental-20dB.mp3 2>&1 | grep "Duration"
-ffmpeg -i instrumental-20dB.mp3 -af "adelay=484170|484170" ending.mp3
-
-# mix the file from step 0 and step 2
-ffmpeg -i 2023-05-24.mixed_by_ffmpeg.mp3 -i ending.mp3 -filter_complex amix=inputs=2:duration=longest:dropout_transition=0:weights="1 0.25":normalize=0 2023-05-24.dist.mp3
-```
-
-### 5. Add id3 tags
-
-```bash
-eyeD3 -a "Victor Miti" -A "Zed News" -t "Zed News Podcast, Episode 003 (Wednesday 24 May 2023)" -n 3 -Y 2023 2023-05-24.dist.mp3
-eyeD3 --genre "Podcast" 2023-05-24.dist.mp3
-eyeD3 --add-image album-art.jpg:FRONT_COVER 2023-05-24.dist.mp3
-```
-
-## RSS
-
-- <https://rss.com/blog/how-to-create-an-rss-feed-for-a-podcast/>
-- <https://riverside.fm/blog/podcast-rss-feed>
-- <https://www.podcastinsights.com/podcast-rss-feed/>
-- <https://help.spotifyforpodcasters.com/hc/en-us/articles/12515678291995-Your-RSS-feed>
-- <https://podcasters.apple.com/support/823-podcast-requirements>
-- <https://support.google.com/podcast-publishers/answer/9889544?hl=en>
-- <https://castos.com/podcast-rss-feed/>
+- if you're making code contributions, please try and write some tests to accompany your code, and ensure that the tests pass. Also, were necessary, update the docs so that they reflect your changes.
+- your commit messages should follow the conventions described [here](https://www.conventionalcommits.org/en/v1.0.0/). Write your commit message in the imperative: "Fix bug" and not "Fixed bug" or "Fixes bug".
+  Once you are done, please create a [pull request](https://github.com/engineervix/zed-news/pulls).
 
 ## TODO
 
-### Tasks
+### Docs
 
-#### Dev
+- [ ] Add architecture diagram
+
+### Dev
 
 - [ ] Write tests
 
-#### Web
+### More ways to listen
 
-- [ ] Add popup on **Listen and Subscribe button** so that people can choose multiple services
-- [ ] Implement search on the web app
+- [ ] Apple: <https://podcasts.apple.com/us/podcast/zed-news-podcast/id1690709989>
+- [ ] Google: <https://podcasts.google.com/feed/aHR0cHM6Ly96ZWRuZXdzLnBhZ2VzLmRldi9mZWVkLnhtbA>
+- [ ] Spotify: <https://open.spotify.com/show/14vv6liB2y2EWgJGRsNWVa>
+- [ ] Deezer: <https://deezer.com/show/6126025>
+- [ ] RSS: <{{ site.base_url }}/feed.xml>
+- [ ] PocketCast: <https://pca.st/riwx8tbc>
+- [ ] Overast: <https://overcast.fm/itunes1690709989>
+- [ ] Castro: <https://castro.fm/itunes/1690709989>
+- [ ] PlayerFM: <>
+- [ ] Tune In: <>
+- [ ] JioSaavn: <>
+- [ ] Sticher: <>
+- [ ] iheartRadio: <>
+- [ ] RadioPublic: <>
+- [ ] Gaana: <>
+
+### Web
+
+- [ ] Create a **More ways to listen** button with a popup/modal so that people can choose multiple services from the above list
+- [ ] Implement **search** on the web app
 - [ ] Dark mode
+- [ ] Improve the mobile UI. For example, the audio player
 - [ ] Learn more about [using the aria-current attribute](https://tink.uk/using-the-aria-current-attribute/)
 
-#### Core
+### Core
 
 - [ ] Add a separate module for summarization backends so we can choose which one to work with
-- [ ] Add appropriate error handling on `requests` and `feedparser` jobs as well as all other operations, such connecting to AWS Polly, etc.
-- [ ] Add task to perform substitution so that, for instance, K400 is written as 400 Kwacha. the AWS Polly voices fail to read Zambian money correctly.
+- [ ] Add appropriate error handling on `requests` and `feedparser` jobs as well as all other operations, such as connecting to AWS Polly, etc.
+- [ ] Add task to perform substitution so that, for instance, K400 is written as 400 Kwacha. The AWS Polly voices fail to read Zambian money correctly.
 
-#### Features for future releases
+### Features for future releases
 
-- [ ] Allow for passing of an arg variable for the voice, or dynamically choose a voice from a list, just like the random intros and outros.
-- [ ] Mention the weather in Lusaka, Livingstone, Kabwe, etc. Even the weather forecast
+- [ ] Connect with social media platforms and automagically tweet, post to facebook when a new episode is out.
+- [ ] Incorporate a newsletter version where the news is sent to your mailbox in a nice, clean format. People can subscribe / unsubscribe.
+- [ ] Mention the weather in Lusaka, Livingstone, Kabwe, etc. Perhaps the weather forecast for the following day?
 - [ ] Mention exchange rates
+- [ ] Cleanup the news by consolidating similar articles from different sources
+- [ ] Find a way of training the voice to learn how to pronounce Zambian words.
+- [ ] Find a way to summarize for free!
+- [ ] Allow for passing of an arg variable for the voice, or dynamically choose a voice from a list, just like the random intros and outros.
 
-#### Podcast URLs
+## Credits
 
-TODO: Add button "More ways to listen"
+### Music
 
-- Apple: <https://podcasts.apple.com/us/podcast/zed-news-podcast/id1690709989>
-- Google: <https://podcasts.google.com/feed/aHR0cHM6Ly96ZWRuZXdzLnBhZ2VzLmRldi9mZWVkLnhtbA>
-- Spotify: <https://open.spotify.com/show/14vv6liB2y2EWgJGRsNWVa>
-- Deezer: <https://deezer.com/show/6126025>
-- RSS: <{{ site.base_url }}/feed.xml>
-- PocketCast: <https://pca.st/riwx8tbc>
-- Overast: <https://overcast.fm/itunes1690709989>
-- Castro: <https://castro.fm/itunes/1690709989>
-- PlayerFM: <>
-- Tune In: <>
-- JioSaavn: <>
-- Sticher: <>
-- iheartRadio: <>
-- RadioPublic: <>
-- Gaana: <>
+- opening: <https://pixabay.com/music/beats-classical-hip-hop-143320/>
+- closing: <https://pixabay.com/music/beats-digital-technology-131644/>
+
+### Icon
+
+- logo adapted from <https://www.pngrepo.com/svg/227923/news-reporter-woman>
