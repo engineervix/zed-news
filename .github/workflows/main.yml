@@ -146,7 +146,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install poetry==1.4.1
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -169,21 +169,12 @@ jobs:
           export LANG=en_US.UTF-8
           export LANGUAGE=en_US:en
           export LC_ALL=en_US.UTF-8
-          export POETRY_HOME=/opt/poetry
-          python3 -m venv $POETRY_HOME
-          $POETRY_HOME/bin/pip install poetry==1.4.1
-          source $POETRY_HOME/bin/activate
           poetry install
 
       - name: Test with unittest
         shell: bash
         run: |
-          # Note that you have to activate the virtualenv in every step
-          # because GitHub actions doesn't preserve the environment
-          source $POETRY_HOME/bin/activate
-
-          # Run tests
-          invoke test
+          poetry run invoke test
 
       - name: "Upload coverage data"
         uses: actions/upload-artifact@v3
@@ -200,7 +191,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install poetry==1.4.1
 
       - name: Set up Python
         uses: actions/setup-python@v4
