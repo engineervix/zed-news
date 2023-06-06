@@ -7,6 +7,7 @@ import subprocess
 import boto3
 import eyed3
 from botocore.exceptions import BotoCoreError, ClientError
+from mutagen.mp3 import MP3 as MutagenMP3
 from pydantic import FilePath
 
 from app.core.db.models import MP3
@@ -156,8 +157,8 @@ def upload_to_s3(src: FilePath, dest_folder: str, dest_filename: str):
 
 def get_mp3_info(mp3_file: FilePath) -> dict:
     """Get the filesize and duration of an MP3 file"""
-    audiofile = eyed3.load(mp3_file)
-    return {"filesize": audiofile.info.size_bytes, "duration": audiofile.info.time_secs}
+    audiofile = MutagenMP3(mp3_file)
+    return {"filesize": os.path.getsize(mp3_file), "duration": audiofile.info.length}
 
 
 async def add_to_db(url: str, f: FilePath):
