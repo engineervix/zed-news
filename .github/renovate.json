@@ -1,22 +1,6 @@
 {
   "extends": ["config:base"],
-  "pin": {
-    "automerge": true,
-    "labels": ["dependencies"]
-  },
   "packageRules": [
-    {
-      "matchLanguages": ["python"],
-      "labels": ["dependencies", "python"],
-      "updateTypes": ["minor", "patch", "pin", "digest"],
-      "automerge": true,
-      "semanticCommitType": "build"
-    },
-    {
-      "matchDepTypes": ["devDependencies"],
-      "automerge": true,
-      "labels": ["dependencies"]
-    },
     {
       "matchLanguages": ["javascript"],
       "matchDepTypes": ["dependencies"],
@@ -45,5 +29,5 @@
     }
   ],
   "timezone": "Africa/Lusaka",
-  "schedule": ["after 10pm every weekday", "every weekend"]
+  "schedule": ["every weekend"]
 }
