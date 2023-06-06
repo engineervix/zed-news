@@ -145,6 +145,9 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v3
 
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -177,7 +180,7 @@ jobs:
         run: |
           # Note that you have to activate the virtualenv in every step
           # because GitHub actions doesn't preserve the environment
-          source ~/venv/bin/activate
+          source $POETRY_HOME/bin/activate
 
           # Run tests
           invoke test
@@ -195,6 +198,9 @@ jobs:
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
 
       - name: Set up Python
         uses: actions/setup-python@v4
