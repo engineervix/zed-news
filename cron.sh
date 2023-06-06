@@ -60,6 +60,9 @@ git push origin main || { echo "Failed to push changes to remote repository."; s
 # Send success signal to healthchecks.io
 send_healthcheck_success
 
+# Pause for 7 minutes
+sleep 420
+
 # Notify Admin via Telegram
 today_human_readable=$(date +"%a %d %b %Y")
 apprise -vv -t "🎙️ New Episode » ${today_human_readable}" \
