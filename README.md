@@ -195,7 +195,7 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 ### Dev
 
 - [ ] Switch to [Poetry](https://python-poetry.org/)
-- [ ] Replace [flake8](https://pypi.org/project/flake8/), [pycodestyle](https://pypi.org/project/pydocstyle/) and [isort](https://pypi.org/project/isort/) with [ruff](https://github.com/charliermarsh/ruff)
+- [x] Replace [flake8](https://pypi.org/project/flake8/), [pycodestyle](https://pypi.org/project/pydocstyle/) and [isort](https://pypi.org/project/isort/) with [ruff](https://github.com/charliermarsh/ruff)
 - [ ] Test all the things
 
 ### More ways to listen

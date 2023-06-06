@@ -122,14 +122,6 @@ def import_db_dump(c, dump_file):
 
 
 @task
-def fix_path(c):
-    """fix the PYTHON_PATH"""
-    # export PYTHONPATH="${PYTHONPATH}":`pwd`
-    cwd = os.path.abspath(__file__)
-    c.run(f'export PYTHONPATH="${{PYTHONPATH}}:{cwd}"', pty=True)
-
-
-@task
 def init_db(c):
     """use aerich to generate schema and generate app migrate location"""
     c.run("aerich init-db", pty=True)
@@ -264,17 +256,16 @@ def execute_bump_hack(c, branch, is_first_release=False, major=False):
         c.run("rm -vf .bump_result.txt", pty=True)
 
 
-@task(help={"fix": "let black and isort format your files"})
+@task(help={"fix": "let black and ruff format your files"})
 def lint(c, fix=False):
-    """flake8, black and isort"""
+    """ruff and black"""
 
     if fix:
         c.run("black .", pty=True)
-        c.run("isort --profile black .", pty=True)
+        c.run("ruff check --fix .", pty=True)
     else:
         c.run("black . --check", pty=True)
-        c.run("isort --check-only --profile black .", pty=True)
-        c.run("flake8 wb", pty=True)
+        c.run("ruff check .", pty=True)
 
 
 # TODO: create a "clean" collection comprising the next two tasks below

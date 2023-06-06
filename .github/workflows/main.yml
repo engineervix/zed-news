@@ -17,9 +17,9 @@ on:
       - "v*"
 
 jobs:
-  # Runs the isort, black & flake8 linting steps inside the specified containers rather than on the VM host.
+  # Runs the ruff & black linting steps inside the specified containers rather than on the VM host.
   # Because of this the network configuration changes from host based network to a container network.
-  linter_isort:
+  linter_ruff:
     runs-on: ubuntu-22.04
     container: python:3.10-slim-bullseye
 
@@ -29,10 +29,10 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install -q isort==5.12.0
-      - name: isort
+          pip install -q ruff==0.0.270
+      - name: ruff
         run: |
-          isort . --check-only --profile black
+          ruff check --format=github .
 
   linter_black:
     runs-on: ubuntu-22.04
@@ -48,21 +48,6 @@ jobs:
       - name: black
         run: |
           black . --check
-
-  linter_flake8:
-    runs-on: ubuntu-22.04
-    container: python:3.10-slim-bullseye
-
-    steps:
-      - name: Checkout Code Repository
-        uses: actions/checkout@v3
-
-      - name: Install Dependencies
-        run: |
-          pip install -q flake8==6.0.0
-      - name: flake8
-        run: |
-          flake8 app/core
 
   # Runs the frontend linting steps on the VM
   linter_stylelint:
@@ -148,9 +133,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       [
-        linter_isort,
+        linter_ruff,
         linter_black,
-        linter_flake8,
         linter_stylelint,
         linter_eslint,
         linter_prettier,
@@ -248,9 +232,8 @@ jobs:
   release:
     needs:
       [
-        linter_isort,
+        linter_ruff,
         linter_black,
-        linter_flake8,
         linter_stylelint,
         linter_eslint,
         linter_prettier,

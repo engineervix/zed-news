@@ -41,10 +41,9 @@ dev = [
   "commitizen",
   "coverage[toml]",
   "DSLR",
-  "flake8",
-  "isort",
   "pip-tools",
   "pre-commit",
+  "ruff",
 ]
 
 [tool.setuptools]
@@ -73,13 +72,28 @@ exclude = '''
 )
 '''
 
-[tool.isort]
-profile = "black"
-skip = ["node_modules", ".git", "__pycache__", "LC_MESSAGES", "venv", ".venv"]
-blocked_extensions = ["rst", "html", "js", "svg", "txt", "css", "scss", "png", "snap", "ts", "tsx"]
-known_first_party = "app"
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-default_section = "THIRDPARTY"
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+select = ["B", "C", "E", "F", "W", "B9"]
+ignore = ["E203", "E266", "E501", "F403", "F401"]
+exclude = [
+  ".git",
+  "__pycache__",
+  "node_modules",
+  "public",
+  "venv",
+]
+
+[tool.ruff.isort]
+known-first-party = ["app"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.ruff.pycodestyle]
+max-doc-length = 120
+
+[tool.ruff.mccabe]
+max-complexity = 10
 
 [tool.coverage.run]
 include = ["app/core/*"]
