@@ -5,7 +5,7 @@ services:
     build:
       context: .
       args:
-        DEVELOPMENT: 1
+        DEVELOPMENT: ${DEVELOPMENT:-0}
     command: tail -f /dev/null
     volumes:
       - ./:/home/zednews/app/

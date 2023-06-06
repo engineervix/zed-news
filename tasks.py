@@ -7,29 +7,6 @@ from colorama import Fore, init
 from invoke import task
 
 
-@task(
-    help={
-        "base": "run pip-compile to pin core dependencies",
-        "dev": "run pip-compile to pin dev dependencies",
-    }
-)
-def pip_compile(c, base=False, dev=False):
-    """run pip-compile to pin dependencies"""
-    if all(option is False for option in [base, dev]):
-        base = dev = True
-
-    if base:
-        c.run(
-            "python -m piptools compile -o requirements.txt pyproject.toml",
-            pty=True,
-        )
-    if dev:
-        c.run(
-            "python -m piptools compile --all-extras -o requirements-dev.txt pyproject.toml",
-            pty=True,
-        )
-
-
 @task
 def db_snapshot(c, filename_prefix):
     """Create a Database snapshot using DSLR"""
@@ -287,7 +264,7 @@ def clean_test(c):
 
     c.run("rm -fr .tox/", pty=True)
     c.run("rm -f .coverage", pty=True)
-    c.run("rm -f coverage.xml", pty=True)
+    c.run("rm -f coverage.*", pty=True)
     c.run("rm -fr htmlcov/", pty=True)
     c.run("rm -fr .pytest_cache", pty=True)
 

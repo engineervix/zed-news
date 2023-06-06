@@ -42,19 +42,21 @@ ENV LC_ALL en_US.UTF-8
 USER zednews
 
 # set up virtual environment & install python dependencies
+ARG POETRY_VERSION=1.4.1
 ARG DEVELOPMENT
 ENV VIRTUAL_ENV=/home/zednews/venv \
     DEVELOPMENT=${DEVELOPMENT}
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install --upgrade pip
-RUN pip install pip-tools
-COPY --chown=zednews ./requirements.txt .
-COPY --chown=zednews ./requirements-dev.txt .
-RUN python3 -m pip install -r requirements.txt ${DEVELOPMENT:+-r requirements-dev.txt}
+RUN python -m pip install poetry==$POETRY_VERSION
+COPY --chown=zednews ./pyproject.toml .
+COPY --chown=zednews ./poetry.lock .
+RUN poetry install ${DEVELOPMENT:+--with dev} --no-root
 
 # Copy the source code of the project into the container
 COPY --chown=zednews:zednews . .
+RUN poetry install --only-root
 
 # Runtime command that executes when "docker run" is called
 # basically, do nothing ... we'll run commands ourselves

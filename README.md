@@ -67,6 +67,7 @@ It consists primarily of two parts / components:
 
 On your machine:
 
+- you need to have [poetry](https://python-poetry.org/) installed
 - create a python [virtual environment](https://realpython.com/python-virtual-environments-a-primer/)
 - upgrade pip to latest version
 
@@ -77,7 +78,7 @@ On your machine:
 - install dependencies
 
   ```bash
-  pip install -r requirements.txt -r requirements-dev.txt
+  poetry install
   ```
 
 - update environment variables.
@@ -194,7 +195,7 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 ### Dev
 
-- [ ] Switch to [Poetry](https://python-poetry.org/)
+- [x] Switch to [Poetry](https://python-poetry.org/)
 - [x] Replace [flake8](https://pypi.org/project/flake8/), [pycodestyle](https://pypi.org/project/pydocstyle/) and [isort](https://pypi.org/project/isort/) with [ruff](https://github.com/charliermarsh/ruff)
 - [ ] Test all the things
 
