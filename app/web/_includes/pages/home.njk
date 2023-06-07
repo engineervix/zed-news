@@ -96,7 +96,11 @@
                 <div class="flex-shrink-0">
                     <img src="/img/zed-news-podcast-icon.svg" alt="Episode {{ episode.data.episode }}" />
                 </div>
-                <div class="flex-grow-1 ms-3">
+                <div class="flex-grow-1 ms-3"
+                     data-aos="fade-up"
+                     data-aos-delay="50"
+                     data-aos-duration="1800"
+                     data-aos-easing="ease-out-back">
                     <div class="small text-muted">{{ episode.data.title }}</div>
                     <a class="link-dark" href="{{ episode.url }}"
                     >Episode {{ episode.data.episode }}

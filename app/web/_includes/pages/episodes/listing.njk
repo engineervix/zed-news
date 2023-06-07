@@ -31,7 +31,11 @@
     <div class="row gx-5 justify-content-center">
       <div class="col-lg-10">
         {% for episode in episodes %}
-        <div class="d-flex mb-4 border-bottom">
+        <div class="d-flex mb-4 border-bottom"
+             data-aos="fade-up"
+             data-aos-delay="50"
+             data-aos-duration="1800"
+             data-aos-easing="ease-out-back">
           <div class="flex-shrink-0">
             <img src="/img/zed-news-podcast-icon.svg" alt="Episode {{ episode.data.episode }}" />
           </div>
