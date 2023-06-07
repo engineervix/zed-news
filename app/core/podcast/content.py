@@ -8,13 +8,7 @@ from num2words import num2words
 from pydantic import HttpUrl
 
 from app.core.db.models import Article, Episode
-from app.core.utilities import (
-    COHERE_API_KEY,
-    OPENAI_API_KEY,
-    podcast_host,
-    today,
-    today_human_readable,
-)
+from app.core.utilities import COHERE_API_KEY, OPENAI_API_KEY, podcast_host, today, today_human_readable
 
 llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
 co = cohere.Client(COHERE_API_KEY)
@@ -110,16 +104,25 @@ dive_in_choices = [
 async def create_transcript(news: list[dict[str, str]], dest: str):
     """Create a podcast transcript from the news, and write it to a file
 
-    Steps:
-    1. categorize the news by source
-    2. write a brief intro welcoming the listener to the podcast
-    3. for each source:
-        - mention that we're reading from the source
-        - for each news item:
-            - read the title
-            - if item has category, specify that it was posted in that category
-            - read the content
-    4. write a brief outro thanking the listener for listening to the podcast
+    Args:
+        news (list[dict[str, str]]): A list of news articles represented as
+            dictionaries, where each dictionary contains the following keys:
+            - 'source': The article source.
+            - 'url': The URL of the article.
+            - 'title': The title of the article.
+            - 'content': The content of the article. This is passed to the OpenAI API for summarization.
+            - 'category': The category of the article.
+        dest (str): The destination file path where the transcript will be written.
+
+    Raises:
+        - OpenAIException: If there is an issue with the OpenAI API.
+        - TimeoutError: If the summarization request times out.
+        - ConnectionError: If there is a network connectivity issue.
+        - ValueError: If the input data is invalid or in the wrong format.
+        - TypeError: If the input data is of incorrect type.
+
+    Returns:
+        None: The function writes the transcript to the specified file but does not return any value.
     """
 
     # Create a dictionary to store the articles by source
@@ -183,7 +186,7 @@ async def create_transcript(news: list[dict[str, str]], dest: str):
 
             summary = llm(summary_prompt)
 
-            # =============== Summarize using OpenAI ===============
+            # =============== Summarize using Cohere ===============
             # logging.info(f"Summarizing '{title}' via Cohere ...")
             # # https://docs.cohere.com/reference/summarize-2
             # response = co.summarize(

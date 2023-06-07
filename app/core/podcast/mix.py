@@ -89,6 +89,7 @@ async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{to
     output_1 = run_ffmpeg_command(command_1)
     duration_1 = extract_duration_in_milliseconds(output_1)
 
+    # get duration of the outro instrumental
     command_2 = f'ffmpeg -i {outro_track} 2>&1 | grep "Duration"'
     output_2 = run_ffmpeg_command(command_2)
     duration_2 = extract_duration_in_milliseconds(output_2)
