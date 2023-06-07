@@ -136,13 +136,15 @@ The project uses [pgweb](https://github.com/sosedoff/pgweb) to help visualize da
 
 ### Web
 
+This project uses Node [v16](https://nodejs.org/en/blog/release/v16.0.0). I use [volta](https://volta.sh/) to manage node versions. If you have volta installed on your machine, then it'll automatically use the correct Node binary for this project.
+
 - install frontend dependencies
 
   ```bash
   npm install
   ```
 
-- start the dev server
+- start the dev server, accessible at <http://127.0.0.1:8080/>
 
   ```bash
   npm start
