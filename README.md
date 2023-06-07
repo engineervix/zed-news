@@ -21,6 +21,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [Introduction](#introduction)
+- [Why this project?](#why-this-project)
 - [Development](#development)
   - [Core](#core)
   - [Web](#web)
@@ -36,6 +37,7 @@
 - [Credits](#credits)
   - [Music](#music)
   - [Icon](#icon)
+  - [News Sources](#news-sources)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -53,6 +55,12 @@ It consists primarily of two parts / components:
   - process the audio using [ffmpeg](https://ffmpeg.org/), and
   - generate content for the website.
 - **web** -- this is an [11ty](https://www.11ty.dev/) project, consisting of logic to build a static site for the podcast, including an RSS feed.
+
+## Why this project?
+
+- I'm generally terrible at keeping up with current affairs
+- I wanted to learn how to work with AI tools while solving a real problem
+- I was inspired by [Hackercast](https://camrobjones.com/hackercast/)
 
 ## Development
 
@@ -155,11 +163,11 @@ The final outputs of this project are:
 
 For a smooth, unattended setup, please follow these steps:
 
-1.  Set up a Linux server with a Python virtual environment for the project, and make sure `docker` and `docker-compose` are installed.
+1. Set up a [\*nix](https://en.wikipedia.org/wiki/Unix-like) machine (it can be your laptop, a VPS, etc.) with a Python virtual environment for the project, and make sure `docker` and `docker-compose` are installed.
 
-2.  Configure a cron job on the Linux server to run the `cron.sh` script located in the repository root. This script will handle the automated generation and deployment process.
+2. Configure a cron job on the machine to run the `cron.sh` script located in the repository root. This script will handle the automated generation and deployment process.
 
-3.  Ensure that the Linux server has `git` properly configured. This is necessary for the `cron.sh` script to push the generated content to the repository, triggering the build and deployment.
+3. Ensure that the machine has `git` properly configured. This is necessary for the `cron.sh` script to push the generated content to the repository, triggering the build and deployment.
 
 By following these steps, you can automate the deployment process and keep your project up to date without manual intervention.
 
@@ -233,16 +241,18 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 ### Features for future releases
 
+- [ ] Add [Diamond TV](https://diamondtvzambia.com) as a news source. Might be a good idea to replace Muvi TV with Diamond TV because the latter seems to have infrequent updates. Also, we don't want too many news items -- it kills the whole point of this project -- to get the latest updates delivered in a _concise_ manner.
 - [ ] Connect with social media platforms and automagically tweet, post to facebook when a new episode is out.
 - [ ] Incorporate a newsletter version where the news is sent to your mailbox in a nice, clean format. People can subscribe / unsubscribe.
 - [ ] Mention the weather in Lusaka, Livingstone, Kabwe, etc. Perhaps the weather forecast for the following day?
 - [ ] Mention exchange rates
-- [ ] Cleanup the news by consolidating similar articles from different sources
+- [ ] Cleanup the news by consolidating similar articles from different sources. In other words, let's make this [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
 - [ ] Find a way of training the voice to learn how to pronounce Zambian words.
-- [ ] Find a way to summarize for free!
+- [ ] Find a way to summarize for free, without relying on OpenAI's API. Perhaps train your own model, learn how to leverage tools like [NLTK](https://www.nltk.org/), [spaCy](https://spacy.io/), etc.
 - [ ] Find a way to make a closing statement based on the news. Something like, "Don't forget to register yor sim card before the ZICTA deadline ..."
 - [ ] Keep the background music running throughout the show
-- [ ] Allow for passing of an arg variable for the voice, or dynamically choose a voice from a list, just like the random intros and outros.
+- [ ] Different background music for each day of the week
+- [ ] Possibly allow for passing of an argument variable for the voice, or dynamically choose a voice from a list, just like the random intros and outros.
 
 ## Credits
 
@@ -254,3 +264,11 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 ### Icon
 
 - logo adapted from <https://www.pngrepo.com/svg/227923/news-reporter-woman>
+
+### News Sources
+
+- [ZNBC](https://www.znbc.co.zm/)
+- [Zambia Daily Mail](http://www.daily-mail.co.zm/)
+- [News Diggers!](https://diggers.news/)
+- [Muvi TV](https://www.muvitv.com/)
+- [Mwebantu](https://www.mwebantu.com/)
