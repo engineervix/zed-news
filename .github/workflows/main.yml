@@ -157,13 +157,6 @@ jobs:
 
       - name: Install Dependencies
         shell: bash
-        env:
-          OPENAI_API_KEY: "fake_key"
-          COHERE_API_KEY: "another_fake_key"
-          AWS_ACCESS_KEY_ID: "1234567890"
-          AWS_SECRET_ACCESS_KEY: "fake_secret_key"
-          AWS_REGION_NAME: "any-region"
-          AWS_BUCKET_NAME: "bucket-name"
         run: |
           sudo apt update --yes --quiet
           export DEBIAN_FRONTEND=noninteractive
@@ -180,6 +173,13 @@ jobs:
 
       - name: Test with unittest
         shell: bash
+        env:
+          OPENAI_API_KEY: "fake_key"
+          COHERE_API_KEY: "another_fake_key"
+          AWS_ACCESS_KEY_ID: "1234567890"
+          AWS_SECRET_ACCESS_KEY: "fake_secret_key"
+          AWS_REGION_NAME: "any-region"
+          AWS_BUCKET_NAME: "bucket-name"
         run: |
           poetry run invoke test
 
