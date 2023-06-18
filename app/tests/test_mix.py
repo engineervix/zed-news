@@ -77,7 +77,6 @@ class TestMixAudio(unittest.TestCase):
     def tearDown(self):
         # Remove temporary directory and its contents
         shutil.rmtree(self.temp_dir)
-        os.remove(self.dest)
 
     @patch("app.core.db.models.Episode.filter")
     def test_mix_audio(self, filter_mock):
