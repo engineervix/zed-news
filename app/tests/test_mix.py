@@ -63,7 +63,7 @@ class TestMixAudio(unittest.TestCase):
         outro_audio_path = tempfile.NamedTemporaryFile(suffix=".mp3", dir=self.temp_dir, delete=False).name
 
         # Copy example audio files to temporary directory
-        data_dir = TEST_DIR / "data"
+        data_dir = TEST_DIR / "test_data"
         shutil.copyfile(data_dir / "example.mp3", example_audio_path)
         shutil.copyfile(data_dir / "intro.mp3", intro_audio_path)
         shutil.copyfile(data_dir / "outro.mp3", outro_audio_path)
@@ -77,6 +77,7 @@ class TestMixAudio(unittest.TestCase):
     def tearDown(self):
         # Remove temporary directory and its contents
         shutil.rmtree(self.temp_dir)
+        os.remove(self.dest)
 
     @patch("app.core.db.models.Episode.filter")
     def test_mix_audio(self, filter_mock):
