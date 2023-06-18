@@ -11,11 +11,9 @@
 # 1. cd to project directory
 # 2. Activate virtual environment
 # 3. git pull
-# 4. Run script inside docker container
+# 4. Run script inside docker container (cleanup afterwards)
 # 5. commit changes
 # 6. push changes to remote
-# 7. deactivate virtual environment
-# 8. stop docker container
 # =================================================================================================
 
 set -e  # Exit immediately if any command fails
