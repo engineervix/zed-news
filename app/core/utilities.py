@@ -127,7 +127,7 @@ def format_filesize(filesize: int):
 
 def is_valid_date(datestring: str) -> bool:
     try:
-        if datestring != datetime.strptime(datestring, "%Y-%m-%d").strftime("%Y-%m-%d"):
+        if datestring != datetime.datetime.strptime(datestring, "%Y-%m-%d").strftime("%Y-%m-%d"):
             raise ValueError("Incorrect date format, should be YYYY-MM-DD")
         return True
     except ValueError:
