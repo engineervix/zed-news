@@ -255,6 +255,7 @@ def clean_pyc(c):
     c.run("find . -name '*.pyc' -exec rm -f {} +", pty=True)
     c.run("find . -name '*.pyo' -exec rm -f {} +", pty=True)
     c.run("find . -name '__pycache__' -exec rm -fr {} +", pty=True)
+    c.run("find . -name '.ruff_cache' -exec rm -fr {} +", pty=True)
     c.run('find . -type d -name "*.egg-info" -exec rm -fr {} +', pty=True)
 
 
