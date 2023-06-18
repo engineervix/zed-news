@@ -218,7 +218,7 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 - [x] Switch to [Poetry](https://python-poetry.org/)
 - [x] Replace [flake8](https://pypi.org/project/flake8/), [pycodestyle](https://pypi.org/project/pydocstyle/) and [isort](https://pypi.org/project/isort/) with [ruff](https://github.com/charliermarsh/ruff)
-- [ ] Test all the things
+- [ ] Improve test coverage
 
 ### More ways to listen
 
