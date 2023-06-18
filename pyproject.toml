@@ -94,7 +94,7 @@ max-doc-length = 120
 max-complexity = 10
 
 [tool.coverage.run]
-include = ["app/core/*"]
+source = ["app/core/"]
 branch = true   # Measure branch coverage
 
 [tool.coverage.report]
