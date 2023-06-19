@@ -22,7 +22,7 @@ async def get_episode_number() -> int:
 
 async def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, summary: str):
     """Find an article by title, URL & date, and update it with the given summary"""
-    article = await Article.get(title=title, url=url, date=date)
+    article = await Article.filter(title=title, url=url, date=date).first()
     article.summary = summary
     await article.save()
 
