@@ -125,14 +125,34 @@ const audioPlayer = document.querySelector("#audio-player .podcast-player");
 
 if (homePlayButton && audioPlayer) {
   homePlayButton.addEventListener("click", () => {
-    if (audioPlayer.paused) {
-      audioPlayer.play();
-      homePlayButton.classList.add("playing");
-      homePlayButton.innerHTML = `<i class="fa-solid fa-circle-pause me-2"></i>Pause`;
-    } else {
-      audioPlayer.pause();
-      homePlayButton.classList.remove("playing");
-      homePlayButton.innerHTML = `<i class="fa-solid fa-circle-play me-2"></i>Play`;
-    }
+    toggleAudio();
   });
+
+  audioPlayer.addEventListener("play", () => {
+    updateButtonState(true);
+  });
+
+  audioPlayer.addEventListener("pause", () => {
+    updateButtonState(false);
+  });
+}
+
+function toggleAudio() {
+  if (audioPlayer.paused) {
+    audioPlayer.play();
+  } else {
+    audioPlayer.pause();
+  }
+
+  updateButtonState(!audioPlayer.paused); // Update button state based on the audio player's current paused state
+}
+
+function updateButtonState(isPlaying) {
+  if (isPlaying) {
+    homePlayButton.classList.add("playing");
+    homePlayButton.innerHTML = `<i class="fa-solid fa-circle-pause me-2"></i>Pause`;
+  } else {
+    homePlayButton.classList.remove("playing");
+    homePlayButton.innerHTML = `<i class="fa-solid fa-circle-play me-2"></i>Play`;
+  }
 }
