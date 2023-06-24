@@ -87,13 +87,13 @@ function generatePodcastListenButton() {
 
   if (platform === "mac os" || platform === "ios") {
     buttonHTML = `
-      <a class="podcast-listen-btn px-4 me-sm-3" href="#">
+      <a class="podcast-listen-btn" href="https://podcasts.apple.com/us/podcast/zed-news-podcast/id1690709989">
         <img src="/img/apple-podcasts-badge.svg" alt="Listen on Apple Podcasts" height="40" />
       </a>
     `;
   } else {
     buttonHTML = `
-      <a class="podcast-listen-btn px-4 me-sm-3" href="#">
+      <a class="podcast-listen-btn" href="https://podcasts.google.com/feed/aHR0cHM6Ly96ZWRuZXdzLnBhZ2VzLmRldi9mZWVkLnhtbA">
         <img src="/img/google-podcasts-badge.svg" alt="Listen on Google Podcasts" height="38" />
       </a>
     `;
