@@ -31,9 +31,8 @@
 - [TODO](#todo)
   - [Docs](#docs)
   - [Dev](#dev)
-  - [More ways to listen](#more-ways-to-listen)
-  - [Web](#web-1)
-  - [Core](#core-1)
+  - [Frontend (Web)](#frontend-web)
+  - [Backend (Core)](#backend-core)
   - [Features for future releases](#features-for-future-releases)
 - [Credits](#credits)
   - [Music](#music)
@@ -221,33 +220,16 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 - [x] Replace [flake8](https://pypi.org/project/flake8/), [pycodestyle](https://pypi.org/project/pydocstyle/) and [isort](https://pypi.org/project/isort/) with [ruff](https://github.com/charliermarsh/ruff)
 - [ ] Improve test coverage
 
-### More ways to listen
+### Frontend (Web)
 
-- [ ] Apple: <https://podcasts.apple.com/us/podcast/zed-news-podcast/id1690709989>
-- [ ] Google: <https://podcasts.google.com/feed/aHR0cHM6Ly96ZWRuZXdzLnBhZ2VzLmRldi9mZWVkLnhtbA>
-- [ ] Spotify: <https://open.spotify.com/show/14vv6liB2y2EWgJGRsNWVa>
-- [ ] Deezer: <https://deezer.com/show/6126025>
-- [ ] RSS: `{{ site.base_url }}/feed.xml`
-- [ ] PocketCast: <https://pca.st/riwx8tbc>
-- [ ] Overast: <https://overcast.fm/itunes1690709989>
-- [ ] Castro: <https://castro.fm/itunes/1690709989>
-- [ ] PlayerFM: <>
-- [ ] Tune In: <>
-- [ ] JioSaavn: <>
-- [ ] Sticher: <>
-- [ ] iheartRadio: <>
-- [ ] RadioPublic: <>
-- [ ] Gaana: <>
-
-### Web
-
-- [ ] Create a **More ways to listen** button with a popup/modal so that people can choose multiple services from the above list
+- [x] Create a **More ways to listen** button with a popup/modal so that people can choose multiple services
+- [ ] Keep things DRY. For example, the **More ways to listen** modal on the _home_ and _about_ pages, the header and footer icons.
+- [ ] Toggle Dark/Light mode
+- [ ] Improve the mobile UI. For example, the audio player controls
+- [ ] Improve a11y. For instance, learn more about [using the aria-current attribute](https://tink.uk/using-the-aria-current-attribute/)
 - [ ] Implement **search** on the web app
-- [ ] Dark mode
-- [ ] Improve the mobile UI. For example, the audio player
-- [ ] Learn more about [using the aria-current attribute](https://tink.uk/using-the-aria-current-attribute/)
 
-### Core
+### Backend (Core)
 
 - [x] Add a separate module for summarization backends so we can choose which one to work with
 - [ ] Add more robust error handling on `requests` and `feedparser` jobs as well as all other operations, such as connecting to AWS Polly, etc.
