@@ -10,6 +10,7 @@ from app.core.podcast.content import (
     get_episode_number,
     random_dig_in,
     random_intro,
+    random_opening,
     random_outro,
     update_article_with_summary,
 )
@@ -94,6 +95,14 @@ class TestArticleUpdate(unittest.IsolatedAsyncioTestCase):
 
 
 class TestRandomContent(unittest.TestCase):
+    @patch("app.core.podcast.content.get_episode_number")
+    def test_random_opening(self, mock_get_episode_number):
+        mock_get_episode_number.return_value = 4
+        result = asyncio.run(random_opening())
+        self.assertIsInstance(result, str)
+        self.assertNotEqual(result, "")
+        self.assertIn("fourth", result)
+
     def test_random_intro(self):
         result = random_intro()
         self.assertIsInstance(result, str)
