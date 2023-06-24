@@ -5,7 +5,7 @@
   <div class="container px-5">
     <div class="row gx-5 align-items-center justify-content-center">
       <div class="col-lg-8 col-xl-7 col-xxl-6">
-        <div class="my-5 text-center text-xl-start">
+        <div class="my-5 text-start">
           <h1 class="display-5 fw-bolder mb-2">What's this all about❓</h1>
           <p class="lead fw-normal mb-4">
             Thanks for asking. Well, this project arose from a personal need
@@ -16,22 +16,16 @@
             would help me stay informed. This is the result. I hope you find
             it useful too.
           </p>
-          <div
-            class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start"
-          >
-            {# <div class="podcast-listen-btn-container"></div>
-            <a class="btn btn-outline-dark px-4" href="#!">
-              <i class="fa-solid fa-headphones me-2"></i>
-              Listen & Subscribe
-            </a> #}
-            <a class="btn btn-danger px-4" href="/#audio-player">
+          <div class="d-flex flex-column align-items-start flex-md-row justify-content-md-between gap-3" >
+            <a class="btn btn-outline-danger px-4" href="/#audio-player">
                 <i class="fa-solid fa-circle-play me-2"></i>
                 Listen
             </a>
-            {# <a class="btn btn-danger px-4" href="https://deezer.com/show/6126025" target="_blank" rel="noopener noreferrer">
-                <i class="fa-brands fa-deezer me-2"></i>
-                Listen on Deezer
-            </a> #}
+            <div class="podcast-listen-btn-container"></div>
+            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#listen-and-subscribe">
+                <i class="fa-solid fa-headphones me-2"></i>
+                Listen & Subscribe
+            </button>
           </div>
         </div>
       </div>
@@ -272,4 +266,118 @@
     </a>
   </div>
 </section>
+
+{# Modal #}
+<div class="modal fade" id="listen-and-subscribe" tabindex="-1" aria-labelledby="listenAndSubscribeLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <p class="modal-title fs-5" id="listenAndSubscribeLabel">Take your pick …</p>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a
+                    class="btn btn-outline-dark px-4"
+                    href="https://podcasts.apple.com/us/podcast/zed-news-podcast/id1690709989"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <i class="fa-brands fa-apple me-2"></i>
+                    Apple Podcasts
+                </a>
+                <a
+                    class="btn btn-outline-success px-4"
+                    href="https://podcasts.google.com/feed/aHR0cHM6Ly96ZWRuZXdzLnBhZ2VzLmRldi9mZWVkLnhtbA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <i class="fa-brands fa-google me-2"></i>
+                    Google Podcasts
+                </a>
+                <a
+                    class="btn btn-outline-danger px-4"
+                    href="https://deezer.com/show/6126025"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <i class="fa-brands fa-deezer me-2"></i>
+                    Deezer
+                </a>
+                <a
+                    class="btn btn-social-yt px-4"
+                    href="https://pca.st/riwx8tbc"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" aria-label="Pocket Casts" role="img" viewBox="0 0 512 512" width="1rem" height="1rem" fill="#000000" class="me-2">
+                        <g id="SVGRepo_bgCarrierPocketCast" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrierPocketCast" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrierPocketCast">
+                            <rect width="512" height="512" rx="15%" fill="none"></rect>
+                            <path fill="#ffffff" d="M256 400a144 144 0 11144-144h48a192 192 0 10-192 192v-48zm0-71a73 73 0 1173-73h42a115 115 0 10-115 115v-42z"></path>
+                        </g>
+                    </svg>
+                    <span class="d-inline-block align-middle">PocketCast</span>
+                </a>
+                <a
+                    class="btn btn-social-email px-4"
+                    href="https://overcast.fm/itunes1690709989"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" aria-label="Overcast" role="img" viewBox="0 0 512 512" stroke-linecap="round" stroke-width="23" width="1rem" height="1rem" fill="#000000" class="me-2">
+                        <g id="SVGRepo_bgCarrierOverCast" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrierOverCast" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrierOverCast">
+                            <rect width="512" height="512" rx="15%" fill="none"></rect>
+                            <g fill="none" stroke="#000000">
+                            <circle cx="255" cy="255" r="175"></circle>
+                            <path d="m160 181.1s-24.2 27.3-24.2 75 24.2 73.9 24.2 73.9"></path>
+                            <path d="m352.8 181.1s24.2 27.3 24.2 75-24.2 73.9-24.2 73.9"></path>
+                            <path d="m314.2 213s16.3 20.3 15.9 43c-.5 27.3-15.7 42.3-15.7 42.3"></path>
+                            <path d="m197.8 213s-16.3 20.3-15.9 43c.5 27.3 15.7 42.3 15.7 42.3"></path>
+                            </g>
+                            <g fill="#000000">
+                            <circle cx="255" cy="255" r="32"></circle>
+                            <path d="m260.4 284.9-22.7-6.1-37.8 141.2 22.7 6.1z"></path>
+                            <path d="m251.6 284.7 22.6-6 37.6 141.3-22.6 6z"></path>
+                            <path d="m230.6 360.9 8.4-8.6 58.2 56.7-8.4 8.6z"></path>
+                            <path d="m279.9 361.2-7.6-7.7-57.7 57.3 7.6 7.7z"></path>
+                            </g>
+                        </g>
+                    </svg>
+                    <span class="d-inline-block align-middle">Overast</span>
+                </a>
+                <a
+                    class="btn btn-social-gh px-4"
+                    href="https://castro.fm/itunes/1690709989"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" aria-label="Castro" role="img" viewBox="0 0 32 32" fill="#fff" width="1rem" height="1rem" class="me-2">
+                        <g id="SVGRepo_bgCarrierCastro" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrierCastro" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrierCastro">
+                            <path d="M16 0c-8.839 0-16 7.161-16 16s7.161 16 16 16c8.839 0 16-7.161 16-16s-7.161-16-16-16zM15.995 18.656c-3.645 0-3.645-5.473 0-5.473 3.651 0 3.651 5.473 0 5.473zM22.656 25.125l-2.683-3.719c5.303-3.876 2.553-12.267-4.009-12.256-6.568 0.016-9.281 8.417-3.964 12.271l-2.688 3.724c-3.995-2.891-5.676-8.025-4.161-12.719 1.521-4.687 5.891-7.869 10.823-7.864 6.277 0 11.365 5.088 11.365 11.364 0.005 3.641-1.735 7.063-4.683 9.199z"></path>
+                        </g>
+                    </svg>
+                    <span class="d-inline-block align-middle">Castro</span>
+                </a>
+                <a
+                    class="btn btn-social-rss px-4"
+                    href="/feed.xml"
+                    target="_blank"
+                >
+                    <i class="fa-solid fa-rss me-2"></i>
+                    RSS Feed
+                </a>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
