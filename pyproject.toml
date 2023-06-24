@@ -74,7 +74,7 @@ exclude = '''
 line-length = 120
 target-version = "py310"
 select = ["B", "C", "E", "F", "W", "B9"]
-ignore = ["E203", "E266", "E501", "F403", "F401"]
+ignore = ["E203", "E266", "E501"]
 exclude = [
   ".git",
   "__pycache__",
