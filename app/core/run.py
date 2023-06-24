@@ -17,6 +17,7 @@ from app.core.podcast.eleventify import render_jinja_template
 from app.core.podcast.episode import add_articles_to_episode, add_episode_to_db
 from app.core.podcast.mix import add_to_db, mix_audio, upload_to_s3
 from app.core.podcast.voice import create_audio, delete_source_mp3
+from app.core.summarization.backends import openai
 from app.core.utilities import DATA_DIR, configure_logging, count_words, today_iso_fmt
 
 raw_news = f"{DATA_DIR}/{today_iso_fmt}_news.json"
@@ -56,7 +57,7 @@ async def main():
         # Create podcast transcript
         from app.core.podcast.content import create_transcript
 
-        await create_transcript(news, transcript)
+        await create_transcript(news, transcript, openai.summarize)
 
         # Create podcast audio
         output_key = create_audio(transcript)

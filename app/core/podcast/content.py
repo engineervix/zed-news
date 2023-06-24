@@ -1,17 +1,13 @@
 import datetime
 import logging
 import random
+from typing import Callable
 
-import cohere
-from langchain import OpenAI, PromptTemplate
 from num2words import num2words
 from pydantic import HttpUrl
 
 from app.core.db.models import Article, Episode
-from app.core.utilities import COHERE_API_KEY, OPENAI_API_KEY, podcast_host, today, today_human_readable
-
-llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
-co = cohere.Client(COHERE_API_KEY)
+from app.core.utilities import podcast_host, today, today_human_readable
 
 
 async def get_episode_number() -> int:
@@ -37,7 +33,7 @@ async def random_opening():
         f"Today is {today_human_readable}. Welcome to the {episode_number} installment of the Zed News Podcast! I'm your host, {podcast_host}, and I'm excited to have you accompany me as we embark on a voyage through the latest news and stories from across Zambia.",
         f"Greetings and a warm welcome to the {episode_number} edition of the Zed News Podcast! It's {today_human_readable}, and I'm your host, {podcast_host}. Join me as we dive into the dynamic world of news and uncover the intriguing narratives shaping Zambia's landscape.",
         f"It's {today_human_readable}. I am thrilled to have you here for the {episode_number} edition of the Zed News Podcast! This is your host, {podcast_host}. Together, let's embark on an enriching journey through the vibrant tapestry of news and stories that define Zambia.",
-        f"Welcome! It's a pleasure to have you join me today for the {episode_number} installment of the Zed News Podcast! I'm {podcast_host}, your friendly guide through the ever-evolving news landscape of Zambia. Get ready to immerse yourself in the latest headlines and captivating narratives that await us.",
+        f"Welcome! It's a pleasure to have you join me today, {today_human_readable} for the {episode_number} installment of the Zed News Podcast! I'm {podcast_host}, your friendly guide through the ever-evolving news landscape of Zambia. Get ready to immerse yourself in the latest headlines and captivating narratives that await us.",
         f"Here we are, on {today_human_readable}, marking the {episode_number} edition of the Zed News Podcast! I'm {podcast_host}, your enthusiastic host, and I'm delighted to have you with me as we traverse the vast expanse of news and stories that illuminate the heart of Zambia.",
     ]
 
@@ -104,8 +100,9 @@ dive_in_choices = [
 ]
 
 
-async def create_transcript(news: list[dict[str, str]], dest: str):
-    """Create a podcast transcript from the news, and write it to a file
+async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callable):
+    """Create a podcast transcript from the news, using the provided summarization function
+    and write it to a file
 
     Args:
         news (list[dict[str, str]]): A list of news articles represented as
@@ -116,6 +113,9 @@ async def create_transcript(news: list[dict[str, str]], dest: str):
             - 'content': The content of the article. This is passed to the OpenAI API for summarization.
             - 'category': The category of the article.
         dest (str): The destination file path where the transcript will be written.
+        summarizer (Callable): The function to use for summarization. This function must accept two arguments:
+            - content (str): The content of the article.
+            - title (str): The title of the article.
 
     Raises:
         - OpenAIException: If there is an issue with the OpenAI API.
@@ -128,10 +128,8 @@ async def create_transcript(news: list[dict[str, str]], dest: str):
         None: The function writes the transcript to the specified file but does not return any value.
     """
 
-    # Create a dictionary to store the articles by source
     articles_by_source = {}
 
-    # Iterate over each article in the news list
     for article in news:
         source = article["source"].replace("Zambia National Broadcasting Corporation (ZNBC)", "ZNBC")
 
@@ -170,38 +168,8 @@ async def create_transcript(news: list[dict[str, str]], dest: str):
             ]
 
             title = article["title"]
-
             content = article["content"]
-
-            # =============== Summarize using OpenAI ===============
-            template = """
-            Please provide a very short, sweet, informative and engaging summary of the following news entry, in not more than two sentences.
-            Please provide your output in a manner suitable for reading as part of a podcast.
-
-            {entry}
-            """
-
-            prompt = PromptTemplate(input_variables=["entry"], template=template)
-            summary_prompt = prompt.format(entry=content)
-
-            num_tokens = llm.get_num_tokens(summary_prompt)
-            logging.info(f"'{title}' and its prompt has {num_tokens} tokens")
-
-            summary = llm(summary_prompt)
-
-            # =============== Summarize using Cohere ===============
-            # logging.info(f"Summarizing '{title}' via Cohere ...")
-            # # https://docs.cohere.com/reference/summarize-2
-            # response = co.summarize(
-            #     text=content,
-            #     model="summarize-xlarge",
-            #     temperature=0,
-            #     length="auto",
-            #     format="paragraph",
-            #     extractiveness="auto",
-            #     additional_command="in a manner suitable for reading as part of a podcast",
-            # )
-            # summary = response.summary
+            summary = summarizer(content, title)
 
             await update_article_with_summary(title, article["url"], today, summary)
 
