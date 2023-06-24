@@ -83,8 +83,3 @@ def get_news():
                 encountered_titles.add(title)
 
     return latest_news[::-1]
-
-
-# if __name__ == "__main__":
-#     with open(f"data/_znbc_news_{today_iso_fmt}.json", "w") as json_file:
-#         json.dump(fetch_news(), json_file, indent=2, ensure_ascii=False)

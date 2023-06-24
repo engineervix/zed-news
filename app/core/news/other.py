@@ -195,8 +195,3 @@ def get_rss_feed_entries():
     except Exception:
         logger.error(traceback.format_exc())
         return []
-
-
-# if __name__ == "__main__":
-#     with open(f"data/_other_news_{today_iso_fmt}.json", "w") as json_file:
-#         json.dump(get_rss_feed_entries(), json_file, indent=2, ensure_ascii=False)
