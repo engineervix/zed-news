@@ -30,7 +30,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
 
   pgweb:
-    image: sosedoff/pgweb:0.14.0
+    image: sosedoff/pgweb:0.14.1
     ports:
       - 8081:8081
     environment:
