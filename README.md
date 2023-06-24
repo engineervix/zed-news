@@ -250,7 +250,7 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 ### Core
 
 - [x] Add a separate module for summarization backends so we can choose which one to work with
-- [ ] Add appropriate error handling on `requests` and `feedparser` jobs as well as all other operations, such as connecting to AWS Polly, etc.
+- [ ] Add more robust error handling on `requests` and `feedparser` jobs as well as all other operations, such as connecting to AWS Polly, etc.
 - [ ] Add task to perform substitution so that, for instance, K400 is written as 400 Kwacha. The AWS Polly voices fail to read Zambian money correctly.
 
 ### Features for future releases
