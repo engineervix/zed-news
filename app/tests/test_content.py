@@ -1,10 +1,9 @@
 import asyncio
 import datetime
 import unittest
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from tortoise import Tortoise
-from tortoise.exceptions import DoesNotExist
 
 from app.core.db.models import Article
 from app.core.podcast.content import (
@@ -77,15 +76,21 @@ class TestArticleUpdate(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(updated_article.summary, "This is a test summary")
         self.assertEqual(await Article.all().count(), 1)
 
-    async def test_update_article_with_summary_article_not_found(self):
+    @patch("app.core.podcast.content.logging")
+    async def test_update_article_with_summary_article_not_found(self, mock_logging):
+        data = {
+            "title": "Non-existent Article",
+            "url": "https://example.com",
+            "date": datetime.date.today(),
+            "summary": "This article doesn't exist",
+        }
+
         # Call the function with an article that doesn't exist in the database
-        with self.assertRaises(DoesNotExist):
-            await update_article_with_summary(
-                title="Non-existent Article",
-                url="http://example.com",
-                date=datetime.date.today(),
-                summary="This article doesn't exist",
-            )
+        await update_article_with_summary(**data)
+        # Assert that the function logged a warning
+        mock_logging.warning.assert_called_once_with(
+            f"Could not find article with title '{data['title']}', URL '{data['url']}', and date '{data['date']}'"
+        )
 
 
 class TestRandomContent(unittest.TestCase):
