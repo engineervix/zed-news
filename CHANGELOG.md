@@ -4,6 +4,70 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.0](https://github.com/engineervix/zed-news/compare/v0.2.0...v0.3.0) (2023-06-24)
+
+
+### 💄 Styling
+
+* let's use animate on scroll ([494249d](https://github.com/engineervix/zed-news/commit/494249dbd59f2698987ef48cff592641df4aec51))
+
+
+### 👷 CI/CD
+
+* add environment variables for CI tests ([00abab0](https://github.com/engineervix/zed-news/commit/00abab019a79dacc71a81c6dcfb1b678a4d7c4d7))
+* fix placement of env variables ([6934d72](https://github.com/engineervix/zed-news/commit/6934d72ef3a1a750ec4d4ac9b523b5ad6e6ebcd0))
+* fix poetry setup ([cdc7fb5](https://github.com/engineervix/zed-news/commit/cdc7fb509dee22129d5424b1254957debe231961))
+* install poetry ([bb0e2ba](https://github.com/engineervix/zed-news/commit/bb0e2ba818c928bad487c23a1ad7110740e05e50))
+* use latest version of `actions/checkout` ([d5aa008](https://github.com/engineervix/zed-news/commit/d5aa00881267ac56a9cdba60dcd12c9ceb9d1bd2))
+
+
+### ⚙️ Build System
+
+* **deps-dev:** update dependency sass-loader to v13.3.2 ([#25](https://github.com/engineervix/zed-news/issues/25)) ([d160a24](https://github.com/engineervix/zed-news/commit/d160a24f708ffc9844e4a7016e16348c3fa05520))
+* **deps:** bump outdated python packages ([79559cc](https://github.com/engineervix/zed-news/commit/79559ccb18a12efeb21cede31e53664c6be36d9c))
+* **deps:** remove animate.css ([a042cce](https://github.com/engineervix/zed-news/commit/a042ccee5bda61ab9f325952d92ec25bff87b8d2))
+* **deps:** update dependency webpack-cli to v5.1.4 ([#26](https://github.com/engineervix/zed-news/issues/26)) ([9d32366](https://github.com/engineervix/zed-news/commit/9d323661bb2b797f11aeefe3c81aaf808d5f6395))
+* install mutagen ([e83f772](https://github.com/engineervix/zed-news/commit/e83f7720c37c9efb6d0554181ccf0bf0d826ee26))
+* install poetry and remove extraneous config files ([b4ab738](https://github.com/engineervix/zed-news/commit/b4ab7380d07d561fb2b2b7e470040278b67e68a4))
+* replace isort and flake8 with ruff ([31280f7](https://github.com/engineervix/zed-news/commit/31280f79379baff98b7f775c63656d559cb3fb4b))
+* temporarily add requirements.txt to fix CF builds ([80799c9](https://github.com/engineervix/zed-news/commit/80799c944a40f6cb184c090eb34f40a2f4c4b481))
+
+
+### ✅ Tests
+
+* add some sample test data to work with ([8619606](https://github.com/engineervix/zed-news/commit/8619606b277b1767b3cbcc746b003dfd03756d81))
+* add test for `random_opening()` ([ee21e4c](https://github.com/engineervix/zed-news/commit/ee21e4c561b9801eec68df169267fcee6aa34e66))
+* fix coverage configuration ([b06218d](https://github.com/engineervix/zed-news/commit/b06218d1ddc5eff5faf8648278cb1cc446337a9a))
+* fix test_update_article_with_summary_article_not_found ([3c700b3](https://github.com/engineervix/zed-news/commit/3c700b343d604af803adaa31e5040162b28d4677))
+* test transcript creation ([a502554](https://github.com/engineervix/zed-news/commit/a50255433f595fe16eb212a38ca59b3ca614f98d))
+* write more tests ([a5aed89](https://github.com/engineervix/zed-news/commit/a5aed89ecb13fee3801b9cccc92a82e82f83a988))
+
+
+### 🐛 Bug Fixes
+
+* avoid returning multiple Article objects ([26b60ea](https://github.com/engineervix/zed-news/commit/26b60eac86ce267cee6cf5c6b597d9f19b045299))
+* correct metadata for episode 004 ([af6dac4](https://github.com/engineervix/zed-news/commit/af6dac44396a0c3abd4e078050111064dd425890))
+* datetime.datetime is the one with `strptime` method ([f88063b](https://github.com/engineervix/zed-news/commit/f88063b5527eb31318ccd32484165c7b01b7b3dc))
+* play/pause button controls & state on home page ([8ca6d02](https://github.com/engineervix/zed-news/commit/8ca6d025de6a4f81a8f2b4a69cf74887c4f57a04))
+* specify the correct(ish) episode pubDate ([491248c](https://github.com/engineervix/zed-news/commit/491248c3a2bdfe2572ced4d5ff5fad8eae93c060))
+* use mutagen to determine mp3 length ([6ce9f19](https://github.com/engineervix/zed-news/commit/6ce9f19423ccd2e1fee1e0ae7030b337bec57c54))
+* use the correct syntax for rich text in episode description ([4079a66](https://github.com/engineervix/zed-news/commit/4079a66b1bd681b0ba022043b63d393c2e5793b3))
+
+
+### ♻️ Code Refactoring
+
+* reduce the treble gain by half (from 6dB to 3dB) ([c3c0f61](https://github.com/engineervix/zed-news/commit/c3c0f61ff48553f943f5d23229ae95de91226101))
+* remove spacing on google/apple podcast button, and ad URLs ([47e741d](https://github.com/engineervix/zed-news/commit/47e741d2511fe39da0a97e4ee2ee0762d9ac41a4))
+* use description instead of just specifying episode No. ([cd04555](https://github.com/engineervix/zed-news/commit/cd0455564c4cc1cd870df4c0ff8b0856226f9f65))
+
+
+### 🚀 Features
+
+* add **More ways to listen** button and modal ([239d429](https://github.com/engineervix/zed-news/commit/239d429db99afab1afeebf58dc3b3ac61245aea5))
+* change the voice sampling rate to 44.1kHz ([110bd71](https://github.com/engineervix/zed-news/commit/110bd71b03dccecc54ec11b9d2d92f3f9cf0e9b9))
+* conditional rendering of (social) icons in footer ([38fcbdc](https://github.com/engineervix/zed-news/commit/38fcbdcd8436e4b4247358a1a26f9c043d1ff51e))
+* separate modules for summarization backends ([92c9af0](https://github.com/engineervix/zed-news/commit/92c9af085a8ab4a0398b31ad6d8a4a547980c576))
+
 ## [v0.2.0](https://github.com/engineervix/zed-news/compare/v0.1.0...v0.2.0) (2023-06-05)
 
 
