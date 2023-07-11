@@ -1,4 +1,5 @@
 import logging
+import math
 import textwrap
 
 from langchain import OpenAI, PromptTemplate
@@ -25,7 +26,9 @@ def summarize(content: str, title: str) -> str:
     # Trim the content if it exceeds the available tokens
     # TODO: Instead of truncating the content, split it
     # see <https://python.langchain.com/docs/modules/data_connection/document_transformers/text_splitters/split_by_token>
-    max_chars = max_prompt_tokens * 4  # Assuming 1 token ≈ 4 chars
+    chars = int(max_prompt_tokens * 3.75)  # Assuming 1 token ≈ 4 chars
+    # round down max_chars to the nearest 100
+    max_chars = math.floor(chars / 100) * 100
     if len(content) > max_chars:
         content = textwrap.shorten(content, width=max_chars, placeholder=" ...")
 
