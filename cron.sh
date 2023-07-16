@@ -4,7 +4,7 @@
 # description:  zed-news execution script, to be run by cron
 # author:       Victor Miti <https://github.com/engineervix>
 # url:          <https://github.com/engineervix/zed-news>
-# version:      0.3.0
+# version:      0.3.1
 # license:      BSD-3-Clause
 #
 # Logical steps

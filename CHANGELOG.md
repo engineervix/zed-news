@@ -4,6 +4,19 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.1](https://github.com/engineervix/zed-news/compare/v0.3.0...v0.3.1) (2023-07-16)
+
+
+### 👷 CI/CD
+
+* **deps:** update sosedoff/pgweb docker tag to v0.14.1 ([1f5bd91](https://github.com/engineervix/zed-news/commit/1f5bd911cfe2a84087dc92aa59e915712696c434))
+
+
+### 🐛 Bug Fixes
+
+* quick and dirty fix for exceeding token limit ([94754b8](https://github.com/engineervix/zed-news/commit/94754b87479771d652acde136e00988ba3673018))
+* yet another hack to manage max token limit ([28008a1](https://github.com/engineervix/zed-news/commit/28008a15b189f04f326cdd53a9041ec3d09f72cc))
+
 ## [v0.3.0](https://github.com/engineervix/zed-news/compare/v0.2.0...v0.3.0) (2023-06-24)
 
 
