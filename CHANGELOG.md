@@ -4,6 +4,26 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.2](https://github.com/engineervix/zed-news/compare/v0.3.1...v0.3.2) (2023-10-15)
+
+
+### 🐛 Bug Fixes
+
+* handle a situation where article div doesn't have expected class ([8894eae](https://github.com/engineervix/zed-news/commit/8894eaebdb83305b9a22edfe0f67630653c7869d))
+
+
+### 📝 Docs
+
+* minor documentation fixes ([f58fd30](https://github.com/engineervix/zed-news/commit/f58fd30f7c569113748cd654fd5f6ac81920d3c9))
+
+
+### ⚙️ Build System
+
+* **deps:** run `poetry lock --no-update` ([0b16b3d](https://github.com/engineervix/zed-news/commit/0b16b3d4fd8e9ed2d15d3effc90f667a409682da))
+* **deps:** update dependency langchain to v0.0.239 ([#33](https://github.com/engineervix/zed-news/issues/33)) ([7f21573](https://github.com/engineervix/zed-news/commit/7f2157332534b8105de47dc0218d5cfc6e207c15))
+* **deps:** update dependency ruff to v0.0.291 ([#24](https://github.com/engineervix/zed-news/issues/24)) ([1afb09f](https://github.com/engineervix/zed-news/commit/1afb09fc55812897aec0e64dcd922a434d34992d))
+* **deps:** update node.js to v16.20.2 ([#30](https://github.com/engineervix/zed-news/issues/30)) ([809af83](https://github.com/engineervix/zed-news/commit/809af836f0efb9382db5786e0ba730f864344b71))
+
 ## [v0.3.1](https://github.com/engineervix/zed-news/compare/v0.3.0...v0.3.1) (2023-07-16)
 
 
