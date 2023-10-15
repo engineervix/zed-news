@@ -107,12 +107,12 @@ On your machine:
 - access the `app` container
 
   ```bash
-  inv exec app "bash"
+  inv exec app bash
   ```
 
 In the container:
 
-- you can use [aerich](https://github.com/tortoise/aerich) to apply database migrations version
+- you can use [aerich](https://github.com/tortoise/aerich) to apply database migrations
 
   ```bash
   inv upgrade
