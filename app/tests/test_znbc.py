@@ -48,6 +48,29 @@ class TestGetArticleDetail(unittest.TestCase):
         self.assertEqual(result, expected_content.split("Post Views:")[0].strip())
         mock_requests.get.assert_called_once_with(self.url)
 
+    @patch("app.core.news.znbc.requests")
+    def test_get_article_detail_none(self, mock_requests):
+        """
+        We expect an article to have a div with class entry-content.
+        If this is not found, we raise an AttributeError & return None
+        """
+        mock_response = MagicMock()
+        mock_response.text = """
+            <article>
+                <div>
+                    <p>Paragraph 1</p>
+                    <p>Paragraph 2</p>
+                </div>
+            </article>
+        """
+        mock_requests.get.return_value = mock_response
+
+        expected_content = None
+        result = get_article_detail(self.url)
+        self.assertEqual(result, expected_content)
+
+        mock_requests.get.assert_called_once_with(self.url)
+
 
 class TestGetNews(unittest.TestCase):
     @patch("app.core.news.znbc.get_article_detail")

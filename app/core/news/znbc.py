@@ -3,11 +3,14 @@
 Fetches today's news from https://www.znbc.co.zm/news/
 """
 
+import logging
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
 from app.core.utilities import today_iso_fmt
+
+logger = logging.getLogger(__name__)
 
 ua = UserAgent(
     fallback="Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.648.204",
@@ -23,13 +26,16 @@ def get_article_detail(url):
     article = soup.find("article")
 
     # Extract article content
-    content_element = article.select_one("div.entry-content")
-    paragraphs = content_element.find_all("p")
-    content = "\n".join([p.get_text(strip=True) for p in paragraphs])
+    try:
+        content_element = article.select_one("div.entry-content")
+        paragraphs = content_element.find_all("p")
+        content = "\n".join([p.get_text(strip=True) for p in paragraphs])
 
-    # Remove "Post Views: number" from the content
-    content = content.split("Post Views:")[0].strip()
-
+        # Remove "Post Views: number" from the content
+        content = content.split("Post Views:")[0].strip()
+    except AttributeError as err:
+        logger.exception(f"Error fetching article detail for {url}\n: {err}")
+        content = None
     return content
 
 
@@ -68,18 +74,19 @@ def get_news():
                 # Extract article detail
                 content = get_article_detail(detail_url)
 
-                latest_news.append(
-                    {
-                        "source": "Zambia National Broadcasting Corporation (ZNBC)",
-                        "url": detail_url,
-                        "title": title,
-                        "content": content,
-                        "category": category,
-                        # "author": author,
-                    }
-                )
+                if content:
+                    latest_news.append(
+                        {
+                            "source": "Zambia National Broadcasting Corporation (ZNBC)",
+                            "url": detail_url,
+                            "title": title,
+                            "content": content,
+                            "category": category,
+                            # "author": author,
+                        }
+                    )
 
-                # Add title to encountered titles set
-                encountered_titles.add(title)
+                    # Add title to encountered titles set
+                    encountered_titles.add(title)
 
     return latest_news[::-1]
