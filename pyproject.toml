@@ -30,14 +30,14 @@ langchain = "^0.0.239"
 mutagen = "^1.46.0"
 num2words = "^0.5.12"
 openai = "^0.27.7"
-tortoise-orm = {extras = ["psycopg"], version = "^0.19.3"}
-psycopg2-binary = "^2.9.6"
+psycopg = {extras = ["c", "pool"], version = "^3.1.12"}
 python-dateutil = "^2.8.2"
 python-dotenv = "^1.0.0"
 pytz = "^2023.3"
 requests = "^2.31.0"
 tiktoken = "^0.4.0"
 tomli = "^2.0.1"
+tortoise-orm = "^0.20.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
