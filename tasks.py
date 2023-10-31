@@ -1,10 +1,29 @@
 import datetime
 import os
+import shutil
 import subprocess
 
 import tomli
 from colorama import Fore, init
 from invoke import task
+
+
+def get_docker_compose_command():
+    """
+    `docker-compose` is the preferred command,
+    but if it's not available, we fall back to `docker compose`
+    """
+    if shutil.which("docker-compose"):
+        return "docker-compose"
+    elif shutil.which("docker"):
+        return "docker compose"
+    else:
+        raise subprocess.CalledProcessError(
+            returncode=1,
+            cmd=None,
+            output=b"",
+            stderr=b"Neither 'docker-compose' nor 'docker' executable found in the system path",
+        )
 
 
 @task
@@ -23,34 +42,38 @@ def db_snapshot(c, filename_prefix):
 @task(help={"build": "Build images before starting containers."})
 def up(c, build=False):
     """docker-compose up -d"""
+    docker_compose = get_docker_compose_command()
     if build:
         c.run(
-            "docker-compose -f docker-compose.yml up -d --build 2>&1 | tee build.log",
+            f"{docker_compose} -f docker-compose.yml up -d --build 2>&1 | tee build.log",
             pty=True,
         )
     else:
-        c.run("docker-compose -f docker-compose.yml up -d", pty=True)
+        c.run(f"{docker_compose} -f docker-compose.yml up -d", pty=True)
 
 
 @task
 def exec(c, container, command):
     """docker-compose exec [container] [command(s)]"""
-    c.run(f"docker-compose exec {container} {command}", pty=True)
+    docker_compose = get_docker_compose_command()
+    c.run(f"{docker_compose} exec {container} {command}", pty=True)
 
 
 @task(help={"follow": "Follow log output"})
 def logs(c, container, follow=False):
     """docker-compose logs [container] [-f]"""
+    docker_compose = get_docker_compose_command()
     if follow:
-        c.run(f"docker-compose logs {container} -f", pty=True)
+        c.run(f"{docker_compose} logs {container} -f", pty=True)
     else:
-        c.run(f"docker-compose logs {container}", pty=True)
+        c.run(f"{docker_compose} logs {container}", pty=True)
 
 
 @task
 def stop(c):
     """docker-compose stop"""
-    c.run("docker-compose stop", pty=True)
+    docker_compose = get_docker_compose_command()
+    c.run(f"{docker_compose} stop", pty=True)
 
 
 @task(
@@ -60,10 +83,11 @@ def stop(c):
 )
 def down(c, volumes=False):
     """docker-compose down"""
+    docker_compose = get_docker_compose_command()
     if volumes:
-        c.run("docker-compose down -v", pty=True)
+        c.run(f"{docker_compose} down -v", pty=True)
     else:
-        c.run("docker-compose down", pty=True)
+        c.run(f"{docker_compose} down", pty=True)
 
 
 @task(help={"dump_file": "The name of the dump file to import"})
