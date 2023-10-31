@@ -44,19 +44,11 @@ git pull || { echo "Failed to pull changes from Git."; send_healthcheck_failure;
 
 # 4. Run script inside docker container
 inv up --build || { echo "Failed to build Docker container."; send_healthcheck_failure; exit 1; }
-if command -v docker-compose &>/dev/null; then
-    docker-compose run --rm app invoke toolchain || {
-        echo "Failed to run script inside Docker container."
-        send_healthcheck_failure
-        exit 1
-    }
-elif command -v docker &>/dev/null; then
-    docker compose run --rm app invoke toolchain || {
-        echo "Failed to run script inside Docker container."
-        send_healthcheck_failure
-        exit 1
-    }
-fi
+docker compose run --rm app invoke toolchain || {
+    echo "Failed to run script inside Docker container."
+    send_healthcheck_failure
+    exit 1
+}
 inv down || { echo "Failed to stop Docker container."; send_healthcheck_failure; exit 1; }
 
 # 5. commit changes
