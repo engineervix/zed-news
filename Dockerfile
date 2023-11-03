@@ -38,11 +38,11 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-# Use user "zednews" to run the build commands below and the server itself.
+# Use user "zednews" to run the build commands below
 USER zednews
 
 # set up virtual environment & install python dependencies
-ARG POETRY_VERSION=1.4.1
+ARG POETRY_VERSION=1.6.1
 ARG DEVELOPMENT
 ENV VIRTUAL_ENV=/home/zednews/venv \
     DEVELOPMENT=${DEVELOPMENT}
