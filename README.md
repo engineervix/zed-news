@@ -10,7 +10,7 @@
 [![healthchecks.io](https://healthchecks.io/badge/24d88c7e-cc91-4dac-b9a5-d50e52/ewRXZ-TO/zed-news.svg)](https://healthchecks.io)
 
 [![python3](https://img.shields.io/badge/python-3.10-brightgreen.svg)](https://www.python.org/downloads/)
-[![Node v16](https://img.shields.io/badge/Node-v16-teal.svg)](https://nodejs.org/en/blog/release/v16.0.0)
+[![Node v18](https://img.shields.io/badge/Node-v18-teal.svg)](https://nodejs.org/en/blog/release/v18.0.0)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![code style: prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)](https://prettier.io/)
 
@@ -136,7 +136,7 @@ The project uses [pgweb](https://github.com/sosedoff/pgweb) to help visualize da
 
 ### Web
 
-This project uses Node [v16](https://nodejs.org/en/blog/release/v16.0.0). I use [volta](https://volta.sh/) to manage node versions. If you have volta installed on your machine, then it'll automatically use the correct Node binary for this project.
+This project uses Node [v18](https://nodejs.org/en/blog/release/v18.0.0). I use [volta](https://volta.sh/) to manage node versions. If you have volta installed on your machine, then it'll automatically use the correct Node binary for this project.
 
 - install frontend dependencies
 
