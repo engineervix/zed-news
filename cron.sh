@@ -53,7 +53,7 @@ inv down || { echo "Failed to stop Docker container."; send_healthcheck_failure;
 
 # 5. commit changes
 today_iso=$(date --iso)
-git add . || { echo "Failed to stage changes for commit."; send_healthcheck_failure; exit 1; }
+git add app/web/ || { echo "Failed to stage changes for commit."; send_healthcheck_failure; exit 1; }
 git commit --no-verify -m "chore: ✨ new episode 🎙️ » ${today_iso}" || { echo "Failed to commit changes."; send_healthcheck_failure; exit 1; }
 
 # 6. push changes to remote
