@@ -20,7 +20,7 @@ URLs = [
     "http://www.daily-mail.co.zm/feed/",
     "https://diggers.news/rss/",
     "https://www.muvitv.com/rss/",
-    # "https://www.mwebantu.com/rss/",
+    "https://www.mwebantu.com/rss/",
 ]
 
 
