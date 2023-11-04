@@ -42,31 +42,31 @@ async def render_jinja_template(production_time, word_count):
     lc = Locale.parse(lingo.replace("-", "_"))
     utc_dt = datetime.now(timezone.utc) + timedelta(minutes=5)
     LSK = pytz.timezone("Africa/Lusaka")
-    print(
-        base_template.render(
-            {
-                "title": today_human_readable,
-                "description": f"This is the {number_ordinal} episode of the podcast.",
-                "episode": f"{number:03}",
-                "date": utc_dt.astimezone(LSK).isoformat(),
-                "mp3_url": mp3.url,
-                "mp3_duration": format_duration(mp3.duration),
-                "mp3_size": format_filesize(mp3.filesize),
-                "enclosure_length": mp3.filesize,
-                "itunes_duration": convert_seconds_to_mmss(mp3.duration),
-                "presenter": podcast_host,
-                "locale_id": lingo,
-                "locale_name": lc.display_name,
-                "production_time": format_duration(production_time),
-                "word_count": f"{word_count:,}",
-                "speaking_rate": words_per_minute(mp3.duration, word_count),
-                "num_articles": len(articles),
-                "num_sources": len(set(sources)),
-                "articles": [
-                    {"source": article.source, "url": article.url, "title": f'"{article.title}"'}
-                    for article in articles
-                ],
-            }
-        ),
-        file=open(dist_file, "w"),
-    )
+    with open(dist_file, "w") as f:
+        f.write(
+            base_template.render(
+                {
+                    "title": today_human_readable,
+                    "description": f"This is the {number_ordinal} episode of the podcast.",
+                    "episode": f"{number:03}",
+                    "date": utc_dt.astimezone(LSK).isoformat(),
+                    "mp3_url": mp3.url,
+                    "mp3_duration": format_duration(mp3.duration),
+                    "mp3_size": format_filesize(mp3.filesize),
+                    "enclosure_length": mp3.filesize,
+                    "itunes_duration": convert_seconds_to_mmss(mp3.duration),
+                    "presenter": podcast_host,
+                    "locale_id": lingo,
+                    "locale_name": lc.display_name,
+                    "production_time": format_duration(production_time),
+                    "word_count": f"{word_count:,}",
+                    "speaking_rate": words_per_minute(mp3.duration, word_count),
+                    "num_articles": len(articles),
+                    "num_sources": len(set(sources)),
+                    "articles": [
+                        {"source": article.source, "url": article.url, "title": f'"{article.title}"'}
+                        for article in articles
+                    ],
+                }
+            ),
+        )
