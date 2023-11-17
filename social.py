@@ -73,8 +73,8 @@ def create_facebook_post(content: str) -> str:
     """Create a Facebook post using OpenAI's language model."""
 
     template = """
-    Please create a very short, sweet, informative and engaging facebook post inviting people to listen to today's podcast whose content is below, with appropriate usage of bullet points, emojis and whitespace.
-    The post should be based on the news entries. Do not add the link to the podcast as it will be added automatically.
+    Please create a nice facebook post inviting people to listen to today's podcast whose content is below, with appropriate usage of bullet points, emojis, whitespace and hashtags.
+    Please keep it very short, sweet, informative and engaging. Do not add the link to the podcast as it will be added automatically.
 
     {entry}
     """
