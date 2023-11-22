@@ -172,7 +172,7 @@ def get_rss_feed_entries():
         feeds = [
             feedparser.parse(
                 url,
-                request_headers={"User-Agent": ua.random, "Cache-Control": "max-age=0"},
+                request_headers={"User-Agent": ua.chrome, "Cache-Control": "max-age=0"},
             )
             for url in URLs
         ]

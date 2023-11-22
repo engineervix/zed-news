@@ -45,7 +45,7 @@ def get_news():
     Fetches today's news from https://www.znbc.co.zm/news/
     """
     url = "https://www.znbc.co.zm/news/"
-    headers = {"User-Agent": ua.random}
+    headers = {"User-Agent": ua.firefox}
     response = requests.get(url, headers=headers, timeout=60)
     soup = BeautifulSoup(response.text, "html5lib")
     news = soup.find_all("article")
