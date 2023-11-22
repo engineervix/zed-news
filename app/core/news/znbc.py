@@ -23,7 +23,7 @@ def get_article_detail(url):
     Fetches the article detail from the URL
     """
     response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html5lib")
+    soup = BeautifulSoup(response.text, "html.parser")
     article = soup.find("article")
 
     # Extract article content
@@ -47,7 +47,7 @@ def get_news():
     url = "https://www.znbc.co.zm/news/"
     headers = {"User-Agent": ua.firefox}
     response = requests.get(url, headers=headers, timeout=60)
-    soup = BeautifulSoup(response.text, "html5lib")
+    soup = BeautifulSoup(response.text, "html.parser")
     news = soup.find_all("article")
     latest_news = []
     encountered_titles = set()

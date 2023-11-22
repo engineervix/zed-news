@@ -1110,27 +1110,6 @@ docs = ["Sphinx", "docutils (<0.18)"]
 test = ["objgraph", "psutil"]
 
 [[package]]
-name = "html5lib"
-version = "1.1"
-description = "HTML parser based on the WHATWG HTML specification"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-files = [
-    {file = "html5lib-1.1-py2.py3-none-any.whl", hash = "sha256:0d78f8fde1c230e99fe37986a60526d7049ed4bf8a9fadbad5f00e22e58e041d"},
-    {file = "html5lib-1.1.tar.gz", hash = "sha256:b2e5b40261e20f354d198eae92afc10d750afb487ed5e50f9c4eaf07c184146f"},
-]
-
-[package.dependencies]
-six = ">=1.9"
-webencodings = "*"
-
-[package.extras]
-all = ["chardet (>=2.2)", "genshi", "lxml"]
-chardet = ["chardet (>=2.2)"]
-genshi = ["genshi"]
-lxml = ["lxml"]
-
-[[package]]
 name = "identify"
 version = "2.5.24"
 description = "File identification library for Python"
@@ -2550,17 +2529,6 @@ files = [
 ]
 
 [[package]]
-name = "webencodings"
-version = "0.5.1"
-description = "Character encoding aliases for legacy web content"
-optional = false
-python-versions = "*"
-files = [
-    {file = "webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78"},
-    {file = "webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"},
-]
-
-[[package]]
 name = "yarl"
 version = "1.9.2"
 description = "Yet another URL library"
@@ -2665,4 +2633,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "~=3.10"
-content-hash = "238063a32042f0d00545f7ebc250c5310c27ff1711a902c7449a98e5f0a5faeb"
+content-hash = "81fbb304e9afd1d6f066a00f599a323cdf57f16c717e06e27b8395d10cffa51b"
