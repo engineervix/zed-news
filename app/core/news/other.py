@@ -38,17 +38,27 @@ def get_daily_mail_article_detail(url):
 
         response = requests.get(new_url)
         soup = BeautifulSoup(response.text, "html5lib")
-        article = soup.find("article")
+        if article := soup.find("article"):
+            content_element = article.select_one("div.entry-content")
+            paragraphs = content_element.find_all("p")
+            content = "\n".join([p.get_text() for p in paragraphs])
 
-        content_element = article.select_one("div.entry-content")
-        paragraphs = content_element.find_all("p")
-        content = "\n".join([p.get_text() for p in paragraphs])
+            # Remove "CLICK TO READ MORE" from the content
+            content = content.replace("CLICK TO READ MORE", "...")
+            content = content.replace("https://enews.daily-mail.co.zm/welcome/home", "")
 
-        # Remove "CLICK TO READ MORE" from the content
-        content = content.replace("CLICK TO READ MORE", "...")
-        content = content.replace("https://enews.daily-mail.co.zm/welcome/home", "")
+            return content
+        elif article := soup.find("main"):
+            content_elements = article.select("div.e-con-inner")
+            content_element = content_elements[-1]
+            paragraphs = content_element.find_all("p")
+            content = "\n".join([p.get_text() for p in paragraphs])
 
-        return content
+            # remove Read more: eNews Daily Mail | Without Fear Or Favour (daily-mail.co.zm)
+            content = content.replace("Read more: eNews Daily Mail | Without Fear Or Favour (daily-mail.co.zm)", "")
+
+            return content
+        return None
 
 
 def get_mwebantu_article_detail(url):
