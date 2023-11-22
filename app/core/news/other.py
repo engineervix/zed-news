@@ -176,7 +176,12 @@ def get_feed_title(url):
 
 
 def get_rss_feed_entries():
-    """Parses URLs and fetches today's feeds"""
+    """
+    Parses URLs and fetches today's feeds
+
+    TODO: This is a poor implementation - everything breaks if something goes wrong
+    when fetching article content. We need to refactor this to handle errors better.
+    """
 
     try:
         feeds = [
