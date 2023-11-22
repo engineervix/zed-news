@@ -4,6 +4,40 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.4.0](https://github.com/engineervix/zed-news/compare/v0.3.2...v0.4.0) (2023-11-22)
+
+
+### 👷 CI/CD
+
+* bump Node from v16 to v18 ([2c2b83e](https://github.com/engineervix/zed-news/commit/2c2b83e23d5f0379483ce84d5133f23451e97497))
+* remove requirements.txt because cloudflare recognizes poetry ([c899203](https://github.com/engineervix/zed-news/commit/c899203ac088f1a79cf52c09ddc13fd3edee52ec))
+
+
+### 🚀 Features
+
+* programmatically post to facebook ([52567c7](https://github.com/engineervix/zed-news/commit/52567c764bd7ae05dcd4a91788f7cc0bc8afbbfc))
+
+
+### 🐛 Bug Fixes
+
+* ensure that file is closed ([7837abd](https://github.com/engineervix/zed-news/commit/7837abda79aa69d5ff6d21ed3211efd325fc1639))
+
+
+### ⚙️ Build System
+
+* **deps:** add html5lib ([54c6b3c](https://github.com/engineervix/zed-news/commit/54c6b3c6556b7898c1ed8893284c5065aced81e7))
+* **deps:** fix psycopg dependencies to allow for better multiarch compatibility ([f38ab3f](https://github.com/engineervix/zed-news/commit/f38ab3f0a1dcfb43cebd547834b61d752eed4238))
+* switch to node v18 ([27a0249](https://github.com/engineervix/zed-news/commit/27a02499e848332984447e44727f9493cbf41d41))
+* update poetry to 1.6.1 ([53d0ade](https://github.com/engineervix/zed-news/commit/53d0ade3a125eb51fe7bbe458340169598e69cee))
+
+
+### ♻️ Code Refactoring
+
+* account for the situation where `docker-compose` doesn't exist ([0712568](https://github.com/engineervix/zed-news/commit/07125680ecc711b9f4bfed71b2095b8502fe904f))
+* change social post prompt ([1ff1aca](https://github.com/engineervix/zed-news/commit/1ff1acaee9507cb68358b60484196178fef126e4))
+* update Daily Mail article detail parser ([33e330e](https://github.com/engineervix/zed-news/commit/33e330efe50f6bbe1372f05198a7136f97de4a7e))
+* use html5lib instead of html.parser ([50c2dfa](https://github.com/engineervix/zed-news/commit/50c2dfa65db0e79b6733ecadad05e3a940b79097))
+
 ## [v0.3.2](https://github.com/engineervix/zed-news/compare/v0.3.1...v0.3.2) (2023-10-15)
 
 
