@@ -37,7 +37,7 @@ def get_daily_mail_article_detail(url):
         new_url = urlunparse(parsed_url._replace(query=""))
 
         response = requests.get(new_url)
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(response.text, "html5lib")
         article = soup.find("article")
 
         content_element = article.select_one("div.entry-content")
@@ -64,7 +64,7 @@ def get_mwebantu_article_detail(url):
         new_url = urlunparse(parsed_url._replace(query=""))
 
         response = requests.get(new_url)
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(response.text, "html5lib")
 
         article = soup.find("article")
         if article:
@@ -96,7 +96,7 @@ def get_muvitv_article_detail(url):
         new_url = urlunparse(parsed_url._replace(query=""))
 
         response = requests.get(new_url)
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(response.text, "html5lib")
 
         article = soup.find("article")
         content_element = article.select_one("div.tdb_single_content")
@@ -123,7 +123,7 @@ def get_diggers_article_detail(url):
         new_url = urlunparse(parsed_url._replace(query=""))
 
         response = requests.get(new_url)
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(response.text, "html5lib")
 
         article = soup.select_one("div.article-text")
         paragraphs = article.find_all("p")

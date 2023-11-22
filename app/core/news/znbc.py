@@ -4,6 +4,7 @@ Fetches today's news from https://www.znbc.co.zm/news/
 """
 
 import logging
+
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
@@ -22,7 +23,7 @@ def get_article_detail(url):
     Fetches the article detail from the URL
     """
     response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html5lib")
     article = soup.find("article")
 
     # Extract article content
@@ -46,7 +47,7 @@ def get_news():
     url = "https://www.znbc.co.zm/news/"
     headers = {"User-Agent": ua.random}
     response = requests.get(url, headers=headers, timeout=60)
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html5lib")
     news = soup.find_all("article")
     latest_news = []
     encountered_titles = set()
