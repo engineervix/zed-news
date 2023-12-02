@@ -150,10 +150,10 @@ def main(args=None):
                 content = get_content()
                 facebook_post = create_facebook_post(content)
                 post_to_facebook(facebook_post, podcast_url)
-                requests.get(HEALTHCHECKS_FACEBOOK_PING_URL)
+                requests.get(HEALTHCHECKS_FACEBOOK_PING_URL, timeout=10)
             except Exception as e:
                 logger.error(e)
-                requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail")
+                requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
         else:
             print("Either the podcast is not live or the platform you specified is not supported.")
             sys.exit(1)
