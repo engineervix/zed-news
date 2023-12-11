@@ -2,7 +2,8 @@ import logging
 import math
 import textwrap
 
-from langchain import OpenAI, PromptTemplate
+from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
 
 from app.core.utilities import OPENAI_API_KEY
 

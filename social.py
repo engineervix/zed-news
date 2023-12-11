@@ -9,17 +9,15 @@ __version__ = "0.0.0"
 
 import argparse
 import logging
-import math
 import os
 import pathlib
 import sys
-import textwrap
 from http import HTTPStatus
 
 import facebook
 import requests
+import together
 from dotenv import load_dotenv
-from langchain import OpenAI, PromptTemplate
 
 from app.core.utilities import DATA_DIR, configure_logging, today_iso_fmt
 
@@ -38,10 +36,9 @@ FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
 # - https://developers.facebook.com/docs/facebook-login/guides/access-tokens#usertokens
 # - https://stackoverflow.com/questions/18664325/how-to-programmatically-post-to-my-own-wall-on-facebook
 
-# OpenAI
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-MAX_TOKENS = 4096
-llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
+# Together
+TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
+together.api_key = TOGETHER_API_KEY
 
 podcast_transcript = f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}_podcast-content.txt"
 podcast_url = f"https://zednews.pages.dev/episode/{today_iso_fmt}/"
@@ -70,35 +67,27 @@ def get_content() -> str:
 
 
 def create_facebook_post(content: str) -> str:
-    """Create a Facebook post using OpenAI's language model."""
+    """
+    Create a Facebook post using Together AI's Inference API.
 
-    template = """
-    Please create a nice facebook post (max 120 words) inviting people to listen to today's podcast whose content is below, highlighting some key news items you consider important, with appropriate usage of bullet points, emojis, whitespace and hashtags.
-    Do not add the link to the podcast as it will be added automatically.
-
-    {entry}
+    https://docs.together.ai/reference/complete
     """
 
-    # Calculate the maximum number of tokens available for the prompt
-    max_prompt_tokens = MAX_TOKENS - llm.get_num_tokens(template)
+    prompt = f"<human>: You are a social media marketing guru. You have been hired by a podcaster to create a nice facebook post (max 130 words) inviting people to listen to today's podcast whose transcript is below. Highlight some interesting news items, appropriately paraphrasing them to grab the attention of your audience. Also, appropriately utilize bullet points, emojis, whitespace and hashtags where necessary. Do not add the link to the podcast as it will be added automatically.\n\n```{content}\n```\n<bot>:"
+    model = "togethercomputer/llama-2-70b-chat"
+    temperature = 0.7
+    max_tokens = 512
 
-    # Trim the content if it exceeds the available tokens
-    # TODO: Instead of truncating the content, split it
-    # see <https://python.langchain.com/docs/modules/data_connection/document_transformers/text_splitters/split_by_token>
-    chars = int(max_prompt_tokens * 3.75)  # Assuming 1 token ≈ 4 chars
-    # round down max_chars to the nearest 100
-    max_chars = math.floor(chars / 100) * 100
-    if len(content) > max_chars:
-        content = textwrap.shorten(content, width=max_chars, placeholder=" ...")
+    output = together.Complete.create(
+        prompt=prompt,
+        model=model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        repetition_penalty=1.1,
+    )
+    logger.info(output)
 
-    prompt = PromptTemplate(input_variables=["entry"], template=template)
-
-    facebook_post_prompt = prompt.format(entry=content)
-
-    num_tokens = llm.get_num_tokens(facebook_post_prompt)
-    logging.info(f"the prompt has {num_tokens} tokens")
-
-    return llm(facebook_post_prompt)
+    return output["output"]["choices"][0]["text"]
 
 
 def post_to_facebook(content: str, url: str) -> None:
