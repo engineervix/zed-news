@@ -240,6 +240,32 @@ class TestTranscriptCreation(unittest.IsolatedAsyncioTestCase):
         self.assertIn(today_human_readable, transcript_content)
         self.assertIn("eleventh", transcript_content)
 
+    @patch("app.core.podcast.content.get_episode_number")
+    @patch("app.core.summarization.backends.together.summarize")
+    def test_create_transcript_with_together(self, mock_summarizer, mock_get_episode_number):
+        mock_get_episode_number.return_value = 8
+        summary = "This is a summary of the content"
+        mock_summarizer.return_value = summary
+
+        destination = self.text_file
+        news = self.article_data
+
+        asyncio.run(create_transcript(news, destination, mock_summarizer))
+
+        with open(destination, "r") as file:
+            transcript_content = file.read()
+
+        expected_calls = [call(item["content"], item["title"]) for item in news]
+
+        mock_summarizer.assert_has_calls(expected_calls)
+        self.assertIn(summary, transcript_content)
+        self.assertEqual(len(news), transcript_content.count(summary))
+        self.assertIn("We are going to start with news from", transcript_content)
+        self.assertIn("Next up, we have news from", transcript_content)
+        self.assertIn("To wrap up today's edition", transcript_content)
+        self.assertIn(today_human_readable, transcript_content)
+        self.assertIn("eighth", transcript_content)
+
 
 if __name__ == "__main__":
     unittest.main()
