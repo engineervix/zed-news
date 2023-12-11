@@ -109,10 +109,14 @@ def get_muvitv_article_detail(url):
         soup = BeautifulSoup(response.text, "html.parser")
 
         article = soup.find("article")
-        content_element = article.select_one("div.tdb_single_content")
-        paragraphs = content_element.find_all("p")
 
-        content = "\n".join([p.get_text(strip=True) for p in paragraphs])
+        if article:
+            content_element = article.select_one("div.tdb_single_content")
+            paragraphs = content_element.find_all("p")
+
+            content = "\n".join([p.get_text(strip=True) for p in paragraphs])
+        else:
+            content = None
 
         return content
 
@@ -136,9 +140,13 @@ def get_diggers_article_detail(url):
         soup = BeautifulSoup(response.text, "html.parser")
 
         article = soup.select_one("div.article-text")
-        paragraphs = article.find_all("p")
 
-        content = "\n".join([p.get_text(strip=True) for p in paragraphs])
+        if article:
+            paragraphs = article.find_all("p")
+
+            content = "\n".join([p.get_text(strip=True) for p in paragraphs])
+        else:
+            content = None
 
         return content
 

@@ -29,11 +29,14 @@ def get_article_detail(url):
     # Extract article content
     try:
         content_element = article.select_one("div.entry-content")
-        paragraphs = content_element.find_all("p")
-        content = "\n".join([p.get_text(strip=True) for p in paragraphs])
+        if content_element:
+            paragraphs = content_element.find_all("p")
+            content = "\n".join([p.get_text(strip=True) for p in paragraphs])
 
-        # Remove "Post Views: number" from the content
-        content = content.split("Post Views:")[0].strip()
+            # Remove "Post Views: number" from the content
+            content = content.split("Post Views:")[0].strip()
+        else:
+            content = None
     except AttributeError as err:
         logger.exception(f"Error fetching article detail for {url}\n: {err}")
         content = None
