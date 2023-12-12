@@ -69,7 +69,7 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
 
     prompt = f"You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news & current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources as presented below, so go ahead and present today's episode. Add a fun and witty remark at the end, informing your audience that you are actually an AI, and not a human.\n\n"
 
-    metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable()}\nHost: {podcast_host}\n\n"
+    metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
     content = ""
 
