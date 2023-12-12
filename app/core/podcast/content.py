@@ -8,8 +8,6 @@ from pydantic import HttpUrl
 from app.core.db.models import Article, Episode
 from app.core.utilities import TOGETHER_API_KEY, podcast_host, today, today_human_readable
 
-together.api_key = TOGETHER_API_KEY
-
 
 async def get_episode_number() -> int:
     """Returns the episode number based on the number of episodes in the database"""
@@ -67,7 +65,7 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    prompt = f"You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news & current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources as presented below, so go ahead and present today's episode. Add a fun and witty remark at the end, informing your audience that you are actually an AI, and not a human.\n\n"
+    prompt = f"<human>: You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news & current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources as presented below, so go ahead and present today's episode. Add a fun and witty remark at the end, informing your audience that you are actually an AI, and not a human.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
@@ -85,12 +83,12 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
             content += f"{index}. '{title}' (source {source})"
             content += f"\n{summary.strip()}\n\n"
 
-    notes = prompt + "```" + metadata + "News Items:\n\n" + content + "```"
+    notes = prompt + "```" + metadata + "News Items:\n\n" + content + "```\n<bot>:"
 
     model = "togethercomputer/llama-2-70b-chat"
     temperature = 0.7
     max_tokens = 2048
-
+    together.api_key = TOGETHER_API_KEY
     output = together.Complete.create(
         prompt=notes,
         model=model,
