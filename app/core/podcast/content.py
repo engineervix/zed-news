@@ -65,9 +65,18 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    prompt = f"<human>: You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news and current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources as indicated below, so go ahead and present today's episode. Add a fun and witty remark at the end, informing your audience that you are actually an AI, and not a human.\n\n"
+    prompt = f"<human>: You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news and current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources as indicated below. Study the content, then go ahead and present today's episode. It is important that you cover EVERYTHING, do not leave out anything. Feel free to consolidate any similar news items from different sources, and present the news in a logical sequence, based on common themes. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {await get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
+
+    unwanted_text = [
+        "Sure, here's a summary of the news entry in two sentences:",
+        "Sure, here's a summary of the news entry in not more than two sentences:",
+        "Sure, I can help you with that!",
+        "Here's a summary of the news entry in two sentences:",
+        "Here's a summary of the news entry in not more than two sentences:",
+        "Sure! Here's a possible summary of the news entry:",
+    ]
 
     content = ""
     counter = 0
@@ -77,6 +86,9 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
             title = article["title"]
             text = article["content"]
             summary = summarizer(text, title)
+
+            for text in unwanted_text:
+                summary = summary.replace(text, "")
 
             await update_article_with_summary(title, article["url"], today, summary)
 

@@ -14,7 +14,7 @@ def summarize(content: str, title: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"<human>: You are a distinguished news editor and content publisher, write a summary of the following news entry, in not more than two sentences. Your summary should be sweet, informative and engaging.\n\n {content}\n<bot>:"
+    prompt = f"<human>: You are a distinguished news editor and content publisher, summarize the following news entry, in not more than two sentences. Your summary should be sweet, informative and engaging.\n\n {content}\n<bot>:"
     model = "togethercomputer/llama-2-70b-chat"
     temperature = 0.7
     max_tokens = 512
