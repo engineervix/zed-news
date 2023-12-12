@@ -76,7 +76,7 @@ def create_facebook_post(content: str) -> str:
     prompt = f"<human>: You are a social media marketing guru. You have been hired by a podcaster to create a nice facebook post (max 130 words) inviting people to listen to today's podcast whose transcript is below. Highlight some interesting news items, appropriately paraphrasing them to grab the attention of your audience. Also, appropriately utilize bullet points, emojis, whitespace and hashtags where necessary. Do not add the link to the podcast as it will be added automatically.\n\n```{content}\n```\n<bot>:"
     model = "togethercomputer/llama-2-70b-chat"
     temperature = 0.7
-    max_tokens = 512
+    max_tokens = 768
 
     output = together.Complete.create(
         prompt=prompt,
