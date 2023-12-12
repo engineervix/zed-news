@@ -77,8 +77,8 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         # Iterate over each article in the source
         for index, article in enumerate(articles_by_source[source], start=1):
             title = article["title"]
-            content = article["content"]
-            summary = summarizer(content, title)
+            text = article["content"]
+            summary = summarizer(text, title)
 
             await update_article_with_summary(title, article["url"], today, summary)
 
