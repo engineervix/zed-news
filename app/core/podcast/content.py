@@ -87,7 +87,7 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
 
     model = "togethercomputer/llama-2-70b-chat"
     temperature = 0.7
-    max_tokens = 2048
+    max_tokens = 1792
     together.api_key = TOGETHER_API_KEY
     output = together.Complete.create(
         prompt=notes,

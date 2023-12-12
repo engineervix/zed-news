@@ -14,7 +14,7 @@ def summarize(content: str, title: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"<human>: Please provide a very short, sweet, informative and engaging summary of the following news entry, in not more than two sentences, and in a manner suitable for reading as part of a podcast.\n\n {content}\n<bot>:"
+    prompt = f"<human>: Summarize the following news entry, in not more than two sentences. Your summary should be sweet, informative and engaging.\n\n {content}\n<bot>:"
     model = "togethercomputer/llama-2-70b-chat"
     temperature = 0.7
     max_tokens = 512
