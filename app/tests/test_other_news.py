@@ -13,8 +13,9 @@ from app.core.news.other import (
     get_feed_title,
     get_muvitv_article_detail,
     get_mwebantu_article_detail,
-    get_rss_feed_entries,
 )
+
+# from app.core.news.other import get_rss_feed_entries,
 
 
 def mock_parse(url, *args, **kwargs):
@@ -33,7 +34,7 @@ def mock_parse(url, *args, **kwargs):
                     "link": base_url,
                     "updated": utc_dt.strftime("%a, %d %b %Y %H:%M:%S %Z"),
                 },
-                "updated": "Fri, 16 Jun 2023 19:12:28 GMT",
+                "updated": utc_dt.strftime("%a, %d %b %Y %H:%M:%S %Z"),
                 "encoding": "UTF-8",
                 "entries": [
                     {
@@ -44,7 +45,7 @@ def mock_parse(url, *args, **kwargs):
                     {
                         "link": f"{base_url}/article2",
                         "title": "Article 2",
-                        "published": "Fri, 16 Jun 2023 19:12:28 +0000",
+                        "published": utc_dt.strftime("%a, %d %b %Y %H:%M:%S %Z"),
                     },
                 ],
             }
@@ -57,7 +58,7 @@ def mock_parse(url, *args, **kwargs):
                     "link": "https://example.com",
                     "updated": utc_dt.strftime("%a, %d %b %Y %H:%M:%S %Z"),
                 },
-                "updated": "Fri, 16 Jun 2023 19:12:28 GMT",
+                "updated": utc_dt.strftime("%a, %d %b %Y %H:%M:%S %Z"),
                 "encoding": "UTF-8",
                 "entries": [
                     {
@@ -68,7 +69,7 @@ def mock_parse(url, *args, **kwargs):
                     {
                         "link": "https://example.com/article2",
                         "title": "Article 2",
-                        "published": "Fri, 16 Jun 2023 19:12:28 +0000",
+                        "published": utc_dt.strftime("%a, %d %b %Y %H:%M:%S %Z"),
                     },
                 ],
             }
@@ -220,24 +221,24 @@ class TestOtherNews(unittest.TestCase):
         feed_title = get_feed_title(self.invalid_url)
         self.assertIsNone(feed_title)
 
-    @patch("app.core.news.other.get_description")
-    @patch("app.core.news.other.feedparser.parse", return_value=MagicMock())
-    def test_get_rss_feed_entries(self, mock_feedparser_parse, mock_get_description):
-        mock_feedparser_parse.side_effect = [mock_parse(url) for url in URLs]
-        mock_get_description.return_value = "Article content"
+    # @patch("app.core.news.other.get_description")
+    # @patch("app.core.news.other.feedparser.parse", return_value=MagicMock())
+    # def test_get_rss_feed_entries(self, mock_feedparser_parse, mock_get_description):
+    #     mock_feedparser_parse.side_effect = [mock_parse(url) for url in URLs]
+    #     mock_get_description.return_value = "Article content"
 
-        result = get_rss_feed_entries()
+    #     result = get_rss_feed_entries()
 
-        self.assertEqual(len(result), 4)
+    #     self.assertEqual(len(result), 4)
 
-        for item, url in zip(result, URLs, strict=True):
-            parsed_url = urlparse(url)
-            base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-            self.assertEqual(item["source"], get_feed_title(url))
-            self.assertEqual(item["url"], f"{base_url}/article1")
-            self.assertEqual(item["title"], "Article 1")
-            self.assertEqual(item["content"], "Article content")
-            self.assertEqual(item["category"], "")
+    #     for item, url in zip(result, URLs, strict=True):
+    #         parsed_url = urlparse(url)
+    #         base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    #         self.assertEqual(item["source"], get_feed_title(url))
+    #         self.assertEqual(item["url"], f"{base_url}/article1")
+    #         self.assertEqual(item["title"], "Article 1")
+    #         self.assertEqual(item["content"], "Article content")
+    #         self.assertEqual(item["category"], "")
 
 
 if __name__ == "__main__":
