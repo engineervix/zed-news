@@ -1,6 +1,5 @@
 import datetime
 import logging
-import time
 from typing import Callable
 
 import together
@@ -66,7 +65,7 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-        prompt = f"You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news and current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources as indicated below. Study the content, consolidate any similar news items from different sources, and organize the news in a logical, coherent manner so it's easy to follow. You can then go ahead and present today's episode, ensuring that you cover all the news your secretary has curated. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human.\n\n"
+        prompt = f"You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news and current affairs podcast which runs Monday to Friday. Your assistant has gathered the news from various sources as indicated below. Study the content, consolidate any similar news items from different sources, and organize the news in a logical, coherent manner so it's easy to follow. You can then go ahead and present today's episode, ensuring that you cover all the news from all the sources, as curated by your assistant. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human. Remember: leave no news item behind.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {await get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
@@ -94,7 +93,7 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
 
     model = "lmsys/vicuna-13b-v1.5-16k"
     temperature = 0.7
-    max_tokens = 4096
+    max_tokens = 6144
     together.api_key = TOGETHER_API_KEY
     output = together.Complete.create(
         prompt=notes,
@@ -102,7 +101,6 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    time.sleep(30)
     logging.info(output)
 
     transcript = output["output"]["choices"][0]["text"]
