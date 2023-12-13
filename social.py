@@ -19,7 +19,7 @@ import requests
 import together
 from dotenv import load_dotenv
 
-from app.core.utilities import DATA_DIR, configure_logging, today_iso_fmt
+from app.core.utilities import DATA_DIR, configure_logging, podcast_host, today_iso_fmt
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -73,7 +73,7 @@ def create_facebook_post(content: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"<human>: You are a social media marketing guru. You have been hired by a podcaster to create a nice, short and catchy facebook post (max 130 words) inviting people to listen to today's podcast whose transcript is below. Highlight some interesting news items, appropriately paraphrasing them to grab the attention of your audience. Also, appropriately utilize bullet points, emojis, whitespace and hashtags where necessary. Do not add the link to the podcast as it will be added automatically.\n\n```{content}\n```\n<bot>:"
+    prompt = f"<human>: You are a social media marketing guru. You have been hired by a podcaster, {podcast_host} to create a nice, short and catchy facebook post (max 130 words) inviting people to listen to today's podcast whose transcript is below. Highlight some interesting news headlines, appropriately paraphrasing them to grab the attention of your audience. Also, appropriately utilize bullet points, emojis, whitespace and hashtags where necessary. Do not add the link to the podcast as it will be added automatically.\n\n```{content}\n```\n<bot>:"
     model = "togethercomputer/llama-2-70b-chat"
     temperature = 0.7
     max_tokens = 768
