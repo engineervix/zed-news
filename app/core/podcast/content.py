@@ -1,12 +1,13 @@
 import datetime
 import logging
-import time
+import sys
 from typing import Callable
 
 import together
 from pydantic import HttpUrl
 
 from app.core.db.models import Article, Episode
+from app.core.summarization.backends.together import brief_summary
 from app.core.utilities import DATA_DIR, TOGETHER_API_KEY, podcast_host, today, today_human_readable, today_iso_fmt
 
 
@@ -77,7 +78,12 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         for article in articles_by_source[source]:
             title = article["title"]
             text = article["content"]
-            summary = summarizer(text, title)
+
+            if len(news) < 15:
+                # If there are less than 15 articles, summarize each article in the usual way
+                summary = summarizer(text, title)
+            else:
+                summary = brief_summary(text, title)
 
             await update_article_with_summary(title, article["url"], today, summary)
 
@@ -96,23 +102,20 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
     temperature = 0.7
     max_tokens = 6144
     together.api_key = TOGETHER_API_KEY
+    output = together.Complete.create(
+        prompt=notes,
+        model=model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    logging.info(output)
 
-    while True:
-        output = together.Complete.create(
-            prompt=notes,
-            model=model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
-        logging.info(output)
+    transcript = output["output"]["choices"][0]["text"]
 
-        transcript = output["output"]["choices"][0]["text"]
-
-        if transcript:
-            # Write the transcript to a file
-            with open(dest, "w") as f:
-                f.write(transcript)
-            break  # Exit the loop if transcript is not empty
-        else:
-            logging.warning("Transcript is empty. Retrying in 10 seconds...")
-            time.sleep(10)
+    if transcript:
+        # Write the transcript to a file
+        with open(dest, "w") as f:
+            f.write(transcript)
+    else:
+        logging.error("Transcript is empty")
+        sys.exit(1)
