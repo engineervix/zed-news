@@ -1,6 +1,6 @@
 # zed-news
 
-> Automated news podcast consisting of AI-powered updates from various Zambian sources.
+> Automated news podcast consisting of AI-powered updates from various Zambian 🇿🇲 sources.
 
 [![made-with-python](https://forthebadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 [![made-with-javascript](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
@@ -43,7 +43,7 @@
 
 ## Introduction
 
-This is a tool that gathers news from various Zambian sources, summarizes the news items and presents the news as a podcast.
+This is a tool that gathers news from various Zambian 🇿🇲 sources, summarizes the news items and presents the news as a podcast.
 
 It consists primarily of two parts / components:
 
