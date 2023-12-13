@@ -14,7 +14,7 @@ def summarize(content: str, title: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"<human>: You are a distinguished news editor and content publisher, your task is to summarize the following news entry. The summary should accurately reflect the main message and arguments presented in the original text, while also being concise and easy to understand.\n\n ```{content}```\n<bot>:"
+    prompt = f"<human>: You are a distinguished news editor and content publisher, your task is to summarize the following news entry. The summary should accurately reflect the main message and arguments presented in the original text, while also being concise and easy to understand. Just summarize straight away, without responding to me.\n\n ```{content}```\n<bot>:"
     model = "togethercomputer/llama-2-70b-chat"
     temperature = 0.7
     max_tokens = 512
