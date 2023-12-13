@@ -65,17 +65,31 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    prompt = f"<human>: You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news and current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources as indicated below. Study the content, then go ahead and present today's episode. It is important that you cover EVERYTHING, do not leave out anything. Feel free to consolidate any similar news items from different sources, and present the news in a logical sequence, based on common themes. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human.\n\n"
+    prompt = f"<human>: You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news and current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources, and has given you the notes as shown below. To ensure accuracy, please read the content carefully and pay attention to any nuances or complexities in the language, then go ahead and present today's episode. It is important that you cover EVERYTHING, do not leave out anything. Feel free to consolidate any similar news items from different sources, and present the news in a logical sequence, based on common themes. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {await get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
     unwanted_text = [
-        "Sure, here's a summary of the news entry in two sentences:",
-        "Sure, here's a summary of the news entry in not more than two sentences:",
+        # "Sure, here's a summary of the news entry in two sentences:",
+        # "Sure, here is a summary of the news entry in two sentences:",
+        # "Sure, here's a summary of the news entry in not more than two sentences:",
+        # "Sure, here is a summary of the news entry in not more than two sentences:",
+        "Sure! Here's the summary:",
+        "Sure! Here is the summary:",
         "Sure, I can help you with that!",
-        "Here's a summary of the news entry in two sentences:",
-        "Here's a summary of the news entry in not more than two sentences:",
+        "Sure, I can do that!",
+        # "Here's a summary of the news entry in two sentences:",
+        # "Here is a summary of the news entry in two sentences:",
+        # "Here's a summary of the news entry in not more than two sentences:",
+        # "Here is a summary of the news entry in not more than two sentences:",
+        # "Here's a two-sentence summary of the news entry:",
+        # "Here is a two-sentence summary of the news entry:",
         "Sure! Here's a possible summary of the news entry:",
+        "Sure! Here is a possible summary of the news entry:",
+        "Sure, here's a possible summary:",
+        "Sure, here is a possible summary:",
+        # "Sure! Here's a two-sentence summary of the news entry you provided:",
+        # "Sure! Here is a two-sentence summary of the news entry you provided:",
     ]
 
     content = ""
