@@ -1,5 +1,6 @@
 import datetime
 import logging
+import time
 from typing import Callable
 
 import together
@@ -85,7 +86,7 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
             content += f"{counter}. '{title}' (source: {source})"
             content += f"\n{summary.strip()}\n\n"
 
-    notes = prompt + "```" + metadata + "News Items:\n\n" + content + "```"
+    notes = prompt + "```\n" + metadata + "News Items:\n\n" + content + "```"
 
     # Write the content to a file
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
@@ -95,16 +96,23 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
     temperature = 0.7
     max_tokens = 6144
     together.api_key = TOGETHER_API_KEY
-    output = together.Complete.create(
-        prompt=notes,
-        model=model,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    logging.info(output)
 
-    transcript = output["output"]["choices"][0]["text"]
+    while True:
+        output = together.Complete.create(
+            prompt=notes,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+        logging.info(output)
 
-    # Write the transcript to a file
-    with open(dest, "w") as f:
-        f.write(transcript)
+        transcript = output["output"]["choices"][0]["text"]
+
+        if transcript:
+            # Write the transcript to a file
+            with open(dest, "w") as f:
+                f.write(transcript)
+            break  # Exit the loop if transcript is not empty
+        else:
+            logging.warning("Transcript is empty. Retrying in 10 seconds...")
+            time.sleep(10)
