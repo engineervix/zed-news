@@ -12,6 +12,7 @@ import logging
 import os
 import pathlib
 import sys
+import time
 from http import HTTPStatus
 
 import facebook
@@ -40,7 +41,7 @@ FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 together.api_key = TOGETHER_API_KEY
 
-podcast_transcript = f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}_podcast-content.txt"
+news_headlines = f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt"
 podcast_url = f"https://zednews.pages.dev/episode/{today_iso_fmt}/"
 
 
@@ -61,8 +62,8 @@ def podcast_is_live(url):
 
 
 def get_content() -> str:
-    """Get the content of the podcast transcript"""
-    with open(podcast_transcript, "r") as f:
+    """Get the headlines"""
+    with open(news_headlines, "r") as f:
         return f.read()
 
 
@@ -73,8 +74,9 @@ def create_facebook_post(content: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"<human>: You are a social media marketing guru. You have been hired by a podcaster, {podcast_host} to create a nice, short and catchy facebook post (max 130 words) inviting people to listen to today's podcast whose transcript is below. Highlight some interesting news headlines, appropriately paraphrasing them to grab the attention of your audience. Also, appropriately utilize bullet points, emojis, whitespace and hashtags where necessary. Do not add the link to the podcast as it will be added automatically.\n\n```{content}\n```\n<bot>:"
-    model = "togethercomputer/llama-2-70b-chat"
+    prompt = f"You are a social media marketing guru. You have been hired by a podcaster, {podcast_host}, who hosts a news and current affairs podcast which runs Monday to Friday. Your task is to create a nice, short and catchy facebook post inviting people to listen to today's podcast whose details are below. Appropriately utilize bullet points, emojis, whitespace and hashtags where necessary. Do not add the link to the podcast as it will be added automatically.\n\n```{content}\n```"
+
+    model = "lmsys/vicuna-13b-v1.5-16k"
     temperature = 0.7
     max_tokens = 768
 
@@ -83,9 +85,9 @@ def create_facebook_post(content: str) -> str:
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
-        repetition_penalty=1.1,
     )
     logger.info(output)
+    time.sleep(30)
 
     return output["output"]["choices"][0]["text"]
 

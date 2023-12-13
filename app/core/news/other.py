@@ -47,6 +47,9 @@ def get_daily_mail_article_detail(url):
             content = content.replace("CLICK TO READ MORE", "...")
             content = content.replace("https://enews.daily-mail.co.zm/welcome/home", "")
 
+            # remove Read more: eNews Daily Mail | Without Fear Or Favour (daily-mail.co.zm)
+            content = content.replace("Read more: eNews Daily Mail | Without Fear Or Favour (daily-mail.co.zm)", "")
+
             return content
         elif article := soup.find("main"):
             content_elements = article.select("div.e-con-inner")
@@ -56,6 +59,10 @@ def get_daily_mail_article_detail(url):
 
             # remove Read more: eNews Daily Mail | Without Fear Or Favour (daily-mail.co.zm)
             content = content.replace("Read more: eNews Daily Mail | Without Fear Or Favour (daily-mail.co.zm)", "")
+
+            # Remove "CLICK TO READ MORE" from the content
+            content = content.replace("CLICK TO READ MORE", "...")
+            content = content.replace("https://enews.daily-mail.co.zm/welcome/home", "")
 
             return content
         return None

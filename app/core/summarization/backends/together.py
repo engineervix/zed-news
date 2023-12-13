@@ -1,4 +1,5 @@
 import logging
+import time
 
 import together
 
@@ -14,10 +15,10 @@ def summarize(content: str, title: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"<human>: You are a distinguished news editor and content publisher, your task is to summarize the following news entry. The summary should accurately reflect the main message and arguments presented in the original text, while also being concise and easy to understand. Just summarize straight away, without responding to me.\n\n ```{content}```\n<bot>:"
-    model = "togethercomputer/llama-2-70b-chat"
+    prompt = f"You are a distinguished news editor and content publisher, your task is to summarize the following news entry. The summary should accurately reflect the main message and arguments presented in the original news entry, while also being concise and easy to understand. Your summary should not exceed two sentences.\n\n ```{content}```:"
+    model = "garage-bAInd/Platypus2-70B-instruct"
     temperature = 0.7
-    max_tokens = 512
+    max_tokens = 128
 
     output = together.Complete.create(
         prompt=prompt,
@@ -25,6 +26,7 @@ def summarize(content: str, title: str) -> str:
         temperature=temperature,
         max_tokens=max_tokens,
     )
+    time.sleep(1.5)
     logging.info(output)
 
     return output["output"]["choices"][0]["text"]

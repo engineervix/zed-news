@@ -1,12 +1,13 @@
 import datetime
 import logging
+import time
 from typing import Callable
 
 import together
 from pydantic import HttpUrl
 
 from app.core.db.models import Article, Episode
-from app.core.utilities import TOGETHER_API_KEY, podcast_host, today, today_human_readable
+from app.core.utilities import DATA_DIR, TOGETHER_API_KEY, podcast_host, today, today_human_readable, today_iso_fmt
 
 
 async def get_episode_number() -> int:
@@ -65,32 +66,9 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    prompt = f"<human>: You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news and current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources, and has given you the notes as shown below. To ensure accuracy, please read the content carefully and pay attention to any nuances or complexities in the language, then go ahead and present today's episode. It is important that you cover EVERYTHING, do not leave out anything. Feel free to consolidate any similar news items from different sources, and present the news in a logical sequence, based on common themes. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human.\n\n"
+        prompt = f"You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news and current affairs podcast which runs Monday to Friday. Your secretary has gathered the news from various sources as indicated below. Study the content, consolidate any similar news items from different sources, and organize the news in a logical, coherent manner so it's easy to follow. You can then go ahead and present today's episode, ensuring that you cover all the news your secretary has curated. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {await get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
-
-    unwanted_text = [
-        # "Sure, here's a summary of the news entry in two sentences:",
-        # "Sure, here is a summary of the news entry in two sentences:",
-        # "Sure, here's a summary of the news entry in not more than two sentences:",
-        # "Sure, here is a summary of the news entry in not more than two sentences:",
-        "Sure! Here's the summary:",
-        "Sure! Here is the summary:",
-        "Sure, I can help you with that!",
-        "Sure, I can do that!",
-        # "Here's a summary of the news entry in two sentences:",
-        # "Here is a summary of the news entry in two sentences:",
-        # "Here's a summary of the news entry in not more than two sentences:",
-        # "Here is a summary of the news entry in not more than two sentences:",
-        # "Here's a two-sentence summary of the news entry:",
-        # "Here is a two-sentence summary of the news entry:",
-        "Sure! Here's a possible summary of the news entry:",
-        "Sure! Here is a possible summary of the news entry:",
-        "Sure, here's a possible summary:",
-        "Sure, here is a possible summary:",
-        # "Sure! Here's a two-sentence summary of the news entry you provided:",
-        # "Sure! Here is a two-sentence summary of the news entry you provided:",
-    ]
 
     content = ""
     counter = 0
@@ -101,9 +79,6 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
             text = article["content"]
             summary = summarizer(text, title)
 
-            for text in unwanted_text:
-                summary = summary.replace(text, "")
-
             await update_article_with_summary(title, article["url"], today, summary)
 
             counter += 1
@@ -111,25 +86,27 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
             content += f"{counter}. '{title}' (source: {source})"
             content += f"\n{summary.strip()}\n\n"
 
-    notes = prompt + "```" + metadata + "News Items:\n\n" + content + "```<bot>:"
+    notes = prompt + "```" + metadata + "News Items:\n\n" + content + "```"
 
-    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-    temperature = 0.4
-    top_p = 0.5
+    # Write the content to a file
+    with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
+        f.write(metadata + "News Items:\n\n" + content)
+
+    model = "lmsys/vicuna-13b-v1.5-16k"
+    temperature = 0.7
     max_tokens = 4096
     together.api_key = TOGETHER_API_KEY
     output = together.Complete.create(
         prompt=notes,
         model=model,
         temperature=temperature,
-        top_p=top_p,
         max_tokens=max_tokens,
-        repetition_penalty=1.1,
     )
+    time.sleep(30)
     logging.info(output)
 
     transcript = output["output"]["choices"][0]["text"]
 
-    # Write the content to a file
+    # Write the transcript to a file
     with open(dest, "w") as f:
         f.write(transcript)
