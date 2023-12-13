@@ -49,7 +49,7 @@ It consists primarily of two parts / components:
 
 - **core** -- this is primarily python code, where the following tasks are handled:
   - gather the news using [requests](https://pypi.org/project/requests/), [feedparser](https://pypi.org/project/feedparser/) and [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
-  - summarise the news using LLMs, via [LangChain](https://python.langchain.com/),
+  - summarise the news using LLMs,
   - create the podcast transcript,
   - convert text to speech using [AWS Polly](https://aws.amazon.com/polly/),
   - process the audio using [ffmpeg](https://ffmpeg.org/), and
@@ -254,8 +254,16 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 ### Music
 
-- opening: <https://pixabay.com/music/beats-classical-hip-hop-143320/>
-- closing: <https://pixabay.com/music/beats-digital-technology-131644/>
+- opening: <https://pixabay.com/music/corporate-african-uplifting-corporate-loopable-version-93670/>
+- closing: <https://pixabay.com/music/upbeat-uplifting-corporate-adventure-loopable-version-93669/>
+
+> **Note**
+>
+> These audio files have the [**gain**](https://www.antarestech.com/community/whats-the-difference-between-gain-and-volume) reduced by -20dB, like this:
+>
+> ```bash
+> ffmpeg -i intro.src.mp3 -af "volume=-20dB" intro.mp3
+> ```
 
 ### Icon
 
