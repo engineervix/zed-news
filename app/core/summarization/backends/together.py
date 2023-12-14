@@ -42,7 +42,7 @@ def brief_summary(content: str, title: str) -> str:
     prompt = f"You are a distinguished news editor and content publisher, your task is to summarize the following news entry in one sentence.\n\n ```{content}```:"
     model = "garage-bAInd/Platypus2-70B-instruct"
     temperature = 0.7
-    max_tokens = 72
+    max_tokens = 78
 
     output = together.Complete.create(
         prompt=prompt,

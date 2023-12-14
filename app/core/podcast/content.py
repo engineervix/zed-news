@@ -1,17 +1,21 @@
 import datetime
 import logging
 import sys
+
+# import time
 from typing import Callable
 
+# import replicate
 import together
-from langchain.llms import OpenAI
+
+# from langchain.llms import OpenAI
 from pydantic import HttpUrl
 
 from app.core.db.models import Article, Episode
 from app.core.summarization.backends.together import brief_summary
 from app.core.utilities import (
     DATA_DIR,
-    OPENAI_API_KEY,
+    # OPENAI_API_KEY,
     TOGETHER_API_KEY,
     podcast_host,
     today,
@@ -19,7 +23,7 @@ from app.core.utilities import (
     today_iso_fmt,
 )
 
-llm = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
+# llm = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
 
 
 async def get_episode_number() -> int:
@@ -78,7 +82,7 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-        prompt = f"You are {podcast_host}, an accomplished, fun and witty scriptwriter, content creator and podcast host. You have a news and current affairs podcast which runs Monday to Friday. Your assistant has gathered the news from various sources as indicated below. Study the content, consolidate any similar news items from different sources, and organize the news in a logical, coherent manner so it's easy to follow. You can then go ahead and present today's episode, ensuring that you cover all the news from all the sources, as curated by your assistant. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human. Remember: leave no news item behind.\n\n"
+    prompt = f"The date is {today_human_readable}. You are {podcast_host}, a fun and witty scriptwriter, content creator and podcast host. You host the Zed News Podcast - a news and current affairs podcast which runs Monday to Friday. Your assistant has gathered the news from various sources as indicated below. Study the content, consolidate any similar news items from different sources, and organize the news in a logical, coherent manner so it's easy to follow. You can then go ahead and present today's episode (number {await get_episode_number()}), ensuring that you cover all the news from all the sources, as curated by your assistant. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human. Remember: leave no news item behind, and do not repeat content.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {await get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
@@ -103,25 +107,66 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
             content += f"{counter}. '{title}' (source: {source})"
             content += f"\n{summary.strip()}\n\n"
 
-    notes = prompt + "```\n" + metadata + "News Items:\n\n" + content + "```"
+    notes = prompt + "```\n" + content + "```"
 
     # Write the content to a file
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + content)
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
-    # temperature = 0.7
-    # max_tokens = 4096
-    # together.api_key = TOGETHER_API_KEY
-    # output = together.Complete.create(
-    #     prompt=notes,
-    #     model=model,
-    #     temperature=temperature,
-    #     max_tokens=max_tokens,
-    # )
-    # logging.info(output)
+    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    temperature = 0.7
+    max_tokens = 4096
+    together.api_key = TOGETHER_API_KEY
+    output = together.Complete.create(
+        prompt=notes,
+        model=model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    logging.info(output)
 
-    # transcript = output["output"]["choices"][0]["text"]
+    transcript = output["output"]["choices"][0]["text"]
+
+    if transcript.strip():
+        # Write the transcript to a file
+        with open(dest, "w") as f:
+            f.write(transcript)
+    else:
+        logging.error("Transcript is empty")
+        sys.exit(1)
+
+    # data = llm(notes)
+    # if data:
+    #     # Write the transcript to a file
+    #     with open(dest, "w") as f:
+    #         f.write(data)
+    # else:
+    #     logging.error("Transcript is empty")
+    #     sys.exit(1)
+
+    # model = replicate.models.get("meta/llama-2-70b-chat")
+    # version = model.versions.get("02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3")
+    # prediction = replicate.predictions.create(
+    #     version=version,
+    #     input={
+    #         "prompt": notes,
+    #         "temperature": 0.7,
+    #         "max_new_tokens": 4096,
+    #     },
+    # )
+
+    # # Check if the task is complete, then get the transcript
+    # while True:
+    #     logging.info("Checking if Replicate Task is completed...")
+    #     prediction.reload()
+    #     result = prediction.status
+    #     if result == "succeeded":
+    #         logging.info("Woohoo! Task completed!")
+    #         break
+    #     prediction.wait()
+
+    # transcript = prediction.output
 
     # if transcript:
     #     # Write the transcript to a file
@@ -130,12 +175,3 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
     # else:
     #     logging.error("Transcript is empty")
     #     sys.exit(1)
-
-    data = llm(notes)
-    if data:
-        # Write the transcript to a file
-        with open(dest, "w") as f:
-            f.write(data)
-    else:
-        logging.error("Transcript is empty")
-        sys.exit(1)
