@@ -12,7 +12,6 @@ import logging
 import os
 import pathlib
 import sys
-import time
 from http import HTTPStatus
 
 import facebook
@@ -74,9 +73,10 @@ def create_facebook_post(content: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"You are a social media marketing guru. You have been hired by a podcaster, {podcast_host}, who hosts a news and current affairs podcast which runs Monday to Friday. Your task is to create a nice, short and catchy facebook post inviting people to listen to today's podcast whose details are below. Appropriately utilize bullet points, emojis, whitespace and hashtags where necessary. Do not add the link to the podcast as it will be added automatically.\n\n```{content}\n```"
+    prompt = f"You are a social media marketing guru. You have been hired by a podcaster, {podcast_host}, who hosts a news and current affairs podcast which runs Monday to Friday. Your task is to immediately create a nice, concise and catchy facebook post inviting people to listen to today's podcast whose details are below (Choose a few headlines as a sneak preview). Appropriately utilize bullet points, emojis, whitespace and hashtags where necessary. Do not add the link to the podcast.\n\n```{content}\n```"
 
-    model = "lmsys/vicuna-13b-v1.5-16k"
+    # model = "lmsys/vicuna-13b-v1.5-16k"
+    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
     temperature = 0.7
     max_tokens = 768
 
@@ -87,9 +87,13 @@ def create_facebook_post(content: str) -> str:
         max_tokens=max_tokens,
     )
     logger.info(output)
-    time.sleep(30)
 
-    return output["output"]["choices"][0]["text"]
+    if result := output["output"]["choices"][0]["text"].strip():
+        return result
+    else:
+        logger.error("Transcript is empty")
+        requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
+        sys.exit(1)
 
 
 def post_to_facebook(content: str, url: str) -> None:
