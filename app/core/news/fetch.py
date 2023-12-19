@@ -18,13 +18,13 @@ def get_latest_news():
     return feeds + news
 
 
-async def save_news_to_db(news: list[dict[str, str]]):
+def save_news_to_db(news: list[dict[str, str]]):
     """Saves the news to the database"""
 
     logging.info("Saving news to the database ...")
 
     for item in news:
-        await Article.create(**item)
+        Article.create(**item)
 
 
 def save_news_to_file(news: list[dict[str, str]], dest: str):

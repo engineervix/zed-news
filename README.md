@@ -112,12 +112,6 @@ On your machine:
 
 In the container:
 
-- you can use [aerich](https://github.com/tortoise/aerich) to apply database migrations
-
-  ```bash
-  inv upgrade
-  ```
-
 - you can run tests
 
   ```bash

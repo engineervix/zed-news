@@ -101,25 +101,28 @@ def import_db_dump(c, dump_file):
     4. import dump file into database
     5. clean up
     """
+    # Extract filename from the dump_file path
+    dump_filename = os.path.basename(dump_file)
+
     # copy dump file into db container
-    c.run(f"docker cp {dump_file} zednews-db-1:/tmp/{dump_file}", pty=True)
+    c.run(f"docker cp {dump_file} zednews-db-1:/tmp/{dump_filename}", pty=True)
     # drop existing database
     c.run(
-        'inv exec "db" "dropdb --if-exists --host db --username=django_dev_user django_dev_db"',
+        'inv exec db "dropdb --if-exists --host db --username=zednews_dev_user zednews_dev_db"',
         pty=True,
     )
     # create new database
     c.run(
-        'inv exec "db" "createdb --host db --username=django_dev_user django_dev_db"',
+        'inv exec db "createdb --host db --username=zednews_dev_user zednews_dev_db"',
         pty=True,
     )
     # import dump file into database
     c.run(
-        f'inv exec "db" "pg_restore --clean --no-acl --if-exists --no-owner --host db --username=django_dev_user -d django_dev_db /tmp/{dump_file}"',
+        f'inv exec db "pg_restore --clean --no-acl --if-exists --no-owner --host db --username=zednews_dev_user -d zednews_dev_db /tmp/{dump_filename}"',
         pty=True,
     )
     # clean up
-    c.run(f'inv exec "db" "rm -vf /tmp/{dump_file}"', pty=True)
+    c.run(f'inv exec db "rm -vf /tmp/{dump_filename}"', pty=True)
 
 
 @task

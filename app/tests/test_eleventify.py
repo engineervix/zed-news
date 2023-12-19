@@ -5,32 +5,38 @@ import unittest
 from datetime import timedelta
 from unittest.mock import patch
 
-from tortoise import Tortoise
+from peewee import SqliteDatabase
 
-from app.core.db.models import MP3, Article, Episode
+from app.core.db.models import Article, Episode, Mp3
 from app.core.podcast.eleventify import render_jinja_template
 from app.core.utilities import lingo, podcast_host, today, today_human_readable, today_iso_fmt
 
+MODELS = [Article, Episode, Mp3]
+test_db = SqliteDatabase(":memory:")
 
-class TestEleventify(unittest.IsolatedAsyncioTestCase):
-    async def asyncSetUp(self):
+
+class TestEleventify(unittest.TestCase):
+    def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
         self.dist_file = os.path.join(self.temp_dir, f"{today_iso_fmt}.njk")
 
         self.patcher = patch("app.core.podcast.eleventify.dist_file", self.dist_file)
         self.patcher.start()
 
-        await Tortoise.init(
-            db_url="sqlite://:memory:",
-            modules={"models": ["app.core.db.models"]},
+        # Bind model classes to test db. Since we have a complete list of
+        # all models, we do not need to recursively bind dependencies.
+        test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
+
+        test_db.connect()
+        test_db.create_tables(MODELS)
+
+        self.mp3 = Mp3.create(
+            url=f"https://example.com/{today_iso_fmt}_podcast_dist.mp3", filesize=10485760, duration=630
         )
-        await Tortoise.generate_schemas(safe=True)
 
-        self.mp3 = MP3(url=f"https://example.com/{today_iso_fmt}_podcast_dist.mp3", filesize=10485760, duration=630)
-        await self.mp3.save()
-
-        self.episode = Episode(
+        self.episode = Episode.create(
             number=1,
+            live=True,
             title=today_human_readable,
             description="Episode 001",
             presenter=podcast_host,
@@ -39,7 +45,6 @@ class TestEleventify(unittest.IsolatedAsyncioTestCase):
             time_to_produce=120,
             word_count=5000,
         )
-        await self.episode.save()
 
         articles = [
             {
@@ -62,17 +67,27 @@ class TestEleventify(unittest.IsolatedAsyncioTestCase):
             }
         )
         self.articles = [Article(**article) for article in articles]
-        await Article.bulk_create(self.articles)
+        for article in self.articles:
+            article.save()
 
-    async def asyncTearDown(self):
+    def tearDown(self):
         shutil.rmtree(self.temp_dir)
-        await Tortoise.close_connections()
-        await Tortoise._drop_databases()
+        # Not strictly necessary since SQLite in-memory databases only live
+        # for the duration of the connection, and in the next step we close
+        # the connection...but a good practice all the same.
+        test_db.drop_tables(MODELS)
+
+        # Close connection to db.
+        test_db.close()
+
+        # If we wanted, we could re-bind the models to their original
+        # database here. But for tests this is probably not necessary.
+
         self.patcher.stop()
 
     @patch("app.core.podcast.eleventify.logging")
-    async def test_render_jinja_template(self, mock_logging):
-        await render_jinja_template(production_time=120, word_count=5000)
+    def test_render_jinja_template(self, mock_logging):
+        render_jinja_template(production_time=120, word_count=5000)
 
         mock_logging.info.assert_called_once_with("Rendering Jinja template ...")
         self.assertTrue(os.path.exists(self.dist_file))

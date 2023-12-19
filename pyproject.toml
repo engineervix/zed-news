@@ -12,9 +12,7 @@ packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "~=3.10"
-aerich = "^0.7.1"
 apprise = "^1.4.0"
-asyncpg = "^0.27.0"
 babel = "^2.12.1"
 beautifulsoup4 = "^4.12.2"
 boto3 = "^1.26.147"
@@ -31,7 +29,8 @@ langchain = "^0.0.348"
 mutagen = "^1.46.0"
 num2words = "^0.5.12"
 openai = "^0.27.7"
-psycopg = {extras = ["c", "pool"], version = "^3.1.12"}
+peewee = "^3.17.0"
+psycopg2 = "^2.9.9"
 python-dateutil = "^2.8.2"
 python-dotenv = "^1.0.0"
 pytz = "^2023.3"
@@ -41,7 +40,6 @@ tiktoken = "^0.4.0"
 together = "^0.2.10"
 tomli = "^2.0.1"
 torch = "^2.1.1"
-tortoise-orm = "^0.20.0"
 transformers = "^4.36.0"
 
 [tool.poetry.group.dev.dependencies]
@@ -115,8 +113,3 @@ version_files = [
 tag_format = "v$major.$minor.$patch"
 annotated_tag = true
 update_changelog_on_bump = false
-
-[tool.aerich]
-tortoise_orm = "app.core.db.config.TORTOISE_ORM"
-location = "./aerich/migrations"
-src_folder = "./."

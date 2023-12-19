@@ -12,7 +12,8 @@ import together
 from pydantic import HttpUrl
 
 from app.core.db.models import Article, Episode
-from app.core.summarization.backends.together import brief_summary
+
+# from app.core.summarization.backends.together import brief_summary
 from app.core.utilities import (
     DATA_DIR,
     # OPENAI_API_KEY,
@@ -26,23 +27,23 @@ from app.core.utilities import (
 # llm = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
 
 
-async def get_episode_number() -> int:
+def get_episode_number() -> int:
     """Returns the episode number based on the number of episodes in the database"""
-    count = await Episode.filter(live=True).count()
+    count = Episode.select().where(Episode.live == True).count()  # noqa: E712
     return count + 1
 
 
-async def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, summary: str):
+def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, summary: str):
     """Find an article by title, URL & date, and update it with the given summary"""
-    article = await Article.filter(title=title, url=url, date=date).first()
+    article = Article.select().where((Article.title == title) & (Article.url == url) & (Article.date == date)).first()
     if article:
         article.summary = summary
-        await article.save()
+        article.save()
     else:
         logging.warning(f"Could not find article with title '{title}', URL '{url}', and date '{date}'")
 
 
-async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callable):
+def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callable):
     """Create a podcast transcript from the news, using the provided summarization function
     and write it to a file
 
@@ -82,9 +83,11 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    prompt = f"The date is {today_human_readable}. You are {podcast_host}, a fun and witty scriptwriter, content creator and podcast host. You host the Zed News Podcast - a news and current affairs podcast which runs Monday to Friday. Your assistant has gathered the news from various sources as indicated below. Study the content, consolidate any similar news items from different sources, and organize the news in a logical, coherent manner so it's easy to follow. You can then go ahead and present today's episode (number {await get_episode_number()}), ensuring that you cover all the news from all the sources, as curated by your assistant. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human. Remember: leave no news item behind, and do not repeat content.\n\n"
+    # prompt = f"The date is {today_human_readable}. You are {podcast_host}, a fun and witty scriptwriter, content creator and podcast host. You host the Zed News Podcast - a news and current affairs podcast which runs Monday to Friday. Your assistant has gathered the news from various sources as indicated below. Study the content, consolidate any similar news items from different sources, and organize the news in a logical, coherent manner so it's easy to follow. You can then go ahead and present today's episode (number {get_episode_number()}), ensuring that you cover all the news from all the sources, as curated by your assistant. At the end, add a fun and witty remark informing your audience that you are actually an AI, and not a human. Remember: leave no news item behind, and do not repeat content.\n\n" # noqa: W505
 
-    metadata = f"Title: Zed News Podcast episode {await get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
+    prompt = f"The date is {today_human_readable}. {podcast_host}, a bot, hosts the Zed News Podcast - a news and current affairs podcast which runs Monday to Friday. Your task, as an accomplished content creater and comedian, is to produce content which she'll read out word-for-word as she presents today's episode (number {get_episode_number()}). Ensure that you cover all the news from all the sources, presented in a logical, coherent manner, with any similar news items from different sources appropriately consolidated. At the end, Ayanda wants her audience to know that she's actually not a human. Remember: leave no news item behind, do not repeat content and ensure your output is presented in a human-readable style.\n\n"
+
+    metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
     content = ""
     counter = 0
@@ -94,13 +97,18 @@ async def create_transcript(news: list[dict[str, str]], dest: str, summarizer: C
             title = article["title"]
             text = article["content"]
 
-            if len(news) < 15:
-                # If there are less than 15 articles, summarize each article in the usual way
-                summary = summarizer(text, title)
-            else:
-                summary = brief_summary(text, title)
+            # if len(news) < 15:
+            #     # If there are less than 15 articles, summarize each article in the usual way
+            #     summary = summarizer(text, title)
+            # else:
+            #     summary = brief_summary(text, title)
 
-            await update_article_with_summary(title, article["url"], today, summary)
+            summary = summarizer(text, title)
+
+            if summary.strip().startswith("Summary: "):
+                summary = summary.replace("Summary: ", "")
+
+            update_article_with_summary(title, article["url"], today, summary)
 
             counter += 1
 

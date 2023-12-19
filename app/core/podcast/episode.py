@@ -1,17 +1,17 @@
 import logging
 
-from app.core.db.models import MP3, Article, Episode
+from app.core.db.models import Article, Episode, Mp3
 from app.core.podcast.content import get_episode_number
 from app.core.utilities import lingo, podcast_host, today_human_readable, today_iso_fmt
 
 
-async def add_episode_to_db(time_to_produce: int, word_count: int):
+def add_episode_to_db(time_to_produce: int, word_count: int):
     """Create an episode entry in the database"""
-    number = await get_episode_number()
+    number = get_episode_number()
 
     logging.info(f"Adding episode {number:03} to the database")
     mp3_file = f"{today_iso_fmt}_podcast_dist.mp3"
-    mp3 = await MP3.filter(url__contains=mp3_file).first()
+    mp3 = Mp3.select().where(Mp3.url.contains(mp3_file)).first()
     data = {
         "number": number,
         # live is false at this point, because we are yet to add articles
@@ -24,17 +24,17 @@ async def add_episode_to_db(time_to_produce: int, word_count: int):
         "time_to_produce": word_count,
         "word_count": time_to_produce,
     }
-    await Episode.create(**data)
+    Episode.create(**data)
 
 
-async def add_articles_to_episode():
+def add_articles_to_episode():
     """Add articles to an episode"""
-    number = await get_episode_number()
+    number = get_episode_number()
     logging.info(f"Updating articles for episode {number:03} ...")
-    episode = await Episode.filter(number=number).first()
+    episode = Episode.select().where(Episode.number == number).first()
 
-    articles = await Article.filter(date=episode.date).all()
+    articles = Article.select().where(Article.date == episode.date)
     for article in articles:
-        await Article.filter(id=article.id).update(episode=episode)
+        Article.update(episode=episode).where(Article.id == article.id).execute()
 
-    await Episode.filter(number=episode.number).update(live=True)
+    Episode.update(live=True).where(Episode.number == episode.number).execute()

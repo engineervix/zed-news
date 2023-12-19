@@ -6,7 +6,7 @@ from babel import Locale
 from jinja2 import Environment, PackageLoader, select_autoescape
 from num2words import num2words
 
-from app.core.db.models import MP3, Article, Episode
+from app.core.db.models import Article, Episode, Mp3
 from app.core.utilities import (
     EPISODE_TEMPLATE_DIR,
     convert_seconds_to_mmss,
@@ -28,14 +28,14 @@ base_template = env.get_template("episode.njk.jinja")
 dist_file = f"{EPISODE_TEMPLATE_DIR}/{today_iso_fmt}.njk"
 
 
-async def render_jinja_template(production_time, word_count):
+def render_jinja_template(production_time, word_count):
     """Render the Jinja template for an episode"""
     logging.info("Rendering Jinja template ...")
-    episode = await Episode.filter(date=today).first()
+    episode = Episode.select().where(Episode.date == today).first()
     number = episode.number
     number_ordinal = num2words(number, to="ordinal")
-    articles = await Article.filter(episode=episode).all()
-    mp3 = await MP3.filter(url__contains=f"{today_iso_fmt}_podcast_dist.mp3").first()
+    articles = Article.select().where(Article.episode == episode)
+    mp3 = Mp3.select().where(Mp3.url.contains(f"{today_iso_fmt}_podcast_dist.mp3")).first()
     sources = []
     for article in articles:
         sources.append(article.source)
