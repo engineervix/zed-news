@@ -1,0 +1,6 @@
+# -----------------------------------------------------------------------------------------------
+# This file's not needed, the only reason it's here is becasue
+# Cloudflare Pages builds fail without it.
+# TODO: Remove this file once Cloudflare Pages Build System V2 is stable.
+# -----------------------------------------------------------------------------------------------
+requests==2.31.0 ; python_version >= "3.10" and python_version < "4.0"
