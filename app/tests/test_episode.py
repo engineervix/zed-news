@@ -1,37 +1,49 @@
 import unittest
 from datetime import timedelta
-from unittest.mock import AsyncMock, patch
+from unittest.mock import MagicMock, patch
 
-from tortoise import Tortoise
+from peewee import SqliteDatabase
 
-from app.core.db.models import MP3, Article, Episode
+from app.core.db.models import Article, Episode, Mp3
 from app.core.podcast.episode import add_articles_to_episode, add_episode_to_db
 from app.core.utilities import lingo, podcast_host, today, today_human_readable, today_iso_fmt
 
+MODELS = [Article, Episode, Mp3]
+test_db = SqliteDatabase(":memory:")
 
-class TestEpisodeInDB(unittest.IsolatedAsyncioTestCase):
-    async def asyncSetUp(self):
-        await Tortoise.init(
-            db_url="sqlite://:memory:",
-            modules={"models": ["app.core.db.models"]},
-        )
-        await Tortoise.generate_schemas(safe=True)
 
-        self.mp3 = MP3(url=f"http://example.com/{today_iso_fmt}_podcast_dist.mp3", filesize=10000, duration=3600)
-        await self.mp3.save()
+class TestEpisodeInDB(unittest.TestCase):
+    def setUp(self):
+        # Bind model classes to test db. Since we have a complete list of
+        # all models, we do not need to recursively bind dependencies.
+        test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
 
-    async def asyncTearDown(self):
-        await Tortoise.close_connections()
-        await Tortoise._drop_databases()
+        test_db.connect()
+        test_db.create_tables(MODELS, safe=True)
+
+        self.mp3 = Mp3(url=f"http://example.com/{today_iso_fmt}_podcast_dist.mp3", filesize=10000, duration=3600)
+        self.mp3.save()
+
+    def tearDown(self):
+        # Not strictly necessary since SQLite in-memory databases only live
+        # for the duration of the connection, and in the next step we close
+        # the connection...but a good practice all the same.
+        test_db.drop_tables(MODELS)
+
+        # Close connection to db.
+        test_db.close()
+
+        # If we wanted, we could re-bind the models to their original
+        # database here. But for tests this is probably not necessary.
 
     @patch("app.core.podcast.episode.logging")
-    async def test_add_episode_to_db(self, mock_logging):
-        mock_create = AsyncMock()
+    def test_add_episode_to_db(self, mock_logging):
+        mock_create = MagicMock()
         Episode.create = mock_create
 
-        await add_episode_to_db(3600, 5000)
+        add_episode_to_db(3600, 5000)
 
-        mock_create.assert_awaited_once_with(
+        mock_create.assert_called_once_with(
             number=1,
             title=today_human_readable,
             description="Episode 001",
@@ -44,18 +56,18 @@ class TestEpisodeInDB(unittest.IsolatedAsyncioTestCase):
         mock_logging.info.assert_called_once_with("Adding episode 001 to the database")
 
 
-class TestArticlesInDB(unittest.IsolatedAsyncioTestCase):
-    async def asyncSetUp(self):
-        await Tortoise.init(
-            db_url="sqlite://:memory:",
-            modules={"models": ["app.core.db.models"]},
-        )
-        await Tortoise.generate_schemas(safe=True)
+class TestArticlesInDB(unittest.TestCase):
+    def setUp(self):
+        # Bind model classes to test db. Since we have a complete list of
+        # all models, we do not need to recursively bind dependencies.
+        test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
 
-        self.mp3 = MP3(url=f"http://example.com/{today_iso_fmt}_podcast_dist.mp3", filesize=10000, duration=3600)
-        await self.mp3.save()
+        test_db.connect()
+        test_db.create_tables(MODELS, safe=True)
 
-        self.episode = Episode(
+        self.mp3 = Mp3.create(url=f"http://example.com/{today_iso_fmt}_podcast_dist.mp3", filesize=10000, duration=3600)
+
+        self.episode = Episode.create(
             number=1,
             title=today_human_readable,
             description="Episode 001",
@@ -65,7 +77,6 @@ class TestArticlesInDB(unittest.IsolatedAsyncioTestCase):
             time_to_produce=3600,
             word_count=5000,
         )
-        await self.episode.save()
 
         articles = [
             {
@@ -87,28 +98,37 @@ class TestArticlesInDB(unittest.IsolatedAsyncioTestCase):
             }
         )
         self.articles = [Article(**article) for article in articles]
-        await Article.bulk_create(self.articles)
+        for article in self.articles:
+            article.save()
 
-    async def asyncTearDown(self):
-        await Tortoise.close_connections()
-        await Tortoise._drop_databases()
+    def tearDown(self):
+        # Not strictly necessary since SQLite in-memory databases only live
+        # for the duration of the connection, and in the next step we close
+        # the connection...but a good practice all the same.
+        test_db.drop_tables(MODELS)
+
+        # Close connection to db.
+        test_db.close()
+
+        # If we wanted, we could re-bind the models to their original
+        # database here. But for tests this is probably not necessary.
 
     @patch("app.core.podcast.episode.logging")
-    async def test_add_articles_to_episode(self, mock_logging):
-        episode = await Episode.get(number=1)
+    def test_add_articles_to_episode(self, mock_logging):
+        episode = Episode.select().where(Episode.number == 1).first()
         self.assertEqual(episode.live, False)
-        self.assertEqual(await episode.articles.all().count(), 0)
-        for article in await Article.filter(date=today):
-            self.assertIsNone(await article.episode)
+        self.assertEqual(episode.articles.count(), 0)
+        for article in Article.select().where(Article.date == today):
+            self.assertIsNone(article.episode)
 
-        await add_articles_to_episode()
-        updated_episode = await Episode.filter(number=1).first()
+        add_articles_to_episode()
+        updated_episode = Episode.select().where(Episode.number == 1).first()
 
         self.assertEqual(updated_episode.live, True)
-        self.assertEqual(await updated_episode.articles.all().count(), 5)
+        self.assertEqual(updated_episode.articles.count(), 5)
         mock_logging.info.assert_called_once_with("Updating articles for episode 001 ...")
-        for article in await Article.filter(date=today):
-            self.assertTrue(await article.episode, updated_episode)
+        for article in Article.select().where(Article.date == today):
+            self.assertTrue(article.episode, updated_episode)
 
 
 if __name__ == "__main__":

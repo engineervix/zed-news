@@ -1,20 +1,17 @@
-import asyncio
+import datetime
 import os
 import shutil
 import tempfile
 import unittest
-from unittest.mock import patch
 
+from peewee import SqliteDatabase
+
+from app.core.db.models import Article, Episode, Mp3
 from app.core.podcast.mix import extract_duration_in_milliseconds, mix_audio
-from app.core.utilities import TEST_DIR, today_iso_fmt
+from app.core.utilities import TEST_DIR, lingo, podcast_host, today_human_readable, today_iso_fmt
 
-
-class MockEpisodeQuerySet:
-    def __init__(self, episodes):
-        self.episodes = episodes
-
-    async def count(self):
-        return len(self.episodes)
+MODELS = [Article, Episode, Mp3]
+test_db = SqliteDatabase(":memory:")
 
 
 class TestDurationExtraction(unittest.TestCase):
@@ -74,17 +71,59 @@ class TestMixAudio(unittest.TestCase):
         self.outro_track = outro_audio_path
         self.dest = os.path.join(self.temp_dir, f"{today_iso_fmt}_podcast_dist.mp3")
 
+        # Bind model classes to test db. Since we have a complete list of
+        # all models, we do not need to recursively bind dependencies.
+        test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
+
+        test_db.connect()
+        test_db.create_tables(MODELS)
+
+        # Create a mock article for testing
+        self.mock_article = Article(
+            title="Test Article",
+            source="Test Source",
+            url="http://example.com",
+            content="This is a test article",
+            date=datetime.date.today(),
+        )
+        self.mock_article.save()
+
+        self.mp3 = Mp3(url=f"https://example.com/{today_iso_fmt}_podcast_dist.mp3", filesize=10485760, duration=630)
+        self.mp3.save()
+
+        self.episode = Episode(
+            number=21,
+            live=True,
+            title=today_human_readable,
+            description="Episode 021",
+            presenter=podcast_host,
+            locale=lingo.replace("-", "_"),
+            mp3=self.mp3,
+            time_to_produce=120,
+            word_count=5000,
+        )
+        self.episode.save()
+
+        self.mock_article.episode = self.episode
+        self.mock_article.save()
+
     def tearDown(self):
         # Remove temporary directory and its contents
         shutil.rmtree(self.temp_dir)
 
-    @patch("app.core.db.models.Episode.filter")
-    def test_mix_audio(self, filter_mock):
-        # Call the function
-        episodes = [1, 2, 3]
-        query_set_mock = MockEpisodeQuerySet(episodes)
-        filter_mock.return_value = query_set_mock
-        asyncio.run(mix_audio(self.voice_track, self.intro_track, self.outro_track, self.dest))
+        # Not strictly necessary since SQLite in-memory databases only live
+        # for the duration of the connection, and in the next step we close
+        # the connection...but a good practice all the same.
+        test_db.drop_tables(MODELS)
+
+        # Close connection to db.
+        test_db.close()
+
+        # If we wanted, we could re-bind the models to their original
+        # database here. But for tests this is probably not necessary.
+
+    def test_mix_audio(self):
+        mix_audio(self.voice_track, self.intro_track, self.outro_track, self.dest)
 
         # Assert that the output file exists
         self.assertTrue(os.path.exists(self.dest))

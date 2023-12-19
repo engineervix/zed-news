@@ -10,7 +10,7 @@ from botocore.exceptions import BotoCoreError, ClientError
 from mutagen.mp3 import MP3 as MutagenMP3
 from pydantic import FilePath
 
-from app.core.db.models import MP3
+from app.core.db.models import Mp3
 from app.core.podcast.content import get_episode_number
 from app.core.utilities import (
     AWS_ACCESS_KEY_ID,
@@ -48,7 +48,7 @@ def extract_duration_in_milliseconds(output: str) -> int:
         return 0
 
 
-async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3"):
+def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3"):
     """
     Mix the voice track, intro track, and outro track into a single audio file
     """
@@ -110,7 +110,7 @@ async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{to
         )
 
         # add Id3 tags
-        episode = await get_episode_number()
+        episode = get_episode_number()
         audio_file = dest
         tag = eyed3.load(audio_file).tag
         tag.artist = "Victor Miti"
@@ -132,7 +132,7 @@ async def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{to
 
 
 def upload_to_s3(src: FilePath, dest_folder: str, dest_filename: str):
-    """Upload the MP3 file to S3 and return the URL"""
+    """Upload the Mp3 file to S3 and return the URL"""
 
     try:
         s3 = boto3.client(
@@ -142,7 +142,7 @@ def upload_to_s3(src: FilePath, dest_folder: str, dest_filename: str):
             aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
         )
 
-        # Upload the MP3 file to S3
+        # Upload the Mp3 file to S3
         dest_key = f"{dest_folder}/{dest_filename}"
         s3.upload_file(src, AWS_BUCKET_NAME, dest_key)
 
@@ -157,14 +157,14 @@ def upload_to_s3(src: FilePath, dest_folder: str, dest_filename: str):
 
 
 def get_mp3_info(mp3_file: FilePath) -> dict:
-    """Get the filesize and duration of an MP3 file"""
+    """Get the filesize and duration of an Mp3 file"""
     audiofile = MutagenMP3(mp3_file)
     return {"filesize": os.path.getsize(mp3_file), "duration": audiofile.info.length}
 
 
-async def add_to_db(url: str, f: FilePath):
+def add_to_db(url: str, f: FilePath):
     """Create an mp3 podcast entry in the database"""
 
-    logging.info(f"Adding MP3 {f} to database ...")
+    logging.info(f"Adding Mp3 {f} to database ...")
     mp3_info = get_mp3_info(f)
-    await MP3.create(url=url, **mp3_info)
+    Mp3.create(url=url, **mp3_info)
