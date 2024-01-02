@@ -4,6 +4,55 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.5.0](https://github.com/engineervix/zed-news/compare/v0.4.0...v0.5.0) (2024-01-02)
+
+
+### ✅ Tests
+
+* mock together summarisation backend ([ca7b9ac](https://github.com/engineervix/zed-news/commit/ca7b9ac1f5bc1b754eee792253bbf10102abd85e))
+* temporarily remove failing test and exercise caution with bs4 ([f76b321](https://github.com/engineervix/zed-news/commit/f76b321b0efdd4b481752fe4b0cfc60b0a658ec2))
+
+
+### 🚀 Features
+
+* install replicate ([40c12ba](https://github.com/engineervix/zed-news/commit/40c12bad73bd363fd7165c955678e0af761c00d9))
+* let the LLM actually present the podcast ([d0e63b3](https://github.com/engineervix/zed-news/commit/d0e63b3e188a74ec1b4b4af550fcb638bab0887b))
+* use together.ai & bump langchain to 0.0.348 ([63e68e7](https://github.com/engineervix/zed-news/commit/63e68e738f852025f7b0f1fcde812630be65926e))
+* use vicuna-13b-v1.5-16k and garage-bAInd/Platypus2-70B-instruct ([16e2877](https://github.com/engineervix/zed-news/commit/16e28772a8e82e6e5fcd25d5faad476f738873a4))
+
+
+### ♻️ Code Refactoring
+
+* change prompt and do not use one-sentence summary ([5b0ad43](https://github.com/engineervix/zed-news/commit/5b0ad43fbb0b0d378cb0e0adca49471e4ade7c75))
+* tweak the content generation ([c1b6237](https://github.com/engineervix/zed-news/commit/c1b62372b4b218f01146b912ddc1d45642ea472c))
+* tweak the together.ai invocation ([39199f1](https://github.com/engineervix/zed-news/commit/39199f1e14999fe5a1ddcb8d74350d36bc4897db))
+* update codebase to incorporate new ORM ([8d2fa06](https://github.com/engineervix/zed-news/commit/8d2fa06b05899113050a1b03875ad23be1653750))
+* yet another small tweak ([b81538c](https://github.com/engineervix/zed-news/commit/b81538c89227be304891cff832b10c3a1bf137d2))
+
+
+### 👷 CI/CD
+
+* **deps:** update sosedoff/pgweb docker tag to v0.14.2 ([daf654d](https://github.com/engineervix/zed-news/commit/daf654df8676cdff6692eae85c3ea1628faaf579))
+
+
+### 🐛 Bug Fixes
+
+* **deps:** update dependency num2words to v0.5.13 ([#50](https://github.com/engineervix/zed-news/issues/50)) ([d9c1593](https://github.com/engineervix/zed-news/commit/d9c15936a50450063554fd94d540fd6b4ee7bbc2))
+* ensure that import_db_dump task works correctly ([c13067f](https://github.com/engineervix/zed-news/commit/c13067f70629e378186e9c544d4834211a04a056))
+* erroneous transcript generation ([0fdb6c9](https://github.com/engineervix/zed-news/commit/0fdb6c9f9f6addf4fb5383173cca26e5e5e63a54))
+
+
+### ⚙️ Build System
+
+* **deps:** update dependency babel-loader to v9.1.3 ([#43](https://github.com/engineervix/zed-news/issues/43)) ([fd4f110](https://github.com/engineervix/zed-news/commit/fd4f110f8bf70ce1b28a267e570fb60a1c7b2dc7))
+* **deps:** update dependency bootstrap to v5.3.2 ([#47](https://github.com/engineervix/zed-news/issues/47)) ([df4d544](https://github.com/engineervix/zed-news/commit/df4d5444cb85baac75a7d4d0fa38dc1512d785d0))
+* **deps:** update dependency boto3 to v1.34.11 ([#32](https://github.com/engineervix/zed-news/issues/32)) ([43b6536](https://github.com/engineervix/zed-news/commit/43b653636b7fe7053da2cab6fa36e6f4e74f413b))
+* **deps:** update dependency cssnano to v6.0.2 ([#44](https://github.com/engineervix/zed-news/issues/44)) ([d2601cf](https://github.com/engineervix/zed-news/commit/d2601cfeff58cfbbd73cd075fa864f54aab4251c))
+* **deps:** update dependency feedparser to v6.0.11 ([#48](https://github.com/engineervix/zed-news/issues/48)) ([539cfe6](https://github.com/engineervix/zed-news/commit/539cfe60b1cc2de9b7e282a3033de1365a001c98))
+* **deps:** update dependency langchain to ^0.0.353 ([#49](https://github.com/engineervix/zed-news/issues/49)) ([7a9987b](https://github.com/engineervix/zed-news/commit/7a9987b6cdabaec558405d38ccffaf6bf09c5677))
+* **deps:** update dependency rimraf to v5.0.5 ([#45](https://github.com/engineervix/zed-news/issues/45)) ([ee33868](https://github.com/engineervix/zed-news/commit/ee33868d367a1d08d4cd3a92c39d2f930338aa72))
+* replace tortoise-orm with peewee. No more async ([af02a49](https://github.com/engineervix/zed-news/commit/af02a498a09ec7104c379d118a6dbedb2bf1923d))
+
 ## [v0.4.0](https://github.com/engineervix/zed-news/compare/v0.3.2...v0.4.0) (2023-11-22)
 
 
