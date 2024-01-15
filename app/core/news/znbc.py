@@ -49,48 +49,60 @@ def get_news():
     """
     url = "https://www.znbc.co.zm/news/"
     headers = {"User-Agent": ua.firefox}
-    response = requests.get(url, headers=headers, timeout=60)
-    soup = BeautifulSoup(response.text, "html.parser")
-    news = soup.find_all("article")
-    latest_news = []
-    encountered_titles = set()
-    # Skip the first item because it seems to be
-    # all the news articles wrapped in an article tag
-    for article in reversed(news[1:]):
-        time_element = article.find("time", class_="entry-date")
-        if time_element and time_element.get("datetime") and time_element.get("datetime").startswith(today_iso_fmt):
-            # Extract article title
-            title_element = article.select_one("h3.entry-title a")
-            title = title_element.text.strip()
 
-            if title not in encountered_titles:
-                # Extract author
-                # author_element = article.select_one("div.author a")
-                # author = author_element.text.strip() if author_element else ""
+    try:
+        response = requests.get(url, headers=headers, timeout=60)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        news = soup.find_all("article")
+        latest_news = []
+        encountered_titles = set()
+        # Skip the first item because it seems to be
+        # all the news articles wrapped in an article tag
+        for article in reversed(news[1:]):
+            time_element = article.find("time", class_="entry-date")
+            if time_element and time_element.get("datetime") and time_element.get("datetime").startswith(today_iso_fmt):
+                # Extract article title
+                title_element = article.select_one("h3.entry-title a")
+                title = title_element.text.strip()
 
-                # Extract detail URL
-                detail_url = title_element["href"]
+                if title not in encountered_titles:
+                    # Extract author
+                    # author_element = article.select_one("div.author a")
+                    # author = author_element.text.strip() if author_element else ""
 
-                # Extract category
-                category_element = article.select_one("a.category-item")
-                category = category_element.text.strip() if category_element else ""
+                    # Extract detail URL
+                    detail_url = title_element["href"]
 
-                # Extract article detail
-                content = get_article_detail(detail_url)
+                    # Extract category
+                    category_element = article.select_one("a.category-item")
+                    category = category_element.text.strip() if category_element else ""
 
-                if content:
-                    latest_news.append(
-                        {
-                            "source": "Zambia National Broadcasting Corporation (ZNBC)",
-                            "url": detail_url,
-                            "title": title,
-                            "content": content,
-                            "category": category,
-                            # "author": author,
-                        }
-                    )
+                    # Extract article detail
+                    content = get_article_detail(detail_url)
 
-                    # Add title to encountered titles set
-                    encountered_titles.add(title)
+                    if content:
+                        latest_news.append(
+                            {
+                                "source": "Zambia National Broadcasting Corporation (ZNBC)",
+                                "url": detail_url,
+                                "title": title,
+                                "content": content,
+                                "category": category,
+                                # "author": author,
+                            }
+                        )
 
-    return latest_news[::-1]
+                        # Add title to encountered titles set
+                        encountered_titles.add(title)
+
+        return latest_news[::-1]
+    except requests.exceptions.ConnectionError as conn_err:
+        logger.exception(f"Connection error occurred for {url}\n: {conn_err}")
+    except requests.exceptions.HTTPError as http_err:
+        logger.exception(f"HTTP error occurred for {url}\n: {http_err}")
+    except requests.exceptions.RequestException as req_err:
+        logger.exception(f"Request error occurred for {url}\n: {req_err}")
+    except Exception as err:
+        logger.exception(f"An unexpected error occurred for {url}\n: {err}")
+    return []
