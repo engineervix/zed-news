@@ -99,10 +99,13 @@ def get_news():
         return latest_news[::-1]
     except requests.exceptions.ConnectionError as conn_err:
         logger.exception(f"Connection error occurred for {url}\n: {conn_err}")
+        return []
     except requests.exceptions.HTTPError as http_err:
         logger.exception(f"HTTP error occurred for {url}\n: {http_err}")
+        return []
     except requests.exceptions.RequestException as req_err:
         logger.exception(f"Request error occurred for {url}\n: {req_err}")
+        return []
     except Exception as err:
         logger.exception(f"An unexpected error occurred for {url}\n: {err}")
-    return []
+        return []
