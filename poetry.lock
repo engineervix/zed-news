@@ -2863,16 +2863,17 @@ files = [
 
 [[package]]
 name = "together"
-version = "0.2.10"
+version = "0.2.11"
 description = "Python client for Together's Cloud Platform!"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "together-0.2.10-py3-none-any.whl", hash = "sha256:f64d9e6e7a6ca00e509e55d7912786f54a6bb0d8009c761a2dd7c86777d992cf"},
-    {file = "together-0.2.10.tar.gz", hash = "sha256:3e08f3207b61cd5aed54232e44976fbfc401bdc62327e16a767962ef14e62979"},
+    {file = "together-0.2.11-py3-none-any.whl", hash = "sha256:0760aafe1b53cf41cb58592086a2b5edef956a2536b52daecfc2f9ef0fc736d5"},
+    {file = "together-0.2.11.tar.gz", hash = "sha256:906ae626b0ec49f7ea90d5660fb4c28664a1f55719f998e868d035f417316e24"},
 ]
 
 [package.dependencies]
+aiohttp = ">=3.7.4,<4.0.0"
 pydantic = ">=2.5.0,<3.0.0"
 requests = ">=2.31.0,<3.0.0"
 sseclient-py = ">=1.7.2,<2.0.0"
