@@ -55,27 +55,27 @@
         {% if pagination.pages | length > 1 %}
         <div class="mb-5 mb-xl-0">
           <nav aria-label="Episode Navigation">
-            <ul class="pagination">
+            <ul class="pagination justify-content-center">
               {% if pagination.href.previous %}
               <li class="page-item">
                 <a class="page-link" href="{{ site.base_url }}{{ pagination.href.previous }}" aria-label="Previous">
-                  <span aria-hidden="true">«</span>
+                  <span aria-hidden="true">« Previous</span>
                   <span class="sr-only">Previous</span>
                 </a>
               </li>
               {% endif %}
-              {% for page_num in range(0, pagination.pages | length) %}
+              {# {% for page_num in range(0, pagination.pages | length) %}
               <li class="page-item {% if page_num  == pagination.pageNumber %} active{% endif %}">
                 <a href="{{ site.base_url }}{{ pagination.hrefs[page_num] }}" class="page-link">
                   {{ page_num + 1 }}
                   {% if page_num == pagination.pageNumber %}<span class="sr-only">(current)</span>{% endif %}
                 </a>
               </li>
-              {% endfor %}
+              {% endfor %} #}
               {% if pagination.href.next %}
               <li class="page-item">
                 <a class="page-link" href="{{ site.base_url }}{{ pagination.href.next }}" aria-label="Next">
-                  <span aria-hidden="true">»</span>
+                  <span aria-hidden="true">Next »</span>
                   <span class="sr-only">Next</span>
                 </a>
               </li>
