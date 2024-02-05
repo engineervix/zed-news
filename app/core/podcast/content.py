@@ -119,9 +119,9 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         f.write(metadata + "News Items:\n\n" + content)
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
-    # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT"
-    model = "Qwen/Qwen1.5-14B-Chat"
+    # model = "Qwen/Qwen1.5-14B-Chat"
     temperature = 0.75
     max_tokens = 4096
     together.api_key = TOGETHER_API_KEY
