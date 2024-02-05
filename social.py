@@ -73,12 +73,13 @@ def create_facebook_post(content: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"You are a social media marketing guru. Your task is to create a short and sweet facebook post containing a sneak preview of today's podcast whose details are below.```{content}\n```"
+    prompt = f"You are a social media marketing guru. Your task is to produce a short facebook teaser post of today's podcast whose details are below. Use bullet points, emojis and hashtags as appropriate. Don't cover every news item, just the most interesting ones.```{content}\n```"
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
-    model = "garage-bAInd/Platypus2-70B-instruct"
-    temperature = 0.7
-    max_tokens = 768
+    # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
+    model = "openchat/openchat-3.5-1210"
+    temperature = 0.75
+    max_tokens = 1024
 
     output = together.Complete.create(
         prompt=prompt,
