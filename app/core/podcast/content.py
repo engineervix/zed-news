@@ -83,9 +83,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    prompt = f"The date is {today_human_readable}. You are {podcast_host}, a fun and witty scriptwriter, content creator and podcast host. You host the Zed News Podcast - a news and current affairs podcast which runs Monday to Friday. You are given the news from various sources as indicated below. You have a microphone in front of you, your task is to present today's episode (number {get_episode_number()}), ensuring that you cover all the news from all the sources. Where necessary, consolidate any similar news items from different sources. Ensure that the podcast is presented in a logical, coherent manner so it's easy to follow. At the end, inform your audience that you are actually not human. Remember: speak in a conversational tone, leave no news item behind and do not repeat content. Do not worry about SFX, music, captions, etc. just speak directly as if you are live on air.\n\n"
-
-    # prompt = f"The date is {today_human_readable}. {podcast_host}, a bot, hosts the Zed News Podcast - a news and current affairs podcast which runs Monday to Friday. Your task, as an accomplished content creater and comedian, is to produce content which she'll read out word-for-word as she presents today's episode (number {get_episode_number()}). Ensure that you cover all the news from all the sources, presented in a logical, coherent manner, with any similar news items from different sources appropriately consolidated. At the end, Ayanda wants her audience to know that she's actually not a human. Remember: leave no news item behind, do not repeat content and ensure your output is presented in a human-readable style.\n\n"  # noqa: W505
+    prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're preparing for episode #{get_episode_number()}. Your goal is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. Conclude the episode with a light-hearted joke acknowledging your non-human nature.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
@@ -122,8 +120,10 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         f.write(metadata + "News Items:\n\n" + content)
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
-    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-    temperature = 0.7
+    # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT"
+    # temperature = 0.7
+    temperature = 1.0
     max_tokens = 4096
     together.api_key = TOGETHER_API_KEY
     output = together.Complete.create(
