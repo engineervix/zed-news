@@ -98,10 +98,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
                 # If there are less than 24 articles, summarize each article in the usual way
                 summary = summarizer(text, title)
             else:
-                if counter % 2 == 0:
-                    summary = summarizer(text, title)
-                else:
-                    summary = brief_summary(text, title)
+                summary = brief_summary(text, title)
 
             # summary = summarizer(text, title)
 
