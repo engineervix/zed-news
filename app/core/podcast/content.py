@@ -12,8 +12,7 @@ import together
 from pydantic import HttpUrl
 
 from app.core.db.models import Article, Episode
-
-# from app.core.summarization.backends.together import brief_summary
+from app.core.summarization.backends.together import brief_summary
 from app.core.utilities import (
     DATA_DIR,
     # OPENAI_API_KEY,
@@ -95,13 +94,16 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
             title = article["title"]
             text = article["content"]
 
-            # if len(news) < 15:
-            #     # If there are less than 15 articles, summarize each article in the usual way
-            #     summary = summarizer(text, title)
-            # else:
-            #     summary = brief_summary(text, title)
+            if len(news) < 24:
+                # If there are less than 24 articles, summarize each article in the usual way
+                summary = summarizer(text, title)
+            else:
+                if counter % 2 == 0:
+                    summary = summarizer(text, title)
+                else:
+                    summary = brief_summary(text, title)
 
-            summary = summarizer(text, title)
+            # summary = summarizer(text, title)
 
             if summary.strip().startswith("Summary: "):
                 summary = summary.replace("Summary: ", "")
