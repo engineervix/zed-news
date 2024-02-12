@@ -66,18 +66,19 @@ def get_content() -> str:
         return f.read()
 
 
-def create_facebook_post(content: str) -> str:
+def create_facebook_post(content: str, url: str) -> str:
     """
     Create a Facebook post using Together AI's Inference API.
 
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"You are a social media marketing guru. Your task is to produce a short facebook teaser post of today's podcast whose details are below. Use bullet points, emojis and hashtags as appropriate. Don't cover every news item, just the most interesting ones.```{content}\n```"
+    prompt = f"You are a social media marketing guru. Your task is to immediately produce a short facebook teaser post of today's podcast whose details are below. Use bullet points, emojis and hashtags as appropriate. Don't cover every news item, just the most interesting ones. The podcast URL is {url}```{content}\n```"
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
-    model = "openchat/openchat-3.5-1210"
+    # model = "openchat/openchat-3.5-1210"
+    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
     temperature = 0.75
     max_tokens = 1024
 
@@ -144,7 +145,7 @@ def main(args=None):
         if args.platform == "facebook" and podcast_is_live(podcast_url):
             try:
                 content = get_content()
-                facebook_post = create_facebook_post(content)
+                facebook_post = create_facebook_post(content, podcast_url)
                 post_to_facebook(facebook_post, podcast_url)
                 requests.get(HEALTHCHECKS_FACEBOOK_PING_URL, timeout=10)
             except Exception as e:
