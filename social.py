@@ -91,7 +91,7 @@ def create_facebook_post(content: str, url: str) -> str:
     logger.info(output)
 
     if result := output["output"]["choices"][0]["text"].strip():
-        return result
+        return result.replace("Facebook Post:", "")
     else:
         logger.error("Transcript is empty")
         requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
