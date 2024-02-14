@@ -222,7 +222,9 @@ def create_facebook_post(content: str, url: str) -> str:
     logger.info(output)
 
     if result := output["output"]["choices"][0]["text"].strip():
-        return result.replace("Facebook Post:", "")
+        result = result.replace("Facebook Post:", "")  # Remove "Facebook Post:"
+        result = result.replace("```", "")  # Remove triple backticks
+        return result
     else:
         logger.error("Transcript is empty")
         requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
@@ -314,7 +316,7 @@ def main(args=None):
             except Exception as e:
                 logger.error(e)
                 requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
-        if args.platform == "facebook-video" and podcast_is_live(podcast_url):
+        elif args.platform == "facebook-video" and podcast_is_live(podcast_url):
             try:
                 video = create_video(
                     image_overlay=f"{ASSETS_DIR}/image-overlay.jpg",
