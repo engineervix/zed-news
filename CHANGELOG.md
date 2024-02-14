@@ -4,6 +4,46 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.6.0](https://github.com/engineervix/zed-news/compare/v0.5.0...v0.6.0) (2024-02-14)
+
+
+### ⚙️ Build System
+
+* **deps:** update dependency black to v23.12.1 ([#59](https://github.com/engineervix/zed-news/issues/59)) ([6643a9a](https://github.com/engineervix/zed-news/commit/6643a9a0fb10de3afb30bb5403d1b9c2edc23fcf))
+* **deps:** update dependency boto3 to v1.34.19 ([#54](https://github.com/engineervix/zed-news/issues/54)) ([3138c19](https://github.com/engineervix/zed-news/commit/3138c195e9486bf7a28879459809d7f555061c90))
+* **deps:** update dependency cssnano to v6.0.3 ([#51](https://github.com/engineervix/zed-news/issues/51)) ([ee75d90](https://github.com/engineervix/zed-news/commit/ee75d9084d9565a58d8993cf14b7e660287cff68))
+* **deps:** update dependency postcss to v8.4.33 ([#52](https://github.com/engineervix/zed-news/issues/52)) ([487d9ad](https://github.com/engineervix/zed-news/commit/487d9ad95c1a4f032d24450022a47278d7c6ee1d))
+* **deps:** update dependency sass-loader to v13.3.3 ([#53](https://github.com/engineervix/zed-news/issues/53)) ([c0baa61](https://github.com/engineervix/zed-news/commit/c0baa6155ffc39a43cf68ef5650b9e950ae008e5))
+* **deps:** update dependency torch to v2.1.2 ([#55](https://github.com/engineervix/zed-news/issues/55)) ([b31dff3](https://github.com/engineervix/zed-news/commit/b31dff38f42ca55ea84dc93ec7c7487d94523798))
+* **deps:** update dependency transformers to v4.36.2 ([#56](https://github.com/engineervix/zed-news/issues/56)) ([2c5d47d](https://github.com/engineervix/zed-news/commit/2c5d47dedc9074b54e5283fe74ccc3ee7bef2f62))
+* **deps:** update dependency ua-parser-js to v1.0.37 ([#57](https://github.com/engineervix/zed-news/issues/57)) ([acbbfe8](https://github.com/engineervix/zed-news/commit/acbbfe8c0dddf0d426d6f02a95ea1d2e71e9beb1))
+
+
+### ♻️ Code Refactoring
+
+* ensure social posts don't start with *Facebook Post:* ([4e5f6a6](https://github.com/engineervix/zed-news/commit/4e5f6a66373c530580ee344d2ff924fa39a641da))
+* go back to using mistralai/Mixtral-8x7B-Instruct-v0.1 for social posts ([05cbf07](https://github.com/engineervix/zed-news/commit/05cbf07c52b36db5bc00593cb936acbcbe37ba60))
+* simplify social share prompt & switch to Platypus2-70B-instruct ([80ebde2](https://github.com/engineervix/zed-news/commit/80ebde22e6cea1149b22ba73af57029384b3a82f))
+
+
+### 🐛 Bug Fixes
+
+* add a quick fix to handle connection errors for ZNBC ([710f46c](https://github.com/engineervix/zed-news/commit/710f46c7338dcfb97dbef859d709031301292139))
+* address the too many articles problem ([79ee3aa](https://github.com/engineervix/zed-news/commit/79ee3aac8358666fdfe8c7311a9b18602ac87cdd))
+* correct the buggy fix in 710f46c ([64be24d](https://github.com/engineervix/zed-news/commit/64be24d7e63275c0d1c00434dd31e1363a480035))
+* remove baclticks in social post and correct conditional statements ([b078422](https://github.com/engineervix/zed-news/commit/b07842220855c17686b2f429dd25b5cff121c661))
+* simplify pagination ([56b1217](https://github.com/engineervix/zed-news/commit/56b1217bcf8900d71efdddc6d3065347a6cf4414))
+* use the correct font and adjust text duration ([e22ca82](https://github.com/engineervix/zed-news/commit/e22ca82947e6b57977efe3182376d0eb31837124))
+
+
+### 🚀 Features
+
+* create facebook post accompanied by video ([f7a7a73](https://github.com/engineervix/zed-news/commit/f7a7a7334bc3256518524c9cbf428f9e5cff51f0))
+* create video and post to facebook ([f5c807f](https://github.com/engineervix/zed-news/commit/f5c807f2b40edd5841e4e67b009badae04e4d791))
+* use openchat/openchat-3.5-1210 for social posts ([3bea658](https://github.com/engineervix/zed-news/commit/3bea6583bf330a13374e5d53ad7ab6df9fe8c4b8))
+* use Qwen/Qwen1.5-14B-Chat for the transcript ([b43e5f7](https://github.com/engineervix/zed-news/commit/b43e5f74c1734a257e92c4b376b35c0cc640b016))
+* use the `NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT` model ([1d6ffdb](https://github.com/engineervix/zed-news/commit/1d6ffdbc6dfd3ae4090d5c3efd8bddd58963b584))
+
 ## [v0.5.0](https://github.com/engineervix/zed-news/compare/v0.4.0...v0.5.0) (2024-01-02)
 
 
