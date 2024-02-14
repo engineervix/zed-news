@@ -139,7 +139,7 @@ def create_video(image_overlay, logo, podcast_mp3, video_loop):
     )  # Adjust opacity as needed (0.0 for fully transparent, 1.0 for fully opaque)
 
     # Add text overlays
-    text_duration = 10  # Duration of the text overlays (in seconds)
+    text_duration = 12  # Duration of the text overlays (in seconds)
 
     # Text at the beginning
     if episode_number := get_episode_number(news_headlines):
@@ -159,7 +159,8 @@ def create_video(image_overlay, logo, podcast_mp3, video_loop):
             f"{today_human_readable}\nZed News Podcast{episode_suffix}",
             fontsize=75,
             color="white",
-            font="Moul",
+            # to get list of available fonts, use moviepy.video.VideoClip.TextClip.list('font')
+            font="Merriweather-Regular",
         )
         .set_duration(text_duration)
         .set_position(("center", "top"))
@@ -167,7 +168,7 @@ def create_video(image_overlay, logo, podcast_mp3, video_loop):
 
     # Text at the end
     text_end = (
-        TextClip(f"Please join us {next_day}{ending_suffix}!", fontsize=50, color="white", font="Vibur")
+        TextClip(f"Please join us {next_day}{ending_suffix}!", fontsize=60, color="white", font="Vibur")
         .set_duration(text_duration)
         .set_position(("center", "center"))
     )
