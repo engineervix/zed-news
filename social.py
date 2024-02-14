@@ -205,7 +205,7 @@ def create_facebook_post(content: str, url: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"You are a social media marketing guru. Your task is to immediately produce a short facebook teaser post of today's podcast whose details are below. Use bullet points, emojis and hashtags as appropriate. Don't cover every news item, just the most interesting ones. The podcast URL is {url}```{content}\n```"
+    prompt = f"You are a social media marketing guru. Your task is to immediately produce a short Facebook teaser post of today's podcast episode whose details are below. Use bullet points, emojis and hashtags as appropriate. Don't cover every news item, just the most interesting ones. Your post will accompany a video, whose URL is {url}. Please note that this video is just basically the audio with some looping animated background, therefore, your post shouldn't ask people to 'watch' the video per se, but rather to, 'check it out' or 'tune in to'. Do not use markdown.```{content}\n```"
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
@@ -223,8 +223,14 @@ def create_facebook_post(content: str, url: str) -> str:
     logger.info(output)
 
     if result := output["output"]["choices"][0]["text"].strip():
-        result = result.replace("Facebook Post:", "")  # Remove "Facebook Post:"
         result = result.replace("```", "")  # Remove triple backticks
+        first_line = result.splitlines()[0].lower()
+        unwanted = ["facebook post:", "post:", "here's your", "here is"]
+
+        if any(string in first_line for string in unwanted):
+            # Remove the first line from result
+            result = "\n".join(result.split("\n")[1:])
+
         return result
     else:
         logger.error("Transcript is empty")
@@ -245,7 +251,7 @@ def post_to_facebook(content: str, url: str) -> None:
     logger.info(content)
 
 
-def post_video_to_facebook(video_file):
+def upload_video_to_facebook(video_file):
     # Step 1: Upload video
     with open(video_file, "rb") as f:
         endpoint = f"https://graph-video.facebook.com/v19.0/me/videos?access_token={FACEBOOK_ACCESS_TOKEN}"
@@ -273,8 +279,10 @@ def post_video_to_facebook(video_file):
             # else:
             #     print("Failed to share the video on your Facebook timeline.")
 
+            return f"https://www.facebook.com/watch/?v={video_id}"
         else:
             print("Failed to upload the video.")
+            return ""
 
 
 def main(args=None):
@@ -297,7 +305,7 @@ def main(args=None):
     share_parser = subparsers.add_parser("share", help="Share to a specific platform")
     share_parser.add_argument(
         "platform",
-        choices=["facebook-post", "facebook-video"],
+        choices=["facebook"],
         help="Which platform to share to. Currently only Facebook is supported.",
         type=str,
     )
@@ -308,25 +316,26 @@ def main(args=None):
     args = parser.parse_args(args)
 
     if args.command == "share":
-        if args.platform == "facebook-post" and podcast_is_live(podcast_url):
+        if args.platform == "facebook" and podcast_is_live(podcast_url):
             try:
-                content = get_content()
-                facebook_post = create_facebook_post(content, podcast_url)
-                post_to_facebook(facebook_post, podcast_url)
-                requests.get(HEALTHCHECKS_FACEBOOK_PING_URL, timeout=10)
-            except Exception as e:
-                logger.error(e)
-                requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
-        elif args.platform == "facebook-video" and podcast_is_live(podcast_url):
-            try:
+                # First, we create a video and upload it
                 video = create_video(
                     image_overlay=f"{ASSETS_DIR}/image-overlay.jpg",
                     logo=f"{ASSETS_DIR}/logo.png",
                     podcast_mp3=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3",
                     video_loop=get_random_video(os.path.join(f"{DATA_DIR}/videos/")),
                 )
-                post_video_to_facebook(video)
-                requests.get(HEALTHCHECKS_FACEBOOK_PING_URL, timeout=10)
+                if video_link := upload_video_to_facebook(video):
+                    # Then we create a facebook post
+                    content = get_content()
+                    facebook_post = create_facebook_post(content, video_link)
+                    post_to_facebook(facebook_post, video_link)
+                    requests.get(HEALTHCHECKS_FACEBOOK_PING_URL, timeout=10)
+                else:
+                    print(
+                        "Something went wrong either while creating the video or attempting to upload it to Facebook."
+                    )
+                    sys.exit(1)
             except Exception as e:
                 logger.error(e)
                 requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
