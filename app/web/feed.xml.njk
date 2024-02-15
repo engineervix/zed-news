@@ -36,7 +36,7 @@
         {% set absolutePostUrl %}{{ episode.url | url | absoluteUrl(site.base_url) }}{% endset %}
         <item>
             <title>{{ episode.data.title }}</title>
-            <description>{{ episode.data.description }} It is presented by {{ episode.data.presenter }} in {{ episode.data.locale.name }} and consists of {{ episode.data.references.count }} articles from {{ episode.data.references.sources }} sources. The size of the audio file is {{ episode.data.mp3.size }}. Running time is {{ episode.data.mp3.length }}.Check out the <![CDATA[ <a href="{{ absolutePostUrl }}">episode notes</a> ]]> for more information, including links to the news sources.</description>
+            <description>{{ episode.data.description }} Today's edition is presented in {{ episode.data.locale.name }} and consists of {{ episode.data.references.count }} articles from {{ episode.data.references.sources }} sources. The size of the audio file is {{ episode.data.mp3.size }}. Running time is {{ episode.data.mp3.length }}.Check out the <![CDATA[ <a href="{{ absolutePostUrl }}">episode notes</a> ]]> for more information, including links to the news sources.</description>
             <pubDate>{{ episode.date | dateToRfc822 }}</pubDate>
             <enclosure url="{{ episode.data.mp3.url }}"
                        type="audio/mpeg" length="{{ episode.data.rss.enclosure_length }}"/>

@@ -1,13 +1,16 @@
 import logging
+import os
 from datetime import datetime, timedelta, timezone
 
 import pytz
+import together
 from babel import Locale
 from jinja2 import Environment, PackageLoader, select_autoescape
-from num2words import num2words
 
+# from num2words import num2words
 from app.core.db.models import Article, Episode, Mp3
 from app.core.utilities import (
+    DATA_DIR,
     EPISODE_TEMPLATE_DIR,
     convert_seconds_to_mmss,
     format_duration,
@@ -27,13 +30,69 @@ env = Environment(
 base_template = env.get_template("episode.njk.jinja")
 dist_file = f"{EPISODE_TEMPLATE_DIR}/{today_iso_fmt}.njk"
 
+# Together
+TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
+together.api_key = TOGETHER_API_KEY
+
+news_headlines = f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt"
+
+logger = logging.getLogger(__name__)
+
+
+def create_episode_summary(content: str, episode: str) -> str:
+    """
+    Using Together AI's Inference API, create a summary to use as
+    the Facebook video description.
+
+
+    https://docs.together.ai/reference/complete
+    """
+
+    prompt = f"Given the details of today's episode below, write a two-sentence summary to use as a description for the media file.\n\n```\n{content}\n```"
+
+    # model = "lmsys/vicuna-13b-v1.5-16k"
+    # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
+    # model = "openchat/openchat-3.5-1210"
+    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    temperature = 0.7
+    max_tokens = 512
+
+    output = together.Complete.create(
+        prompt=prompt,
+        model=model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    logger.info(output)
+
+    if result := output["output"]["choices"][0]["text"].strip():
+        result = result.replace("```", "")  # Remove triple backticks
+        first_line = result.splitlines()[0].lower()
+        unwanted = ["summary:", "here's", "here is", "sure"]
+
+        if any(string in first_line for string in unwanted):
+            # Remove the first line from result
+            result = "\n".join(result.split("\n")[1:])
+
+        return result
+    else:
+        logger.error("Podcast episode summary is empty")
+        return f"This is episode {episode} of the podcast."
+
+
+def get_content() -> str:
+    """Get the headlines"""
+    with open(news_headlines, "r") as f:
+        return f.read()
+
 
 def render_jinja_template(production_time, word_count):
     """Render the Jinja template for an episode"""
     logging.info("Rendering Jinja template ...")
     episode = Episode.select().where(Episode.date == today).first()
     number = episode.number
-    number_ordinal = num2words(number, to="ordinal")
+    # number_ordinal = num2words(number, to="ordinal")
+    episode_summary = create_episode_summary(get_content(), str(number))
     articles = Article.select().where(Article.episode == episode)
     mp3 = Mp3.select().where(Mp3.url.contains(f"{today_iso_fmt}_podcast_dist.mp3")).first()
     sources = []
@@ -47,7 +106,7 @@ def render_jinja_template(production_time, word_count):
             base_template.render(
                 {
                     "title": today_human_readable,
-                    "description": f"This is the {number_ordinal} episode of the podcast.",
+                    "description": episode_summary,
                     "episode": f"{number:03}",
                     "date": utc_dt.astimezone(LSK).isoformat(),
                     "mp3_url": mp3.url,
