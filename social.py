@@ -205,7 +205,7 @@ def create_facebook_post(content: str, url: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"You are a social media marketing guru. Your task is to immediately produce a short Facebook teaser post of today's podcast episode whose details are below. Use bullet points, emojis and hashtags as appropriate. Don't cover every news item, just the most interesting ones. Your post will accompany a video, whose URL is {url}. Please note that this video is just basically the audio with some looping animated background, therefore, your post shouldn't ask people to 'watch' the video per se, but rather to, 'check it out' or 'tune in to'. Do not use markdown.```{content}\n```"
+    prompt = f"You are a social media marketing guru. Your task is to immediately produce a short Facebook teaser post of today's podcast episode whose details are below. Use bullet points, emojis and hashtags as appropriate. Don't cover every news item, just the most interesting ones. Your post will accompany a video, whose URL is {url}. Please note that this video is just basically the audio with some looping animated background, therefore, your post shouldn't ask people to 'watch' the video per se, but rather to, 'check it out' or 'tune in to'. Do not use markdown.\n\n```\n{content}\n```"
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
@@ -238,6 +238,48 @@ def create_facebook_post(content: str, url: str) -> str:
         sys.exit(1)
 
 
+def create_episode_summary(content: str) -> str:
+    """
+    Using Together AI's Inference API, create a summary to use as
+    the Facebook video description.
+
+
+    https://docs.together.ai/reference/complete
+    """
+
+    prompt = f"Given the details of today's episode below, write a two-sentence summary to use as a description for the media file.\n\n```\n{content}\n```"
+
+    # model = "lmsys/vicuna-13b-v1.5-16k"
+    # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
+    # model = "openchat/openchat-3.5-1210"
+    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    temperature = 0.7
+    max_tokens = 512
+
+    output = together.Complete.create(
+        prompt=prompt,
+        model=model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    logger.info(output)
+
+    if result := output["output"]["choices"][0]["text"].strip():
+        result = result.replace("```", "")  # Remove triple backticks
+        first_line = result.splitlines()[0].lower()
+        unwanted = ["summary:", "here's", "here is", "sure"]
+
+        if any(string in first_line for string in unwanted):
+            # Remove the first line from result
+            result = "\n".join(result.split("\n")[1:])
+
+        return result
+    else:
+        logger.error("Podcast episode summary is empty")
+        requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
+        sys.exit(1)
+
+
 def post_to_facebook(content: str, url: str) -> None:
     """Post a link to the Facebook page"""
     graph = facebook.GraphAPI(access_token=FACEBOOK_ACCESS_TOKEN)
@@ -251,13 +293,24 @@ def post_to_facebook(content: str, url: str) -> None:
     logger.info(content)
 
 
-def upload_video_to_facebook(video_file):
+def upload_video_to_facebook(video_file, title=None, description=None):
     # Step 1: Upload video
     with open(video_file, "rb") as f:
         endpoint = f"https://graph-video.facebook.com/v19.0/me/videos?access_token={FACEBOOK_ACCESS_TOKEN}"
 
         files = {"file": f}
-        response = requests.post(endpoint, files=files)
+
+        data = {}
+        if title:
+            data["title"] = title
+        if description:
+            data["description"] = description
+
+        response = requests.post(
+            endpoint,
+            files=files,
+            data=data,
+        )
         video_data = response.json()
 
         if "id" in video_data:
@@ -325,7 +378,12 @@ def main(args=None):
                     podcast_mp3=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3",
                     video_loop=get_random_video(os.path.join(f"{DATA_DIR}/videos/")),
                 )
-                if video_link := upload_video_to_facebook(video):
+                episode_summary = create_episode_summary(get_content())
+                if video_link := upload_video_to_facebook(
+                    video,
+                    title=f"Zed News Podcast - Episode {get_episode_number(news_headlines)} ({today_human_readable})",
+                    description=episode_summary,
+                ):
                     # Then we create a facebook post
                     content = get_content()
                     facebook_post = create_facebook_post(content, video_link)
