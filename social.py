@@ -105,6 +105,17 @@ def get_random_video(path):
         return None
 
 
+def get_random_image(path):
+    """Get a random image from a directory"""
+    image_files = [
+        f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith((".jpg", ".png"))
+    ]
+    if image_files:
+        return os.path.join(path, random.choice(image_files))
+    else:
+        return None
+
+
 def create_video(image_overlay, logo, podcast_mp3, video_loop):
     # Load the video clip
     video_clip = VideoFileClip(video_loop)
@@ -373,7 +384,7 @@ def main(args=None):
             try:
                 # First, we create a video and upload it
                 video = create_video(
-                    image_overlay=f"{ASSETS_DIR}/image-overlay.jpg",
+                    image_overlay=get_random_image(os.path.join(f"{ASSETS_DIR}/images/")),
                     logo=f"{ASSETS_DIR}/logo.png",
                     podcast_mp3=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3",
                     video_loop=get_random_video(os.path.join(f"{DATA_DIR}/videos/")),
