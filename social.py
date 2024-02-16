@@ -384,7 +384,7 @@ def main(args=None):
             try:
                 # First, we create a video and upload it
                 video = create_video(
-                    image_overlay=get_random_image(os.path.join(f"{ASSETS_DIR}/images/")),
+                    image_overlay=get_random_image(os.path.join(f"{DATA_DIR}/images/")),
                     logo=f"{ASSETS_DIR}/logo.png",
                     podcast_mp3=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3",
                     video_loop=get_random_video(os.path.join(f"{DATA_DIR}/videos/")),
