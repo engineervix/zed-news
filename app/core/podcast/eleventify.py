@@ -66,6 +66,7 @@ def create_episode_summary(content: str, episode: str) -> str:
     logger.info(output)
 
     if result := output["output"]["choices"][0]["text"].strip():
+        fallback = f"This is episode {episode} of the Zed News Podcast."
         result = result.replace("```", "")  # Remove triple backticks
         first_line = result.splitlines()[0].lower()
         unwanted = ["summary:", "here's", "here is", "sure"]
@@ -73,11 +74,14 @@ def create_episode_summary(content: str, episode: str) -> str:
         if any(string in first_line for string in unwanted):
             # Remove the first line from result
             result = "\n".join(result.split("\n")[1:])
+            if result.strip() == "":
+                logger.warning("Podcast episode summary is empty after removing unwanted text")
+                result = fallback
 
         return result
     else:
         logger.error("Podcast episode summary is empty")
-        return f"This is episode {episode} of the podcast."
+        return fallback
 
 
 def get_content() -> str:
