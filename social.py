@@ -258,14 +258,14 @@ def create_episode_summary(content: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"Given the details of today's episode below, write a two-sentence summary to use as a description for the media file.\n\n```\n{content}\n```"
+    prompt = f"Given the details of today's episode below, write a very brief summary to use as a description for the media file. Use bullet points and emojis as appropriate. Do not use markdown. At the end, mention that more details can be obtained from {podcast_url}.\n\n```\n{content}\n```"
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
     # model = "openchat/openchat-3.5-1210"
     model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-    temperature = 0.7
-    max_tokens = 512
+    temperature = 0.75
+    max_tokens = 1024
 
     output = together.Complete.create(
         prompt=prompt,
@@ -396,9 +396,12 @@ def main(args=None):
                     description=episode_summary,
                 ):
                     # Then we create a facebook post
-                    content = get_content()
-                    facebook_post = create_facebook_post(content, video_link)
-                    post_to_facebook(facebook_post, video_link)
+                    # content = get_content()
+                    # facebook_post = create_facebook_post(content, video_link)
+                    # post_to_facebook(facebook_post, video_link)
+                    # NOTE: we actually don't need to create a facebook post because
+                    # when we upload the video, a post is automatically created
+                    print(f"Video successfully uploaded to Facebook. Here's the link: {video_link}")
                     requests.get(HEALTHCHECKS_FACEBOOK_PING_URL, timeout=10)
                 else:
                     print(
