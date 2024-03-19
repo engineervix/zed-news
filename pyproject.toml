@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "zed-news"
-version = "0.6.0"
+version = "0.5.0"
 description = "news podcast on auto-pilot"
 authors = ["Victor Miti <victormiti@gmail.com>"]
 readme = "README.md"
@@ -26,14 +26,10 @@ feedparser = "^6.0.10"
 invoke = "^2.1.2"
 jinja2 = "^3.1.2"
 langchain = "^0.0.353"
-librosa = "^0.10.1"
-matplotlib = "^3.8.2"
-moviepy = "^1.0.3"
 mutagen = "^1.46.0"
 num2words = "^0.5.12"
 openai = "^0.27.7"
 peewee = "^3.17.0"
-pillow = "9.5.0" # https://stackoverflow.com/a/76616129
 psycopg2 = "^2.9.9"
 python-dateutil = "^2.8.2"
 python-dotenv = "^1.0.0"
