@@ -122,18 +122,18 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT"
     # model = "Qwen/Qwen1.5-14B-Chat"
-    temperature = 0.8
-    top_p = 0.7
-    top_k = 60
-    repetition_penalty = 1.2
+    temperature = 0.7
+    # top_p = 0.7
+    # top_k = 60
+    repetition_penalty = 1.1
     max_tokens = 4096
     together.api_key = TOGETHER_API_KEY
     output = together.Complete.create(
         prompt=notes,
         model=model,
         temperature=temperature,
-        top_p=top_p,
-        top_k=top_k,
+        # top_p=top_p,
+        # top_k=top_k,
         repetition_penalty=repetition_penalty,
         max_tokens=max_tokens,
     )
