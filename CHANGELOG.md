@@ -4,6 +4,49 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.7.0](https://github.com/engineervix/zed-news/compare/v0.6.0...v0.7.0) (2024-03-25)
+
+
+### ✅ Tests
+
+* fix broken test ([d077ff5](https://github.com/engineervix/zed-news/commit/d077ff5c2cb7b7d625b3244f4982bb65f2886ab1))
+
+
+### 🚀 Features
+
+* add a better description of each podcast ([fbfe3db](https://github.com/engineervix/zed-news/commit/fbfe3dbeb4131cc3a6269cf05016cf8500d8f100))
+* add title and description to the uploaded video ([0e2f6c1](https://github.com/engineervix/zed-news/commit/0e2f6c1c3f2a8c758742eb62480622c3076b832f))
+* do not use the same image overlay everytime ([4f66c53](https://github.com/engineervix/zed-news/commit/4f66c53138683359fde634726c67d95587fb6a16))
+* make the LLM more creative ([df1e8b1](https://github.com/engineervix/zed-news/commit/df1e8b14b56d6f7c1577c92e9a60352b8a41be2b))
+
+
+### 🐛 Bug Fixes
+
+* correct broken YAML in episode 196 Nunjucks template ([adf5e93](https://github.com/engineervix/zed-news/commit/adf5e93a1e40b8b9557c28dfc2d06e1a91fe082d))
+* description formatting in 2024-03-18.njk ([b03e33f](https://github.com/engineervix/zed-news/commit/b03e33f267642084b10008e3a76c8dd1016d637b))
+* ensure we don't have empy description ([c1b40c3](https://github.com/engineervix/zed-news/commit/c1b40c3bb37f342e6510fd7a197da7b3c154701e))
+* iensure that the description has no newlines ([438b71c](https://github.com/engineervix/zed-news/commit/438b71cff0220b5f863e9f4014935e9cc960dfe9))
+* use the correct path for the images ([f181b20](https://github.com/engineervix/zed-news/commit/f181b206c6286d4fb9f5c4b58c2b9ec07c2a156c))
+* yet another description formatting correction ([97150f0](https://github.com/engineervix/zed-news/commit/97150f02ad8f5d21737b026cbec1ffa70cccd314))
+
+
+### ♻️ Code Refactoring
+
+* minimise social noise ([8dda93e](https://github.com/engineervix/zed-news/commit/8dda93eb381eb8ed0b7f9ed8801a6f47c0b1de93))
+* the creativity is too much ([cf4c8b0](https://github.com/engineervix/zed-news/commit/cf4c8b037e8cc565c3a41e85df8a31bcf877ad06))
+
+
+### ⚙️ Build System
+
+* **deps:** update babel monorepo ([#58](https://github.com/engineervix/zed-news/issues/58)) ([686a762](https://github.com/engineervix/zed-news/commit/686a762f8c56a57fc388fcc17206e1987034cc59))
+* **deps:** update dependency beautifulsoup4 to v4.12.3 ([#61](https://github.com/engineervix/zed-news/issues/61)) ([74732fb](https://github.com/engineervix/zed-news/commit/74732fb83a04974cdb65e72cd19d471e58b36902))
+* **deps:** update dependency boto3 to v1.34.70 ([#62](https://github.com/engineervix/zed-news/issues/62)) ([033d5c9](https://github.com/engineervix/zed-news/commit/033d5c994deaeb6496c9449920f8faa27d4ea37d))
+* **deps:** update dependency core-js to v3.36.1 ([#66](https://github.com/engineervix/zed-news/issues/66)) ([ae04a47](https://github.com/engineervix/zed-news/commit/ae04a47f83572234d29fc7bcec39f20db07644c6))
+* **deps:** update dependency css-loader to v6.10.0 ([#67](https://github.com/engineervix/zed-news/issues/67)) ([b51216b](https://github.com/engineervix/zed-news/commit/b51216b3a82bd5777b8f97676eec75137eb4994e))
+* **deps:** update dependency jinja2 to v3.1.3 ([#63](https://github.com/engineervix/zed-news/issues/63)) ([2c703de](https://github.com/engineervix/zed-news/commit/2c703dea2989e9a1d434a77731c581941fbe6b03))
+* **deps:** update dependency mini-css-extract-plugin to v2.8.1 ([#60](https://github.com/engineervix/zed-news/issues/60)) ([267261e](https://github.com/engineervix/zed-news/commit/267261ec30c245d7cad6b304bbae27ca63bbbaf6))
+* **deps:** update dependency together to v0.2.11 ([#64](https://github.com/engineervix/zed-news/issues/64)) ([6bf55dc](https://github.com/engineervix/zed-news/commit/6bf55dca949bdd6dea01e8ff9acdfafdcbd9123d))
+
 ## [v0.6.0](https://github.com/engineervix/zed-news/compare/v0.5.0...v0.6.0) (2024-02-14)
 
 
