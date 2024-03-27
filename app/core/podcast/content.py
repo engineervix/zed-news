@@ -82,7 +82,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    prompt = f"You are {podcast_host}, host of the Zed News Podcast, broadcasting Monday through Friday in the afternoon. Today marks {today_human_readable}, and you're gearing up for the much-anticipated episode {get_episode_number()}. Your mission? To deliver the day's news, seamlessly weaving together various sources while ensuring coherence and logical flow. Feel free to consolidate information from different outlets to provide a comprehensive overview. Your goal is to cover all the news items without redundancy. Forget about bells and whistles like sound effects or music – focus solely on engaging your audience as if you're chatting with them live. At the end of the podcast, you'll reveal, in a humorous twist, that you're actually a machine, not a human being. Also leave your audience with a memorable quote, proverb or anecdote, related to today's news. So, channel your inner showmanship, and let's make this podcast a memorable one!\n\n"
+    prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're preparing for episode number {get_episode_number()}. Your task is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. At the end of the podcast, you'll reveal to your audience that you're not actually human. Remember to cover all the news items from the sources provided, but without repeating any content. Don't worry about sound effects, music, or captions – just speak directly as if you're live on air..\n\n"
 
     metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
@@ -122,7 +122,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT"
     # model = "Qwen/Qwen1.5-14B-Chat"
-    temperature = 0.7
+    temperature = 0.75
     # top_p = 0.7
     # top_k = 60
     # repetition_penalty = 1.1
