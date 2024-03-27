@@ -125,7 +125,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     temperature = 0.7
     # top_p = 0.7
     # top_k = 60
-    repetition_penalty = 1.1
+    # repetition_penalty = 1.1
     max_tokens = 4096
     together.api_key = TOGETHER_API_KEY
     output = together.Complete.create(
@@ -134,7 +134,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         temperature=temperature,
         # top_p=top_p,
         # top_k=top_k,
-        repetition_penalty=repetition_penalty,
+        # repetition_penalty=repetition_penalty,
         max_tokens=max_tokens,
     )
     logging.info(output)
