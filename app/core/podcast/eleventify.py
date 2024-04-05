@@ -41,14 +41,13 @@ logger = logging.getLogger(__name__)
 
 def create_episode_summary(content: str, episode: str) -> str:
     """
-    Using Together AI's Inference API, create a summary to use as
-    the Facebook video description.
+    Using Together AI's Inference API, create a summary to use as episode description.
 
 
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"Given the details of today's episode below, write a very brief summary to use as a description for the media file. Your summary should not exceed 2 sentences.\n\n```\n{content}\n```"
+    prompt = f"Given the details of today's episode below, write a very brief summary to use as a description for the media file. Your summary should be a single paragraph, not exceeding 2 sentences.\n\n```\n{content}\n```"
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
@@ -73,13 +72,12 @@ def create_episode_summary(content: str, episode: str) -> str:
 
         if any(string in first_line for string in unwanted):
             # Remove the first line from result
-            cleaned_up = "\n".join(result.split("\n")[1:])
-            result = cleaned_up.strip().replace("\n", " ")
+            result = "\n".join(result.split("\n")[1:])
             if result.strip() == "":
                 logger.warning("Podcast episode summary is empty after removing unwanted text")
                 result = fallback
 
-        return result
+        return result.replace("\n", " ")  # Remove newlines
     else:
         logger.error("Podcast episode summary is empty")
         return fallback
