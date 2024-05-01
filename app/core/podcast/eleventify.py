@@ -77,7 +77,7 @@ def create_episode_summary(content: str, episode: str) -> str:
                 logger.warning("Podcast episode summary is empty after removing unwanted text")
                 result = fallback
 
-        return result.replace("\n", " ")  # Remove newlines
+        return result.replace("\n", "")  # Remove newlines
     else:
         logger.error("Podcast episode summary is empty")
         return fallback
