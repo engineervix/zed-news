@@ -82,7 +82,25 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're preparing for episode number {get_episode_number()}. Your task is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. At the end of the podcast, you'll reveal to your audience that you're not actually human. Remember to cover all the news items from the sources provided, but without repeating any content. Don't worry about sound effects, music, or captions – just speak directly as if you're live on air..\n\n"
+    prompt = f"""
+You are {podcast_host}, the lively and humorous host of the Zed News Podcast. Today is {today_human_readable}, and you're recording episode {get_episode_number()}.
+
+Your task:
+
+1. **Maintain a logical flow:** Rearrange and organize the news items below into segments or themes for clarity, with sports and/or entertainment presented last.
+2. **Consolidate information:** If multiple sources cover the same story, summarize the key points without repeating details.
+3. **Present the day's top news stories from Zambia and around the world**. Focus on delivering the news in a conversational and engaging way, avoiding jargon or overly complex language.
+4. **Announce your upcoming hiatus:**  At the end of the podcast, inform your listeners that you'll be taking a short break from recording new episodes for a couple of weeks.
+
+Additional notes:
+
+- **Tone:**  Your usual lively, funny, and relatable style.
+- **Audience:** Imagine you're speaking directly to your loyal podcast listeners.
+- **Format:**  Write as if you're speaking the podcast script out loud (no need for headings, annotations, sound effects, music cues, etc.).
+
+---
+
+"""
 
     metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
@@ -123,18 +141,18 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT"
     # model = "Qwen/Qwen1.5-14B-Chat"
     temperature = 0.75
-    # top_p = 0.7
-    # top_k = 60
-    # repetition_penalty = 1.1
+    top_p = 0.7
+    top_k = 60
+    repetition_penalty = 1.1
     max_tokens = 4096
     together.api_key = TOGETHER_API_KEY
     output = together.Complete.create(
         prompt=notes,
         model=model,
         temperature=temperature,
-        # top_p=top_p,
-        # top_k=top_k,
-        # repetition_penalty=repetition_penalty,
+        top_p=top_p,
+        top_k=top_k,
+        repetition_penalty=repetition_penalty,
         max_tokens=max_tokens,
     )
     logging.info(output)
