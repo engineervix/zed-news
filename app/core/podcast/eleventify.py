@@ -64,8 +64,9 @@ def create_episode_summary(content: str, episode: str) -> str:
     )
     logger.info(output)
 
+    fallback = f"This is episode {episode} of the Zed News Podcast."
+
     if result := output["output"]["choices"][0]["text"].strip():
-        fallback = f"This is episode {episode} of the Zed News Podcast."
         result = result.replace("```", "")  # Remove triple backticks
         first_line = result.splitlines()[0].lower()
         unwanted = ["summary:", "here's", "here is", "sure"]
