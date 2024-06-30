@@ -1,5 +1,6 @@
 import logging
 import traceback
+from http import HTTPStatus
 from urllib.parse import urlparse, urlunparse
 
 import dateutil.parser
@@ -21,12 +22,13 @@ URLs = [
     "https://diggers.news/rss/",
     "https://www.muvitv.com/rss/",
     "https://www.mwebantu.com/rss/",
+    "https://www.times.co.zm/?feed=rss2",
 ]
 
 
 def get_daily_mail_article_detail(url):
     """
-    Fetches the article detail from a Zambia Daily mail URL
+    Fetches the article detail from a Zambia Daily Mail URL
     """
     if "daily-mail.co.zm" not in url:
         logger.error(f"{url} is not a Zambia Daily Mail URL")
@@ -66,6 +68,38 @@ def get_daily_mail_article_detail(url):
 
             return content
         return None
+
+
+def get_times_of_zambia_article_detail(url):
+    """
+    Fetches the article detail from a Times of Zambia URL
+    """
+    if "times.co.zm" not in url:
+        logger.error(f"{url} is not a Times of Zambia URL")
+        return None
+    else:
+        response = requests.get(url)
+
+        if response.status_code != HTTPStatus.OK:
+            logger.error(f"Failed to fetch the article from {url}")
+            return None
+
+        soup = BeautifulSoup(response.text, "html.parser")
+        article_content = soup.find("div", class_="single-content")
+
+        if not article_content:
+            logger.error("No article content found")
+            return None
+
+        # Remove any 'Read more' links
+        for read_more in article_content.find_all("a", string="Read more"):
+            read_more.decompose()
+
+        # Extract text from paragraphs
+        paragraphs = article_content.find_all("p")
+        text_content = "\n".join(p.get_text() for p in paragraphs)
+
+        return text_content.strip()
 
 
 def get_mwebantu_article_detail(url):
@@ -164,6 +198,8 @@ def get_description(url):
     """
     if "daily-mail.co.zm" in url:
         return get_daily_mail_article_detail(url)
+    if "times.co.zm" in url:
+        return get_times_of_zambia_article_detail(url)
     elif "mwebantu.com" in url:
         return get_mwebantu_article_detail(url)
     elif "muvitv.com" in url:
@@ -180,6 +216,8 @@ def get_feed_title(url):
     """
     if "daily-mail.co.zm" in url:
         return "Zambia Daily Mail"
+    if "times.co.zm" in url:
+        return "Times of Zambia"
     elif "mwebantu.com" in url:
         return "Mwebantu"
     elif "muvitv.com" in url:
