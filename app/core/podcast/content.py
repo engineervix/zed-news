@@ -82,7 +82,10 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're preparing for episode number {get_episode_number()}. Your task is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. At the end of the podcast, you'll reveal to your audience that you're not actually human. Remember to cover all the news items from the sources provided, but without repeating any content. Don't worry about sound effects, music, or captions – just speak directly as if you're live on air..\n\n"
+    if today_iso_fmt == "2024-07-01":
+        prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're gearing up for episode number {get_episode_number()} after a five-week holiday. Your task is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. At the end of the podcast, leave your audience with a witty anecdote to end on a high note. Remember to cover all the news items from the sources provided below, but without repeating any content. Don't worry about sound effects, music, or captions – just speak directly, naturally and engagingly as if you're live on air. Start by sharing a few highlights from your holiday and express your genuine excitement to reconnect with your loyal listeners. Thank them for their patience during your absence.\n\n"
+    else:
+        prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're preparing for episode number {get_episode_number()}. Your task is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. At the end of the podcast, leave your audience with a witty anecdote to end on a high note. Remember to cover all the news items from the sources provided, but without repeating any content. Don't worry about sound effects, music, or captions – just speak directly, naturally and engagingly as if you're live on air..\n\n"
 
     metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
@@ -122,7 +125,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT"
     # model = "Qwen/Qwen1.5-14B-Chat"
-    temperature = 0.75
+    temperature = 0.8
     # top_p = 0.7
     # top_k = 60
     # repetition_penalty = 1.1
