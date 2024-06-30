@@ -14,7 +14,7 @@ from app.core.utilities import today_iso_fmt
 logger = logging.getLogger(__name__)
 
 ua = UserAgent(
-    fallback="Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.648.204",
+    fallback="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17720",
 )
 
 
@@ -45,9 +45,9 @@ def get_article_detail(url):
 
 def get_news():
     """
-    Fetches today's news from https://www.znbc.co.zm/news/
+    Fetches today's news from https://znbc.co.zm/news/
     """
-    url = "https://www.znbc.co.zm/news/"
+    url = "https://znbc.co.zm/news/"
     headers = {"User-Agent": ua.firefox}
 
     try:
@@ -80,6 +80,8 @@ def get_news():
 
                     # Extract article detail
                     content = get_article_detail(detail_url)
+                    if content.startswith("(ZANIS)"):
+                        content.replace("(ZANIS)", "", 1)
 
                     if content:
                         latest_news.append(
