@@ -4,6 +4,26 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.8.0](https://github.com/engineervix/zed-news/compare/v0.7.0...v0.8.0) (2024-06-30)
+
+
+### ♻️ Code Refactoring
+
+* back to the way things were before df1e8b1 ([8809a63](https://github.com/engineervix/zed-news/commit/8809a63843e798c8c1cb81fb34ba0933e7e177c5))
+* use default repetition penalty ([5cf615f](https://github.com/engineervix/zed-news/commit/5cf615fead209d6fe4a9e3abcfd3804be59f5b24))
+
+
+### 🚀 Features
+
+* add Times of Zambia ([e5366f9](https://github.com/engineervix/zed-news/commit/e5366f96a4e01768d1005e5dbc60e44d9fd325fd))
+
+
+### 🐛 Bug Fixes
+
+* new lines ([f18949d](https://github.com/engineervix/zed-news/commit/f18949d5706400b83b6336d2838f9594e1050349))
+* remove www from znbc URL ([6d0956b](https://github.com/engineervix/zed-news/commit/6d0956bf4ca42044e84791eb3e7cda50ed28f884))
+* rendering of podcast description in template ([bdb12eb](https://github.com/engineervix/zed-news/commit/bdb12eb2ff5c7981f8fbbbd7eee2230649cd8efc))
+
 ## [v0.7.0](https://github.com/engineervix/zed-news/compare/v0.6.0...v0.7.0) (2024-03-25)
 
 
