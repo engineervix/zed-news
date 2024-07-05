@@ -248,8 +248,8 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 ### Music
 
-- opening: <https://pixabay.com/music/corporate-african-uplifting-corporate-loopable-version-93670/>
-- closing: <https://pixabay.com/music/upbeat-uplifting-corporate-adventure-loopable-version-93669/>
+- opening: <https://pixabay.com/music/future-bass-extreme-energy-burst-short-version-2-197550/>
+- closing: <https://pixabay.com/music/future-bass-fashion-future-bass-143924/>
 
 > **Note**
 >
