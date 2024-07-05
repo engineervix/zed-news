@@ -58,9 +58,9 @@
             <ul class="pagination justify-content-center">
               {% if pagination.href.previous %}
               <li class="page-item">
-                <a class="page-link" href="{{ site.base_url }}{{ pagination.href.previous }}" aria-label="Previous">
-                  <span aria-hidden="true">« Previous</span>
-                  <span class="sr-only">Previous</span>
+                <a class="page-link" href="{{ site.base_url }}{{ pagination.href.previous }}" aria-label="Newer episodes">
+                  <span aria-hidden="true">« Newer</span>
+                  <span class="sr-only">Newer</span>
                 </a>
               </li>
               {% endif %}
@@ -74,9 +74,9 @@
               {% endfor %} #}
               {% if pagination.href.next %}
               <li class="page-item">
-                <a class="page-link" href="{{ site.base_url }}{{ pagination.href.next }}" aria-label="Next">
-                  <span aria-hidden="true">Next »</span>
-                  <span class="sr-only">Next</span>
+                <a class="page-link" href="{{ site.base_url }}{{ pagination.href.next }}" aria-label="Older episodes">
+                  <span aria-hidden="true">Older »</span>
+                  <span class="sr-only">Older</span>
                 </a>
               </li>
               {% endif %}
