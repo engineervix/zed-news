@@ -93,8 +93,8 @@ function generatePodcastListenButton() {
     `;
   } else {
     buttonHTML = `
-      <a class="podcast-listen-btn" href="https://podcasts.google.com/feed/aHR0cHM6Ly96ZWRuZXdzLnBhZ2VzLmRldi9mZWVkLnhtbA">
-        <img src="/img/google-podcasts-badge.svg" alt="Listen on Google Podcasts" height="38" />
+      <a class="podcast-listen-btn" href="https://open.spotify.com/show/14vv6liB2y2EWgJGRsNWVa">
+        <img src="/img/spotify-podcast-badge.svg" alt="Listen on Spotify" height="40" />
       </a>
     `;
   }
