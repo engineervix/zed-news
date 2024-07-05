@@ -265,8 +265,9 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 ### News Sources
 
-- [ZNBC](https://www.znbc.co.zm/)
+- [ZNBC](https://znbc.co.zm/)
 - [Zambia Daily Mail](http://www.daily-mail.co.zm/)
+- [Times of Zambia](https://times.co.zm/)
 - [News Diggers!](https://diggers.news/)
 - [Muvi TV](https://www.muvitv.com/)
 - [Mwebantu](https://www.mwebantu.com/)
