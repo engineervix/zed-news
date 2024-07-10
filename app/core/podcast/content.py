@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 import sys
 
 # import time
@@ -85,7 +86,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     if today_iso_fmt == "2024-07-01":
         prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're gearing up for episode number {get_episode_number()} after a five-week holiday. Your task is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. At the end of the podcast, leave your audience with a witty anecdote to end on a high note. Remember to cover all the news items from the sources provided below, but without repeating any content. Don't worry about sound effects, music, or captions – just speak directly, naturally and engagingly as if you're live on air. Start by sharing a few highlights from your holiday and express your genuine excitement to reconnect with your loyal listeners. Thank them for their patience during your absence.\n\n"
     else:
-        prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're preparing for episode number {get_episode_number()}. Your task is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. At the end of the podcast, leave your audience with a witty anecdote to end on a high note. Remember to cover all the news items from the sources provided, but without repeating any content. Don't worry about sound effects, music, or captions – just speak directly, naturally and engagingly as if you're live on air..\n\n"
+        prompt = f"You are {podcast_host}, host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and your task is to produce the text for episode number {get_episode_number()} based on the news items below. Your text will be read as-is by a text-to-speech engine who will take on your persona. This means that you should not add any captions or placeholders for sound effects, music, etc -- all we want is just natural, plain text. Ensure that you cover all items and avoid repetion. Feel free to add constructive comments and jokes where necessary and appropriate. Your persona should reflect a positive tone. End the episode by personally reflecting on the news and any implications for the future, with a challenge for the listener.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
@@ -97,8 +98,8 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
             title = article["title"]
             text = article["content"]
 
-            if len(news) < 24:
-                # If there are less than 24 articles, summarize each article in the usual way
+            if len(news) < 36:
+                # If there are less than 36 articles, summarize each article in the usual way
                 summary = summarizer(text, title)
             else:
                 summary = brief_summary(text, title)
@@ -122,7 +123,9 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         f.write(metadata + "News Items:\n\n" + content)
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
-    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    # model = "mistralai/Mixtral-8x22B-Instruct-v0.1"
+    model = "meta-llama/Llama-3-70b-chat-hf"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT"
     # model = "Qwen/Qwen1.5-14B-Chat"
     temperature = 0.8
@@ -144,7 +147,10 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
 
     transcript = output["output"]["choices"][0]["text"]
 
-    if transcript.strip():
+    if transcript := transcript.strip():
+        # remove the first sentence if it is of the form "Here is ...:"
+        transcript = re.sub(r"^Here is.*?:", "", transcript, flags=re.DOTALL | re.IGNORECASE)
+
         # Write the transcript to a file
         with open(dest, "w") as f:
             f.write(transcript)
