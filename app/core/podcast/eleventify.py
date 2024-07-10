@@ -3,7 +3,7 @@ import os
 from datetime import datetime, timedelta, timezone
 
 import pytz
-import together
+from together import Together
 from babel import Locale
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -32,7 +32,7 @@ dist_file = f"{EPISODE_TEMPLATE_DIR}/{today_iso_fmt}.njk"
 
 # Together
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-together.api_key = TOGETHER_API_KEY
+client = Together(api_key=TOGETHER_API_KEY)
 
 news_headlines = f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt"
 
@@ -56,17 +56,17 @@ def create_episode_summary(content: str, episode: str) -> str:
     temperature = 0.7
     max_tokens = 512
 
-    output = together.Complete.create(
+    response = client.completions.create(
         prompt=prompt,
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    logger.info(output)
+    logger.info(response)
 
     fallback = f"This is episode {episode} of the Zed News Podcast."
 
-    if result := output["output"]["choices"][0]["text"].strip():
+    if result := response.choices[0].text.strip():
         result = result.replace("```", "")  # Remove triple backticks
         first_line = result.splitlines()[0].lower()
         unwanted = ["summary:", "here's", "here is", "sure"]

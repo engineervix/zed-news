@@ -17,7 +17,7 @@ from http import HTTPStatus
 
 import facebook
 import requests
-import together
+from together import Together
 from dotenv import load_dotenv
 from moviepy.editor import AudioFileClip, CompositeVideoClip, ImageClip, TextClip, VideoFileClip
 
@@ -40,7 +40,7 @@ FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
 
 # Together
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-together.api_key = TOGETHER_API_KEY
+client = Together(api_key=TOGETHER_API_KEY)
 
 news_headlines = f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt"
 podcast_url = f"https://zednews.pages.dev/episode/{today_iso_fmt}/"
@@ -225,15 +225,15 @@ def create_facebook_post(content: str, url: str) -> str:
     temperature = 0.75
     max_tokens = 1024
 
-    output = together.Complete.create(
+    response = client.completions.create(
         prompt=prompt,
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    logger.info(output)
+    logger.info(response)
 
-    if result := output["output"]["choices"][0]["text"].strip():
+    if result := response.choices[0].text.strip():
         result = result.replace("```", "")  # Remove triple backticks
         first_line = result.splitlines()[0].lower()
         unwanted = ["facebook post:", "post:", "here's your", "here is"]
@@ -267,15 +267,15 @@ def create_episode_summary(content: str) -> str:
     temperature = 0.75
     max_tokens = 1024
 
-    output = together.Complete.create(
+    response = client.completions.create(
         prompt=prompt,
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    logger.info(output)
+    logger.info(response)
 
-    if result := output["output"]["choices"][0]["text"].strip():
+    if result := response.choices[0].text.strip():
         result = result.replace("```", "")  # Remove triple backticks
         first_line = result.splitlines()[0].lower()
         unwanted = ["summary:", "here's", "here is", "sure"]

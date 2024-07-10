@@ -1,11 +1,11 @@
 import logging
 import time
 
-import together
+from together import Together
 
 from app.core.utilities import TOGETHER_API_KEY
 
-together.api_key = TOGETHER_API_KEY
+client = Together(api_key=TOGETHER_API_KEY)
 
 
 def summarize(content: str, title: str) -> str:
@@ -20,16 +20,16 @@ def summarize(content: str, title: str) -> str:
     temperature = 0.7
     max_tokens = 128
 
-    output = together.Complete.create(
+    response = client.completions.create(
         prompt=prompt,
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
     )
     time.sleep(1.5)
-    logging.info(output)
+    logging.info(response)
 
-    return output["output"]["choices"][0]["text"]
+    return response.choices[0].text
 
 
 def brief_summary(content: str, title: str) -> str:
@@ -44,13 +44,13 @@ def brief_summary(content: str, title: str) -> str:
     temperature = 0.7
     max_tokens = 78
 
-    output = together.Complete.create(
+    response = client.completions.create(
         prompt=prompt,
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
     )
     time.sleep(1.5)
-    logging.info(output)
+    logging.info(response)
 
-    return output["output"]["choices"][0]["text"]
+    return response.choices[0].text
