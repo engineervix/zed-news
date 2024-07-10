@@ -18,7 +18,7 @@ def summarize(content: str, title: str) -> str:
     prompt = f"You are a distinguished news editor and content publisher, your task is to summarize the following news entry. The summary should accurately reflect the main message and arguments presented in the original news entry, while also being concise and easy to understand. Your summary should not exceed two sentences.\n\n ```{content}```:"
     model = "garage-bAInd/Platypus2-70B-instruct"
     temperature = 0.7
-    max_tokens = 128
+    max_tokens = 192
 
     response = client.completions.create(
         prompt=prompt,
@@ -42,7 +42,7 @@ def brief_summary(content: str, title: str) -> str:
     prompt = f"You are a distinguished news editor and content publisher, your task is to summarize the following news entry in one sentence.\n\n ```{content}```:"
     model = "garage-bAInd/Platypus2-70B-instruct"
     temperature = 0.7
-    max_tokens = 78
+    max_tokens = 96
 
     response = client.completions.create(
         prompt=prompt,
