@@ -7,7 +7,7 @@ import sys
 from typing import Callable
 
 # import replicate
-import together
+from together import Together
 
 # from langchain.llms import OpenAI
 from pydantic import HttpUrl
@@ -133,19 +133,20 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     # top_k = 60
     # repetition_penalty = 1.1
     max_tokens = 4096
-    together.api_key = TOGETHER_API_KEY
-    output = together.Complete.create(
-        prompt=notes,
+    client = Together(api_key=TOGETHER_API_KEY)
+    response = client.chat.completions.create(
         model=model,
+        messages=[{"content": notes, "role": "user"}],
         temperature=temperature,
         # top_p=top_p,
         # top_k=top_k,
         # repetition_penalty=repetition_penalty,
         max_tokens=max_tokens,
+        stop=["<|eot_id|>"],
     )
-    logging.info(output)
+    logging.info(response)
 
-    transcript = output["output"]["choices"][0]["text"]
+    transcript = response.choices[0].message.content
 
     if transcript := transcript.strip():
         # remove the first sentence if it is of the form "Here is ...:"
