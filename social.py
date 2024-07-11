@@ -16,6 +16,7 @@ import sys
 from http import HTTPStatus
 
 import facebook
+import PIL
 import requests
 from together import Together
 from dotenv import load_dotenv
@@ -45,6 +46,8 @@ client = Together(api_key=TOGETHER_API_KEY)
 news_headlines = f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt"
 podcast_url = f"https://zednews.pages.dev/episode/{today_iso_fmt}/"
 
+# https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
+PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
 
 def setup():
     configure_logging()
