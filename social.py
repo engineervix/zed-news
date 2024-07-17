@@ -49,6 +49,7 @@ podcast_url = f"https://zednews.pages.dev/episode/{today_iso_fmt}/"
 # https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
 PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
 
+
 def setup():
     configure_logging()
 
