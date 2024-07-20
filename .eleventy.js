@@ -1,5 +1,4 @@
 const path = require("path");
-const htmlmin = require("html-minifier");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
 
 // const searchFilter = require("./app/utils/searchFilter.js");
@@ -36,24 +35,6 @@ module.exports = (eleventyConfig) => {
     ],
     showVersion: true,
   });
-
-  if (process.env.ELEVENTY_ENV === "production") {
-    eleventyConfig.addTransform("htmlmin", (content, outputPath) => {
-      if (outputPath.endsWith(".html")) {
-        const minified = htmlmin.minify(content, {
-          collapseInlineTagWhitespace: false,
-          collapseWhitespace: true,
-          removeComments: true,
-          sortClassName: true,
-          useShortDoctype: true,
-        });
-
-        return minified;
-      }
-
-      return content;
-    });
-  }
 
   // You can return your Config object (optional).
   return {
