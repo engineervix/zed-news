@@ -3,9 +3,9 @@ import os
 from datetime import datetime, timedelta, timezone
 
 import pytz
-from together import Together
 from babel import Locale
 from jinja2 import Environment, PackageLoader, select_autoescape
+from together import Together
 
 # from num2words import num2words
 from app.core.db.models import Article, Episode, Mp3
@@ -34,7 +34,7 @@ dist_file = f"{EPISODE_TEMPLATE_DIR}/{today_iso_fmt}.njk"
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 client = Together(api_key=TOGETHER_API_KEY)
 
-news_headlines = f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt"
+transcript = f"{DATA_DIR}/{today_iso_fmt}_podcast-content.txt"
 
 logger = logging.getLogger(__name__)
 
@@ -47,13 +47,14 @@ def create_episode_summary(content: str, episode: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"Given the details of today's episode below, write a very brief summary to use as a description for the media file. Your summary should be a single paragraph, not exceeding 2 sentences.\n\n```\n{content}\n```"
+    prompt = f"Given the transcript of today's episode below, write a very brief summary to use as a description for the media file. Your summary should be a single paragraph, not exceeding 2 sentences.\n\n```\n{content}\n```"
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
     # model = "openchat/openchat-3.5-1210"
-    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-    temperature = 0.7
+    # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    model = "mistralai/Mixtral-8x22B-Instruct-v0.1"
+    temperature = 0.75
     max_tokens = 512
 
     response = client.completions.create(
@@ -86,7 +87,7 @@ def create_episode_summary(content: str, episode: str) -> str:
 
 def get_content() -> str:
     """Get the headlines"""
-    with open(news_headlines, "r") as f:
+    with open(transcript, "r") as f:
         return f.read()
 
 
