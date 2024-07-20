@@ -2,6 +2,7 @@
 Toolchain for fetching news content and processing it into a podcast.
 """
 
+import calendar
 import json
 import logging
 import subprocess
@@ -17,7 +18,7 @@ from app.core.podcast.episode import add_articles_to_episode, add_episode_to_db
 from app.core.podcast.mix import add_to_db, mix_audio, upload_to_s3
 from app.core.podcast.voice import create_audio, delete_source_mp3
 from app.core.summarization.backends import together as together_backend
-from app.core.utilities import DATA_DIR, configure_logging, count_words, today_iso_fmt
+from app.core.utilities import DATA_DIR, configure_logging, count_words, today, today_iso_fmt
 
 raw_news = f"{DATA_DIR}/{today_iso_fmt}_news.json"
 transcript = f"{DATA_DIR}/{today_iso_fmt}_podcast-content.txt"
@@ -61,10 +62,10 @@ def main():
     output_key = create_audio(transcript)
 
     # Mix audio
+    weekday = calendar.day_name[today.weekday()].lower()
     mix_audio(
         voice_track=f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}.src.mp3",
-        intro_track=f"{DATA_DIR}/instrumental/intro.mp3",
-        outro_track=f"{DATA_DIR}/instrumental/outro.mp3",
+        music_track=f"{DATA_DIR}/instrumental/{weekday}.mp3",
     )
 
     # Upload podcast audio to S3
