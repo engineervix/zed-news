@@ -233,18 +233,18 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 ### Features for future releases
 
-- [ ] Add [Diamond TV](https://diamondtvzambia.com) as a news source. Might be a good idea to replace Muvi TV with Diamond TV because the latter seems to have infrequent updates. Also, we don't want too many news items -- it kills the whole point of this project -- to get the latest updates delivered in a _concise_ manner.
+- [x] Cleanup the news by consolidating similar articles from different sources. In other words, let's make this [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
 - [x] Connect with social media platforms and automagically tweet, post to facebook when a new episode is out.
-- [ ] Incorporate a newsletter version where the news is sent to your mailbox in a nice, clean format. People can subscribe / unsubscribe.
+- [x] Keep the background music running throughout the show
+- [x] Different background music for each day of the week
 - [ ] Mention the weather in Lusaka, Livingstone, Kabwe, etc. Perhaps the weather forecast for the following day?
 - [ ] Mention exchange rates
-- [x] Cleanup the news by consolidating similar articles from different sources. In other words, let's make this [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
+- [ ] Find a way to make a closing statement based on the news. Something like, "Don't forget to register yor sim card before the ZICTA deadline ..."
+- [ ] Possibly allow for passing of an argument variable for the voice, or dynamically choose a voice from a list, just like the random intros and outros.
 - [ ] Find a way of training the voice to learn how to pronounce Zambian words.
 - [ ] Find a way to summarize for free, without relying on OpenAI's API. Perhaps train your own model, learn how to leverage tools like [NLTK](https://www.nltk.org/), [spaCy](https://spacy.io/), etc.
-- [ ] Find a way to make a closing statement based on the news. Something like, "Don't forget to register yor sim card before the ZICTA deadline ..."
-- [ ] Keep the background music running throughout the show
-- [ ] Different background music for each day of the week
-- [ ] Possibly allow for passing of an argument variable for the voice, or dynamically choose a voice from a list, just like the random intros and outros.
+- [ ] Incorporate a newsletter version where the news is sent to your mailbox in a nice, clean format. People can subscribe / unsubscribe.
+- [ ] Add [Diamond TV](https://diamondtvzambia.com) as a news source. Might be a good idea to replace Muvi TV with Diamond TV because the latter seems to have infrequent updates. Also, we don't want too many news items -- it kills the whole point of this project -- to get the latest updates delivered in a _concise_ manner.
 
 ## Credits
 
