@@ -287,7 +287,7 @@ jobs:
 
       - name: "Create coverage badge"
         if: (github.repository == 'engineervix/zed-news') && (github.ref == 'refs/heads/main')
-        uses: schneegans/dynamic-badges-action@v1.6.0
+        uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           # GIST_TOKEN is a GitHub personal access token with scope "gist".
           auth: ${{ secrets.GIST_TOKEN }}
