@@ -3005,13 +3005,13 @@ files = [
 
 [[package]]
 name = "together"
-version = "1.2.1"
+version = "1.2.2"
 description = "Python client for Together's Cloud Platform!"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "together-1.2.1-py3-none-any.whl", hash = "sha256:a94408074e0e50b3dab1d4001cb36a3fdbd0e4d6a0e659ecaae6b7b6355f5369"},
-    {file = "together-1.2.1.tar.gz", hash = "sha256:c67f724f4612fc76283c92beaf0cc0cc076543021d19dae04fb4e950d9bf0e68"},
+    {file = "together-1.2.2-py3-none-any.whl", hash = "sha256:7ce89f902dbaca67e46e693d90182514494f510f3bc16cb89d816a5031ab0433"},
+    {file = "together-1.2.2.tar.gz", hash = "sha256:fd026f4a604e1fb3ee2fa5803f31e5e36ad31b3d182ef47f611326de66907d13"},
 ]
 
 [package.dependencies]
