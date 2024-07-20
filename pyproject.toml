@@ -43,7 +43,7 @@ torch = "^2.1.1"
 transformers = "^4.36.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
+black = "^24.4.2"
 commitizen = "^3.2.2"
 coverage = {version = "<6", extras = ["toml"]}
 dslr = "^0.4.0"
