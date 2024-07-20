@@ -235,10 +235,8 @@ jobs:
           AWS_REGION_NAME: "any-region"
           AWS_BUCKET_NAME: "bucket-name"
         run: |
-          # Note that you have to activate the virtualenv in every step
-          # because GitHub actions doesn't preserve the environment
           source .venv/bin/activate
-          poetry run invoke test
+          invoke test
 
       - name: "Upload coverage data"
         uses: actions/upload-artifact@v4
