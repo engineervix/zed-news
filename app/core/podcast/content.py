@@ -6,11 +6,11 @@ import sys
 # import time
 from typing import Callable
 
-# import replicate
-from together import Together
-
 # from langchain.llms import OpenAI
 from pydantic import HttpUrl
+
+# import replicate
+from together import Together
 
 from app.core.db.models import Article, Episode
 from app.core.summarization.backends.together import brief_summary
@@ -86,7 +86,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     if today_iso_fmt == "2024-07-01":
         prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're gearing up for episode number {get_episode_number()} after a five-week holiday. Your task is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. At the end of the podcast, leave your audience with a witty anecdote to end on a high note. Remember to cover all the news items from the sources provided below, but without repeating any content. Don't worry about sound effects, music, or captions – just speak directly, naturally and engagingly as if you're live on air. Start by sharing a few highlights from your holiday and express your genuine excitement to reconnect with your loyal listeners. Thank them for their patience during your absence.\n\n"
     else:
-        prompt = f"You are {podcast_host}, host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and your task is to produce the text for episode number {get_episode_number()} based on the news items below. Your text will be read as-is by a text-to-speech engine who will take on your persona. This means that you should not add any captions or placeholders for sound effects, music, etc -- all we want is just natural, plain text. Ensure that you cover all items and avoid repetion. Feel free to add constructive comments and jokes where necessary and appropriate. Your persona should reflect a positive tone. End the episode by personally reflecting on the news and any implications for the future, with a challenge for the listener.\n\n"
+        prompt = f"You are {podcast_host}, host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and your task is to produce the text for episode number {get_episode_number()} based on the news items below. Your text will be read as-is by a text-to-speech engine who will take on your persona. This means that you should not add any captions or placeholders for sound effects, music, etc -- all we want is just natural, plain text. Ensure that you cover all items and avoid repetion. Feel free to add constructive comments and jokes where necessary and appropriate. Your persona should reflect a positive tone. End the episode by personally reflecting on the news and any implications for the future.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 

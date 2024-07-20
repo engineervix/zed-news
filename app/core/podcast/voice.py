@@ -28,9 +28,11 @@ def create_audio(transcript: FilePath, podcast_host: str = podcast_host, lingo: 
     3. download the audio file
     """
 
-    content = transcript
-    with open(content, "r") as f:
-        podcast_content = f.read()
+    with open(transcript, "r") as f:
+        content = f.read()
+        # Add dynamic range compression
+        # https://docs.aws.amazon.com/polly/latest/dg/supportedtags.html#drc-tag
+        podcast_content = f'<speak><amazon:effect name="drc">{content}</amazon:effect></speak>'
 
     # Create a Polly client
     polly = boto3.client(
@@ -48,6 +50,7 @@ def create_audio(transcript: FilePath, podcast_host: str = podcast_host, lingo: 
         LanguageCode=lingo,
         VoiceId=podcast_host,
         Text=podcast_content,
+        TextType="ssml",
         OutputS3BucketName=AWS_BUCKET_NAME,
         OutputS3KeyPrefix=f"{s3_podcast_dir}/{today_iso_fmt}-raw",
         OutputFormat="mp3",

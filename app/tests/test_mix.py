@@ -56,19 +56,16 @@ class TestMixAudio(unittest.TestCase):
 
         # Create example audio files
         example_audio_path = tempfile.NamedTemporaryFile(suffix=".mp3", dir=self.temp_dir, delete=False).name
-        intro_audio_path = tempfile.NamedTemporaryFile(suffix=".mp3", dir=self.temp_dir, delete=False).name
-        outro_audio_path = tempfile.NamedTemporaryFile(suffix=".mp3", dir=self.temp_dir, delete=False).name
+        background_audio_path = tempfile.NamedTemporaryFile(suffix=".mp3", dir=self.temp_dir, delete=False).name
 
         # Copy example audio files to temporary directory
         data_dir = TEST_DIR / "test_data"
         shutil.copyfile(data_dir / "example.mp3", example_audio_path)
-        shutil.copyfile(data_dir / "intro.mp3", intro_audio_path)
-        shutil.copyfile(data_dir / "outro.mp3", outro_audio_path)
+        shutil.copyfile(data_dir / "background.mp3", background_audio_path)
 
         # Assign audio file paths for the test
         self.voice_track = example_audio_path
-        self.intro_track = intro_audio_path
-        self.outro_track = outro_audio_path
+        self.music_track = background_audio_path
         self.dest = os.path.join(self.temp_dir, f"{today_iso_fmt}_podcast_dist.mp3")
 
         # Bind model classes to test db. Since we have a complete list of
@@ -123,7 +120,7 @@ class TestMixAudio(unittest.TestCase):
         # database here. But for tests this is probably not necessary.
 
     def test_mix_audio(self):
-        mix_audio(self.voice_track, self.intro_track, self.outro_track, self.dest)
+        mix_audio(self.voice_track, self.music_track, self.dest)
 
         # Assert that the output file exists
         self.assertTrue(os.path.exists(self.dest))

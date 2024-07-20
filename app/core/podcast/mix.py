@@ -48,16 +48,14 @@ def extract_duration_in_milliseconds(output: str) -> int:
         return 0
 
 
-def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3"):
+def mix_audio(voice_track, music_track, dest=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3"):
     """
-    Mix the voice track, intro track, and outro track into a single audio file
+    Mix the voice track and music track into a single audio file
     """
 
     voice_track_file_name = os.path.splitext(voice_track)[0]
     mix_44100 = f"{voice_track_file_name}.44.1kHz.mp3"
     voice_track_in_stereo = f"{voice_track_file_name}.stereo.mp3"
-    eq_mix = f"{voice_track_file_name}.eq-mix.mp3"
-    initial_mix = f"{voice_track_file_name}.mix-01.mp3"
 
     # change the voice track sample rate to 44.1 kHz
     subprocess.run(
@@ -71,64 +69,48 @@ def mix_audio(voice_track, intro_track, outro_track, dest=f"{DATA_DIR}/{today_is
         shell=True,
     )
 
-    # adjust the treble (high-frequency).
-    # The g=3 parameter specifies the gain in decibels (dB) to be applied to the treble frequencies.
+    # mix the voice track and music track
+    # we bump the volume on the voice track by 12dB
+    # and reduce it on the music track by 11dB
     subprocess.run(
-        f'ffmpeg -i {voice_track_in_stereo} -af "treble=g=3" {eq_mix}',
-        shell=True,
+        [
+            "ffmpeg",
+            "-i",
+            voice_track_in_stereo,
+            "-i",
+            music_track,
+            "-filter_complex",
+            "[0:a]volume=12dB[voice]; [1:a]volume=-11dB,aloop=loop=-1:size=2e+09[instrumental]; [voice][instrumental]amix=inputs=2:duration=first:dropout_transition=3[out]",
+            "-map",
+            "[out]",
+            "-c:a",
+            "libmp3lame",
+            "-b:a",
+            "128k",
+            dest,
+        ]
     )
 
-    # initial mix: the intro + voice track
-    subprocess.run(
-        f'ffmpeg -i {eq_mix} -i {intro_track} -filter_complex amix=inputs=2:duration=longest:dropout_transition=0:weights="1 0.25":normalize=0 {initial_mix}',
-        shell=True,
-    )
+    # add Id3 tags
+    episode = get_episode_number()
+    audio_file = dest
+    tag = eyed3.load(audio_file).tag
+    tag.artist = "Victor Miti"
+    tag.album = "Zed News"
+    tag.title = f"Zed News Podcast, Episode {episode:03} ({today_human_readable})"
+    tag.track_num = episode
+    tag.release_date = eyed3.core.Date(today.year, today.month, today.day)
+    tag.genre = "Podcast"
+    album_art_file = f"{IMAGE_DIR}/album-art.jpg"
+    with open(album_art_file, "rb") as cover_art:
+        # The value 3 indicates that the front cover shall be set
+        # # https://eyed3.readthedocs.io/en/latest/eyed3.id3.html#eyed3.id3.frames.ImageFrame
+        tag.images.set(3, cover_art.read(), "image/jpeg")
+    tag.save()
 
-    # get duration of the initial mix
-    command_1 = f'ffmpeg -i {initial_mix} 2>&1 | grep "Duration"'
-    output_1 = run_ffmpeg_command(command_1)
-    duration_1 = extract_duration_in_milliseconds(output_1)
-
-    # get duration of the outro instrumental
-    command_2 = f'ffmpeg -i {outro_track} 2>&1 | grep "Duration"'
-    output_2 = run_ffmpeg_command(command_2)
-    duration_2 = extract_duration_in_milliseconds(output_2)
-
-    # pad the outro instrumental with silence, using initial mix duration and
-    # the outro instrumental's duration
-    # adelay = (duration of initial mix - outro instrumental duration) in milliseconds
-    if duration_1 != 0 and duration_2 != 0:
-        padded_outro = f"{voice_track_file_name}.mix-02.mp3"
-
-        adelay = duration_1 - duration_2
-        subprocess.run(f'ffmpeg -i {outro_track} -af "adelay={adelay}|{adelay}" {padded_outro}', shell=True)
-
-        # final mix: the initial mix + the padded outro
-        subprocess.run(
-            f'ffmpeg -i {initial_mix} -i {padded_outro} -filter_complex amix=inputs=2:duration=longest:dropout_transition=0:weights="1 0.25":normalize=0 {dest}',
-            shell=True,
-        )
-
-        # add Id3 tags
-        episode = get_episode_number()
-        audio_file = dest
-        tag = eyed3.load(audio_file).tag
-        tag.artist = "Victor Miti"
-        tag.album = "Zed News"
-        tag.title = f"Zed News Podcast, Episode {episode:03} ({today_human_readable})"
-        tag.track_num = episode
-        tag.release_date = eyed3.core.Date(today.year, today.month, today.day)
-        tag.genre = "Podcast"
-        album_art_file = f"{IMAGE_DIR}/album-art.jpg"
-        with open(album_art_file, "rb") as cover_art:
-            # The value 3 indicates that the front cover shall be set
-            # # https://eyed3.readthedocs.io/en/latest/eyed3.id3.html#eyed3.id3.frames.ImageFrame
-            tag.images.set(3, cover_art.read(), "image/jpeg")
-        tag.save()
-
-        # Clean up
-        for f in [voice_track_in_stereo, mix_44100, eq_mix, initial_mix, padded_outro]:
-            delete_file(f)
+    # Clean up
+    for f in [voice_track_in_stereo, mix_44100]:
+        delete_file(f)
 
 
 def upload_to_s3(src: FilePath, dest_folder: str, dest_filename: str):

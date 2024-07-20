@@ -18,11 +18,19 @@ from http import HTTPStatus
 import facebook
 import PIL
 import requests
-from together import Together
 from dotenv import load_dotenv
 from moviepy.editor import AudioFileClip, CompositeVideoClip, ImageClip, TextClip, VideoFileClip
+from together import Together
 
-from app.core.utilities import ASSETS_DIR, DATA_DIR, configure_logging, today, today_human_readable, today_iso_fmt
+from app.core.utilities import (
+    ASSETS_DIR,
+    DATA_DIR,
+    configure_logging,
+    podcast_host,
+    today,
+    today_human_readable,
+    today_iso_fmt,
+)
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -44,6 +52,7 @@ TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 client = Together(api_key=TOGETHER_API_KEY)
 
 news_headlines = f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt"
+transcript = f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}_podcast-content.txt"
 podcast_url = f"https://zednews.pages.dev/episode/{today_iso_fmt}/"
 
 # https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
@@ -67,8 +76,8 @@ def podcast_is_live(url):
 
 
 def get_content() -> str:
-    """Get the headlines"""
-    with open(news_headlines, "r") as f:
+    """Get the podcast content"""
+    with open(transcript, "r") as f:
         return f.read()
 
 
@@ -262,12 +271,17 @@ def create_episode_summary(content: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"Given the details of today's episode below, write a very brief summary to use as a description for the media file. Use bullet points and emojis as appropriate. Do not use markdown. At the end, mention that more details can be obtained from {podcast_url}.\n\n```\n{content}\n```"
+    title = f"Title: Zed News Podcast episode {get_episode_number(news_headlines)}"
+    date = f"Date: {today_human_readable}"
+    host = f"Host: {podcast_host}"
+    separator = "------------------------------------"
+    prompt = f"Given the transcript of today's episode below, write a very brief summary to use as a description for a facebook video post. Use bullet points and emojis as appropriate. Do not use markdown. At the end, mention that more details can be obtained from {podcast_url}.\n\n```{separator}\n\n{title}\n{date}\n{host}\n\n{separator}\n\n{content}\n```"
 
     # model = "lmsys/vicuna-13b-v1.5-16k"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
     # model = "openchat/openchat-3.5-1210"
-    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    model = "mistralai/Mixtral-8x22B-Instruct-v0.1"
     temperature = 0.75
     max_tokens = 1024
 
