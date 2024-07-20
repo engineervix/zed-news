@@ -176,6 +176,7 @@ jobs:
         env:
           OPENAI_API_KEY: "fake_key"
           COHERE_API_KEY: "another_fake_key"
+          TOGETHER_API_KEY: "some_key"
           AWS_ACCESS_KEY_ID: "1234567890"
           AWS_SECRET_ACCESS_KEY: "fake_secret_key"
           AWS_REGION_NAME: "any-region"
