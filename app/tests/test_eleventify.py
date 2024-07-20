@@ -19,13 +19,13 @@ class TestEleventify(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
         self.dist_file = os.path.join(self.temp_dir, f"{today_iso_fmt}.njk")
-        self.news_headlines = os.path.join(self.temp_dir, f"{today_iso_fmt}_news_headlines.txt")
+        self.transcript = os.path.join(self.temp_dir, f"{today_iso_fmt}_transcript.txt")
 
         self.patch_dist_file = patch("app.core.podcast.eleventify.dist_file", self.dist_file)
-        self.patch_news_headlines = patch("app.core.podcast.eleventify.news_headlines", self.news_headlines)
+        self.patch_transcript = patch("app.core.podcast.eleventify.transcript", self.transcript)
 
         self.patch_dist_file.start()
-        self.patch_news_headlines.start()
+        self.patch_transcript.start()
 
         # Bind model classes to test db. Since we have a complete list of
         # all models, we do not need to recursively bind dependencies.
@@ -88,7 +88,7 @@ class TestEleventify(unittest.TestCase):
         # database here. But for tests this is probably not necessary.
 
         self.patch_dist_file.stop()
-        self.patch_news_headlines.stop()
+        self.patch_transcript.stop()
 
     @patch("app.core.podcast.eleventify.get_content")
     @patch("app.core.podcast.eleventify.create_episode_summary")
