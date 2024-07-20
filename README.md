@@ -45,17 +45,21 @@
 
 This is a tool that gathers news from various Zambian 🇿🇲 sources, summarizes the news items and presents the news as a podcast.
 
-![How it works](https://res.cloudinary.com/engineervix/image/upload/v1697574721/slidev/zed-news-talk/toolchain.png)
-
 It consists primarily of two parts / components:
 
 - **core** -- this is primarily python code, where the following tasks are handled:
+
   - gather the news using [requests](https://pypi.org/project/requests/), [feedparser](https://pypi.org/project/feedparser/) and [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
   - summarise the news using LLMs,
   - create the podcast transcript,
   - convert text to speech using [AWS Polly](https://aws.amazon.com/polly/),
   - process the audio using [ffmpeg](https://ffmpeg.org/), and
   - generate content for the website.
+
+  The illustration below summarises this:
+
+  ![How it works](https://res.cloudinary.com/engineervix/image/upload/v1697574721/slidev/zed-news-talk/toolchain.png)
+
 - **web** -- this is an [11ty](https://www.11ty.dev/) project, consisting of logic to build a static site for the podcast, including an RSS feed.
 
 ## Why this project?
