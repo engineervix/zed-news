@@ -4,6 +4,7 @@ name: CI/CD
 env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
+  POETRY_VERSION: 1.8.3 # Make sure this matches the Dockerfile
 
 on:
   pull_request:
@@ -17,94 +18,144 @@ on:
       - "v*"
 
 jobs:
-  # Runs the ruff & black linting steps inside the specified containers rather than on the VM host.
-  # Because of this the network configuration changes from host based network to a container network.
-  linter_ruff:
+  ruff:
     runs-on: ubuntu-22.04
-    container: python:3.10-slim-bullseye
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - id: poetry-cache
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - if: steps.poetry-cache.outputs.cache-hit != 'true'
+        name: Install Poetry and Dependencies
+        shell: bash
         run: |
-          pip install -q ruff==0.0.270
+          pip install --upgrade pip
+          pip install poetry==$POETRY_VERSION
+          python -m venv .venv
+          source .venv/bin/activate
+          poetry install --with dev
+
       - name: ruff
+        shell: bash
         run: |
-          ruff check --format=github .
+          source .venv/bin/activate
+          ruff check . --output-format=github
 
-  linter_black:
+  black:
     runs-on: ubuntu-22.04
-    container: python:3.10-slim-bullseye
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - id: poetry-cache
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - if: steps.poetry-cache.outputs.cache-hit != 'true'
+        name: Install Poetry and Dependencies
+        shell: bash
         run: |
-          pip install -q black==23.3.0
+          pip install --upgrade pip
+          pip install poetry==$POETRY_VERSION
+          python -m venv .venv
+          source .venv/bin/activate
+          poetry install --with dev
+
       - name: black
+        shell: bash
         run: |
+          source .venv/bin/activate
           black . --check
 
-  # Runs the frontend linting steps on the VM
-  linter_stylelint:
+  stylelint:
     runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          cache: "npm"
+          node-version-file: .nvmrc
 
-      - name: Install Dependencies
+      - id: node-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - if: steps.node-cache.outputs.cache-hit != 'true'
         run: |
-          npm ci
+          npm ci --no-optional --no-audit --progress=false
 
       - name: Stylelint
         run: |
           npm run lint:style
 
-  linter_eslint:
+  eslint:
     runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          cache: "npm"
+          node-version-file: .nvmrc
 
-      - name: Install Dependencies
+      - id: node-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - if: steps.node-cache.outputs.cache-hit != 'true'
         run: |
-          npm ci
+          npm ci --no-optional --no-audit --progress=false
 
       - name: ESLint
         run: |
           npm run lint:js
 
-  linter_prettier:
+  prettier:
     runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          cache: "npm"
+          node-version-file: .nvmrc
 
-      - name: Install Dependencies
+      - id: node-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - if: steps.node-cache.outputs.cache-hit != 'true'
         run: |
-          npm ci
+          npm ci --no-optional --no-audit --progress=false
 
       - name: Prettier
         run: |
@@ -115,7 +166,7 @@ jobs:
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Dependencies
         shell: bash
@@ -131,37 +182,30 @@ jobs:
   # Runs the python test suite on the VM
   test:
     runs-on: ubuntu-22.04
-    needs:
-      [
-        linter_ruff,
-        linter_black,
-        linter_stylelint,
-        linter_eslint,
-        linter_prettier,
-        shellcheck,
-      ]
+    needs: [ruff, black, stylelint, eslint, prettier, shellcheck]
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v3
-
-      - name: Install poetry
-        run: pipx install poetry==1.8.3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-          cache: "poetry"
-          cache-dependency-path: "poetry.lock"
 
-      - name: Install Dependencies
+      - id: poetry-cache
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: System Dependencies
         shell: bash
         run: |
           sudo apt update --yes --quiet
           export DEBIAN_FRONTEND=noninteractive
           export TZ=Africa/Lusaka
-          sudo apt install --yes --quiet --no-install-recommends tzdata libssl-dev ffmpeg
+          sudo apt install --yes --quiet --no-install-recommends ffmpeg
           sudo sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
           sudo locale-gen
           sudo ln -fs /usr/share/zoneinfo/Africa/Lusaka /etc/localtime
@@ -169,7 +213,16 @@ jobs:
           export LANG=en_US.UTF-8
           export LANGUAGE=en_US:en
           export LC_ALL=en_US.UTF-8
-          poetry install
+
+      - if: steps.poetry-cache.outputs.cache-hit != 'true'
+        name: Install Poetry and Dependencies
+        shell: bash
+        run: |
+          pip install --upgrade pip
+          pip install poetry==$POETRY_VERSION
+          python -m venv .venv
+          source .venv/bin/activate
+          poetry install --with dev
 
       - name: Test with unittest
         shell: bash
@@ -182,10 +235,13 @@ jobs:
           AWS_REGION_NAME: "any-region"
           AWS_BUCKET_NAME: "bucket-name"
         run: |
+          # Note that you have to activate the virtualenv in every step
+          # because GitHub actions doesn't preserve the environment
+          source .venv/bin/activate
           poetry run invoke test
 
       - name: "Upload coverage data"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: covdata
           path: coverage.*
@@ -196,25 +252,37 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v3
-
-      - name: Install poetry
-        run: pipx install poetry==1.8.3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-          cache: "poetry"
-          cache-dependency-path: "poetry.lock"
+
+      - id: poetry-cache
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - if: steps.poetry-cache.outputs.cache-hit != 'true'
+        name: Install Poetry and Dependencies
+        shell: bash
+        run: |
+          pip install --upgrade pip
+          pip install poetry==$POETRY_VERSION
+          python -m venv .venv
+          source .venv/bin/activate
+          poetry install --with dev
 
       - name: "Download coverage data"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: covdata
 
       - name: "Extract total coverage"
         run: |
+          source .venv/bin/activate
           export TOTAL=$(python -c "import json;print(round(json.load(open('coverage.json'))['totals']['percent_covered']))")
           echo "total=$TOTAL" >> $GITHUB_ENV
           echo "### Total coverage: ${TOTAL}%" >> $GITHUB_STEP_SUMMARY
@@ -236,16 +304,7 @@ jobs:
   # Runs the next steps on the VM
   # Creates a GitHub Release when the lint & test jobs succeeds, and only on pushes to tags.
   release:
-    needs:
-      [
-        linter_ruff,
-        linter_black,
-        linter_stylelint,
-        linter_eslint,
-        linter_prettier,
-        shellcheck,
-        test,
-      ]
+    needs: [ruff, black, stylelint, eslint, prettier, shellcheck, test]
 
     permissions:
       contents: write
@@ -256,27 +315,49 @@ jobs:
 
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
-      - name: Install Dependencies
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - id: poetry-cache
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - if: steps.poetry-cache.outputs.cache-hit != 'true'
+        name: Install Poetry and Dependencies
+        shell: bash
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install invoke colorama tomli
+          pip install --upgrade pip
+          pip install poetry==$POETRY_VERSION
+          python -m venv .venv
+          source .venv/bin/activate
+          poetry install --with dev
+
       - name: Get the version
         id: get_version
         run: |
           echo "${{ github.ref }}"
           echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
       - name: Generate Release Title
         id: get_release_title
         shell: bash
         run: |
           export TODAY="($(TZ=Africa/Lusaka date --iso))"
           echo ::set-output name=RELEASE_NAME::"${{ steps.get_version.outputs.VERSION }} $TODAY"
+
       - name: Extract Release Notes
         # This creates a file LATEST_RELEASE_NOTES.md in the parent directory (../)
         shell: bash
         run: |
+          source .venv/bin/activate
           invoke get-release-notes
+
       - name: GitHub Release
         uses: softprops/action-gh-release@v1
         with:
