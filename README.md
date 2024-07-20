@@ -250,16 +250,11 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 ### Music
 
-- opening: <https://pixabay.com/music/future-bass-extreme-energy-burst-short-version-2-197550/>
-- closing: <https://pixabay.com/music/future-bass-fashion-future-bass-143924/>
-
-> **Note**
->
-> These audio files have the [**gain**](https://www.antarestech.com/community/whats-the-difference-between-gain-and-volume) reduced by -20dB, like this:
->
-> ```bash
-> ffmpeg -i intro.src.mp3 -af "volume=-20dB" intro.mp3
-> ```
+- <https://pixabay.com/music/beats-sweet-breeze-167504/>
+- <https://pixabay.com/music/beats-aesthetic-beat-royalty-free-music-215851/>
+- <https://pixabay.com/music/beats-digital-technology-131644/>
+- <https://pixabay.com/music/beats-stellar-echoes-202315/>
+- <https://pixabay.com/music/afrobeat-it-afrobeat-149308/>
 
 ### Icon
 
