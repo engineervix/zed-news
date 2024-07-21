@@ -26,6 +26,10 @@
       "updateTypes": ["patch", "pin", "digest"],
       "automerge": true,
       "semanticCommitType": "ci"
+    },
+    {
+      "matchPackageNames": ["sass"],
+      "enabled": false
     }
   ],
   "timezone": "Africa/Lusaka",
