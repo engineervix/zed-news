@@ -1210,13 +1210,13 @@ testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packag
 
 [[package]]
 name = "invoke"
-version = "2.1.3"
+version = "2.2.0"
 description = "Pythonic task execution"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "invoke-2.1.3-py3-none-any.whl", hash = "sha256:51e86a08d964160e01c44eccd22f50b25842bd96a9c63c11177032594cb86740"},
-    {file = "invoke-2.1.3.tar.gz", hash = "sha256:a3b15d52d50bbabd851b8a39582c772180b614000fa1612b4d92484d54d38c6b"},
+    {file = "invoke-2.2.0-py3-none-any.whl", hash = "sha256:6ea924cc53d4f78e3d98bc436b08069a03077e6f85ad1ddaa8a116d7dad15820"},
+    {file = "invoke-2.2.0.tar.gz", hash = "sha256:ee6cbb101af1a859c7fe84f2a264c059020b0cb7fe3535f9424300ab568f6bd5"},
 ]
 
 [[package]]
@@ -1791,6 +1791,7 @@ optional = false
 python-versions = ">=3"
 files = [
     {file = "nvidia_nvjitlink_cu12-12.3.101-py3-none-manylinux1_x86_64.whl", hash = "sha256:64335a8088e2b9d196ae8665430bc6a2b7e6ef2eb877a9c735c804bd4ff6467c"},
+    {file = "nvidia_nvjitlink_cu12-12.3.101-py3-none-manylinux2014_aarch64.whl", hash = "sha256:211a63e7b30a9d62f1a853e19928fbb1a750e3f17a13a3d1f98ff0ced19478dd"},
     {file = "nvidia_nvjitlink_cu12-12.3.101-py3-none-win_amd64.whl", hash = "sha256:1b2e317e437433753530792f13eece58f0aec21a2b05903be7bffe58a606cbd1"},
 ]
 
