@@ -40,12 +40,12 @@ def main():
     load_dotenv()
 
     # Fetch news
-    news = get_latest_news()
+    # news = get_latest_news()
 
     # Save news to a JSON file
-    save_news_to_file(news, raw_news)
+    # save_news_to_file(news, raw_news)
 
-    # news = _read_json_file(raw_news)  # for testing
+    news = _read_json_file(raw_news)  # for testing
 
     # Connect to the database
     initialize_database()
