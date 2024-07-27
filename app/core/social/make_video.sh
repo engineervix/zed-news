@@ -44,6 +44,9 @@ function send_healthcheck_failure() {
   curl -fsS --retry 3 "${HEALTHCHECKS_PING_URL}/fail" > /dev/null
 }
 
+# shellcheck source=/dev/null
+source "${HOME}/Env/zed-news/bin/activate" || { echo "Failed to activate virtual environment."; send_healthcheck_failure; exit 1; }
+
 LOG_FILE="vastai_error_log_$(date +"%Y%m%d_%H%M%S").txt"
 START_TIME=$(date +%s)
 DAY_OF_MONTH=$(date +"%d")
@@ -71,7 +74,7 @@ get_status() {
   vastai show instance "$instance_id" | awk 'NR==2 {print $3}'
 }
 
-handle_error() {
+handle_vastai_error() {
     echo "An error occurred. Check the log file for details: $LOG_FILE"
     vastai destroy instance "$instance_id"
     END_TIME=$(date +%s)
@@ -101,7 +104,7 @@ if [ "$instance_status" == "running" ]; then
 
 	vastai attach ssh "$instance_id" "$(cat "$KEY_NAME.pub")"
 	# delete last entry in known_hosts
-	cp ~/.ssh/known_hosts ~/.ssh/known_hosts_"$(date +'%Y%m%d_%H%M%S').bak"
+	cp -v ~/.ssh/known_hosts ~/.ssh/known_hosts_"$(date +'%Y%m%d_%H%M%S').bak"
 	sed -i '$ d' ~/.ssh/known_hosts
 	# disable tmux
 	ssh "$(vastai ssh-url "$instance_id")" -o StrictHostKeyChecking=no -i "$KEY_NAME" "touch ~/.no_auto_tmux"
@@ -115,9 +118,6 @@ ssh_url=$(vastai ssh-url "$instance_id")
 port=$(echo "$ssh_url" | cut -d ':' -f 3)
 rsync -chavzP -e "ssh -o StrictHostKeyChecking=no -p $port -i $KEY_NAME" "$source_audio" "$(basename "$ssh_url" | cut -d ':' -f 1)":~/audio.mp3
 rsync -chavzP -e "ssh -o StrictHostKeyChecking=no -p $port -i $KEY_NAME" "$source_image" "$(basename "$ssh_url" | cut -d ':' -f 1)":~/image.png
-
-# Trap any error and call the handle_error function
-trap 'handle_error' ERR
 
 # now you can login and do your thing on the GPU instance
 {
@@ -161,7 +161,7 @@ trap 'handle_error' ERR
                             # Uncomment the following line if you want to use the enhancer (takes a while, but you get better results)
                             # --enhancer gfpgan
 EOF
-} || handle_error
+} || handle_vastai_error
 
 # now, back on the host machine ... let's get the generated file from the remote GPU instance
 rsync -chavzP -e "ssh -o StrictHostKeyChecking=no -p $port -i $KEY_NAME" "$(basename "$ssh_url" | cut -d ':' -f 1)":~/SadTalker/results/*.mp4 sadtalker_output.mp4
@@ -174,11 +174,11 @@ ffmpeg -i video.mp4 -vcodec libx264 -crf 28 "${live_audio_file%.*}.mp4"
 vastai destroy instance "$instance_id"
 
 # cleanup
-rm -fv sadtalker_output.mp4 video.mp4 ssh_*.json
+rm -fv sadtalker_output.mp4 video.mp4 vast_* ssh_*.json
 
 # post the video to social platform
 cd "${HOME}/SITES/zed-news/" || { echo "Failed to change directory."; exit 1; }
-invoke facebook_post
+invoke facebook-post
 
 END_TIME=$(date +%s)
 DURATION=$(( END_TIME - START_TIME ))
