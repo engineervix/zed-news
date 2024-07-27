@@ -36,12 +36,12 @@ source ../.env
 
 # Function to send success signal to healthchecks.io
 function send_healthcheck_success() {
-  curl -fsS --retry 3 "${HEALTHCHECKS_PING_URL}" > /dev/null
+		curl -fsS --retry 3 "${HEALTHCHECKS_PING_URL}" > /dev/null
 }
 
 # Function to send failure signal to healthchecks.io
 function send_healthcheck_failure() {
-  curl -fsS --retry 3 "${HEALTHCHECKS_PING_URL}/fail" > /dev/null
+		curl -fsS --retry 3 "${HEALTHCHECKS_PING_URL}/fail" > /dev/null
 }
 
 # shellcheck source=/dev/null
@@ -71,17 +71,17 @@ vastai create instance "$machine_id" --image pytorch/pytorch:2.4.0-cuda11.8-cudn
 instance_id=$(vastai show instances | sed -n '2p' | cut -d ' ' -f 1)
 
 get_status() {
-  vastai show instance "$instance_id" | awk 'NR==2 {print $3}'
+		vastai show instance "$instance_id" | awk 'NR==2 {print $3}'
 }
 
 handle_vastai_error() {
-    echo "An error occurred. Check the log file for details: $LOG_FILE"
-    vastai destroy instance "$instance_id"
-    END_TIME=$(date +%s)
-    DURATION=$(( END_TIME - START_TIME ))
-    echo "Script failed after $DURATION seconds."
-    send_healthcheck_failure
-    exit 1
+		echo "An error occurred. Check the log file for details: $LOG_FILE"
+		vastai destroy instance "$instance_id"
+		END_TIME=$(date +%s)
+		DURATION=$(( END_TIME - START_TIME ))
+		echo "Script failed after $DURATION seconds."
+		send_healthcheck_failure
+		exit 1
 }
 
 instance_status=$(get_status)
@@ -90,27 +90,27 @@ max_time=300  # 5 minutes in seconds
 
 # Check the status every 5 seconds until it is "running" or until the timeout is reached
 while [ "$instance_status" != "running" ] && [ $elapsed_time -lt $max_time ]; do
-  	echo "Current status: $instance_status. Waiting for 'running' status..."
-  	sleep 5
-  	elapsed_time=$((elapsed_time + 5))
-  	instance_status=$(get_status)
+    echo "Current status: $instance_status. Waiting for 'running' status..."
+    sleep 5
+    elapsed_time=$((elapsed_time + 5))
+    instance_status=$(get_status)
 done
 
 # if status is "running", let's SSH into the instance
 if [ "$instance_status" == "running" ]; then
-  	echo "Instance is now running!"
-	#  We need to generate an SSH key and add it to the machine
-  ssh-keygen -t rsa -b 4096 -f "$KEY_NAME" -N "$PASSPHRASE" -C "vast-box-$(date --iso)@$(hostname)"
+    echo "Instance is now running!"
+    #  We need to generate an SSH key and add it to the machine
+    ssh-keygen -t rsa -b 4096 -f "$KEY_NAME" -N "$PASSPHRASE" -C "vast-box-$(date --iso)@$(hostname)"
 
-	vastai attach ssh "$instance_id" "$(cat "$KEY_NAME.pub")"
-	# delete last entry in known_hosts
-	cp -v ~/.ssh/known_hosts ~/.ssh/known_hosts_"$(date +'%Y%m%d_%H%M%S').bak"
-	sed -i '$ d' ~/.ssh/known_hosts
-	# disable tmux
-	ssh "$(vastai ssh-url "$instance_id")" -o StrictHostKeyChecking=no -i "$KEY_NAME" "touch ~/.no_auto_tmux"
+    vastai attach ssh "$instance_id" "$(cat "$KEY_NAME.pub")"
+    # delete last entry in known_hosts
+    cp -v ~/.ssh/known_hosts ~/.ssh/known_hosts_"$(date +'%Y%m%d_%H%M%S').bak"
+    sed -i '$ d' ~/.ssh/known_hosts
+    # disable tmux
+    ssh "$(vastai ssh-url "$instance_id")" -o StrictHostKeyChecking=no -i "$KEY_NAME" "touch ~/.no_auto_tmux"
 else
-  	echo "Timeout reached. Instance did not change to 'running' within 5 minutes."
-  	exit 1
+    echo "Timeout reached. Instance did not change to 'running' within 5 minutes."
+    exit 1
 fi
 
 # then copy the audio file and the image to the remote instance
@@ -121,7 +121,7 @@ rsync -chavzP -e "ssh -o StrictHostKeyChecking=no -p $port -i $KEY_NAME" "$sourc
 
 # now you can login and do your thing on the GPU instance
 {
-  # shellcheck disable=SC2087
+	# shellcheck disable=SC2087
 	ssh "$(vastai ssh-url "$instance_id")" -o StrictHostKeyChecking=no -i "$KEY_NAME" << EOF
 		# Exit immediately if a command exits with a non-zero status
 		set -e
@@ -154,12 +154,12 @@ rsync -chavzP -e "ssh -o StrictHostKeyChecking=no -p $port -i $KEY_NAME" "$sourc
 		sed -i 's/from torchvision.transforms.functional_tensor import rgb_to_grayscale/from torchvision.transforms.functional import rgb_to_grayscale/' /opt/conda/envs/sadtalker/lib/python3.8/site-packages/basicsr/data/degradations.py
 
 		# run SadTalker
-        python inference.py --driven_audio ../audio.mp3 \
-                            --source_image ../image.png \
-                            --still \
-                            --preprocess full
-                            # Uncomment the following line if you want to use the enhancer (takes a while, but you get better results)
-                            # --enhancer gfpgan
+		python inference.py --driven_audio ../audio.mp3 \
+												--source_image ../image.png \
+												--still \
+												--preprocess full
+												# Uncomment the following line if you want to use the enhancer (takes a while, but you get better results)
+												# --enhancer gfpgan
 EOF
 } || handle_vastai_error
 
