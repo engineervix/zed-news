@@ -32,10 +32,11 @@ from app.core.utilities import (
     today_iso_fmt,
 )
 
-logger = logging.getLogger(__name__)
-load_dotenv()
-
 PROJECT_ROOT = pathlib.Path(__file__).parents[3]
+
+logger = logging.getLogger(__name__)
+load_dotenv(dotenv_path=f"{PROJECT_ROOT}/.env")
+
 HEALTHCHECKS_FACEBOOK_PING_URL = os.getenv("HEALTHCHECKS_FACEBOOK_PING_URL")
 
 # Facebook
@@ -374,7 +375,7 @@ def main(args=None):
         args = sys.argv[1:]
 
     parser = argparse.ArgumentParser(
-        prog="social.py",
+        prog="post.py",
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
