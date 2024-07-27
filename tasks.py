@@ -45,7 +45,7 @@ def up(c, build=False):
     docker_compose = get_docker_compose_command()
     if build:
         c.run(
-            f"{docker_compose} -f docker-compose.yml up -d --build 2>&1 | tee build.log",
+            f"{docker_compose} -f docker-compose.yml up -d --build",
             pty=True,
         )
     else:
@@ -366,3 +366,9 @@ def test(c):
     c.run("coverage run -m unittest discover app/tests", pty=True)
     c.run("coverage json", pty=True)
     c.run("coverage report -m", pty=True)
+
+
+@task
+def facebook_post(c):
+    """Post to Facebook"""
+    c.run("python app/core/social/post.py share facebook", pty=True)

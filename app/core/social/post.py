@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""social.py
+"""post.py
 
 post to social media
 """
@@ -23,7 +23,7 @@ from moviepy.editor import AudioFileClip, CompositeVideoClip, ImageClip, TextCli
 from together import Together
 
 from app.core.utilities import (
-    ASSETS_DIR,
+    ASSETS_DIR,  # noqa: F401
     DATA_DIR,
     configure_logging,
     podcast_host,
@@ -35,7 +35,7 @@ from app.core.utilities import (
 logger = logging.getLogger(__name__)
 load_dotenv()
 
-PROJECT_ROOT = pathlib.Path(__file__).resolve().parent
+PROJECT_ROOT = pathlib.Path(__file__).parents[3]
 HEALTHCHECKS_FACEBOOK_PING_URL = os.getenv("HEALTHCHECKS_FACEBOOK_PING_URL")
 
 # Facebook
@@ -401,12 +401,15 @@ def main(args=None):
         if args.platform == "facebook" and podcast_is_live(podcast_url):
             try:
                 # First, we create a video and upload it
-                video = create_video(
-                    image_overlay=get_random_image(os.path.join(f"{DATA_DIR}/images/")),
-                    logo=f"{ASSETS_DIR}/logo.png",
-                    podcast_mp3=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3",
-                    video_loop=get_random_video(os.path.join(f"{DATA_DIR}/videos/")),
-                )
+                # option 0: programmatically create a video using moviepy
+                # video = create_video(
+                #     image_overlay=get_random_image(os.path.join(f"{DATA_DIR}/images/")),
+                #     logo=f"{ASSETS_DIR}/logo.png",
+                #     podcast_mp3=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3",
+                #     video_loop=get_random_video(os.path.join(f"{DATA_DIR}/videos/")),
+                # )
+                # option 1: use existing video created elsewhere
+                video = f"{DATA_DIR}/{today_iso_fmt}_zed-news-podcast.mp4"
                 episode_summary = create_episode_summary(get_content())
                 if video_link := upload_video_to_facebook(
                     video,
