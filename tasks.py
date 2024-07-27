@@ -371,4 +371,4 @@ def test(c):
 @task
 def facebook_post(c):
     """Post to Facebook"""
-    c.run("python app/core/social/post.py share facebook", pty=True)
+    c.run("python -m app.core.social.post share facebook", pty=True)
