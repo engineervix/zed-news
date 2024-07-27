@@ -165,13 +165,14 @@ EOF
 
 # now, back on the host machine ... let's get the generated file from the remote GPU instance
 rsync -chavzP -e "ssh -o StrictHostKeyChecking=no -p $port -i $KEY_NAME" "$(basename "$ssh_url" | cut -d ':' -f 1)":~/SadTalker/results/*.mp4 sadtalker_output.mp4
+
+# Destroy the GPU instance
+vastai destroy instance "$instance_id"
+
 # replace audio track with the "shiny" version
 ffmpeg -i sadtalker_output.mp4 -i "$live_audio_file" -c:v copy -map 0:v:0 -map 1:a:0 -shortest video.mp4
 # optimize the video
 ffmpeg -i video.mp4 -vcodec libx264 -crf 28 "${live_audio_file%.*}.mp4"
-
-# Destroy the GPU instance
-vastai destroy instance "$instance_id"
 
 # cleanup
 rm -fv sadtalker_output.mp4 video.mp4 vast_* ssh_*.json
