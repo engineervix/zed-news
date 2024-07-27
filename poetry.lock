@@ -3395,6 +3395,20 @@ socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
+name = "vastai"
+version = "0.2.5"
+description = "Vast.ai Python CLI"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "vastai-0.2.5-py3-none-any.whl", hash = "sha256:fb23baea165dd71bdc831b915639a93429ddd9968547987350bf50404f8e92f9"},
+    {file = "vastai-0.2.5.tar.gz", hash = "sha256:cccd3ea4da38cda820c52051e3eac514988f349a51bb71d83d445d8e95819ffc"},
+]
+
+[package.dependencies]
+requests = "*"
+
+[[package]]
 name = "virtualenv"
 version = "20.23.1"
 description = "Virtual Python Environment builder"
@@ -3530,4 +3544,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "~=3.10"
-content-hash = "61eea268adeb18ae1ea4c57648e8d79e231138bac88d5a51e107a56ff6872596"
+content-hash = "9ab2b1457d17c47bfd36f3eae61a0e6849da9c3b846fedfad5c80267d7594510"

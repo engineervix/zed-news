@@ -12,6 +12,7 @@ packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "~=3.10"
+
 apprise = "^1.4.0"
 babel = "^2.12.1"
 beautifulsoup4 = "^4.12.2"
@@ -41,6 +42,7 @@ together = "^1.2.1"
 tomli = "^2.0.1"
 torch = "^2.1.1"
 transformers = "^4.38.0"
+vastai = "^0.2.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"
