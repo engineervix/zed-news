@@ -410,7 +410,7 @@ def main(args=None):
                 #     video_loop=get_random_video(os.path.join(f"{DATA_DIR}/videos/")),
                 # )
                 # option 1: use existing video created elsewhere
-                video = f"{DATA_DIR}/{today_iso_fmt}_zed-news-podcast.mp4"
+                video = f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp4"
                 episode_summary = create_episode_summary(get_content())
                 if video_link := upload_video_to_facebook(
                     video,
