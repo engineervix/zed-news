@@ -100,7 +100,9 @@ done
 if [ "$instance_status" == "running" ]; then
     echo "Instance is now running!"
     #  We need to generate an SSH key and add it to the machine
-    ssh-keygen -t rsa -b 4096 -f "$KEY_NAME" -N "$PASSPHRASE" -C "vast-box-$(date --iso)@$(hostname)"
+    ## but first, delete any that may exist
+    rm -fv vast_*
+    ssh-keygen -t rsa -b 4096 -f "$KEY_NAME" -N "$PASSPHRASE" -C "vast-box-$(date +'%Y%m%d_%H%M%S')@$(hostname)"
 
     vastai attach ssh "$instance_id" "$(cat "$KEY_NAME.pub")"
     # delete last entry in known_hosts
