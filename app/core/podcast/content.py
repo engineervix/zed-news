@@ -125,8 +125,8 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     # model = "lmsys/vicuna-13b-v1.5-16k"
     # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
     # model = "mistralai/Mixtral-8x22B-Instruct-v0.1"
-    # model = "meta-llama/Llama-3-70b-chat-hf"
-    model = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
+    model = "meta-llama/Llama-3-70b-chat-hf"
+    # model = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT"
     # model = "Qwen/Qwen1.5-14B-Chat"
     temperature = 0.8
