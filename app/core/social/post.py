@@ -13,14 +13,17 @@ import os
 import pathlib
 import random
 import sys
+import numpy as np
 from http import HTTPStatus
 
 import facebook
 import PIL
 import requests
 from dotenv import load_dotenv
-from moviepy.editor import AudioFileClip, CompositeVideoClip, ImageClip, TextClip, VideoFileClip
+from moviepy.editor import CompositeVideoClip, ImageClip, TextClip, VideoFileClip
 from together import Together
+from moviepy.video.compositing.concatenate import concatenate_videoclips
+from moviepy.video.tools.segmenting import findObjects
 
 from app.core.utilities import (
     ASSETS_DIR,  # noqa: F401
@@ -130,15 +133,12 @@ def get_random_image(path):
         return None
 
 
-def create_video(image_overlay, logo, podcast_mp3, video_loop):
+def create_video(source_video, logo):
     # Load the video clip
-    video_clip = VideoFileClip(video_loop)
+    video_clip = VideoFileClip(source_video)
 
-    # Load the image clip
-    image_clip = VideoFileClip(image_overlay)
-
-    # Load the audio clip
-    audio_clip = AudioFileClip(podcast_mp3)
+    width, height = video_clip.size
+    screensize = (width, height)
 
     # Load the logo image
     logo_clip = ImageClip(logo, transparent=True)
@@ -147,21 +147,33 @@ def create_video(image_overlay, logo, podcast_mp3, video_loop):
     logo_clip = logo_clip.resize(height=100)  # Resize the logo to a height of 100 pixels while preserving aspect ratio
 
     # Position the logo at the bottom right corner
-    logo_position = (video_clip.size[0] - logo_clip.size[0], video_clip.size[1] - logo_clip.size[1])
+    logo_position = (
+        video_clip.size[0] - logo_clip.size[0],
+        video_clip.size[1] - logo_clip.size[1],
+    )
     logo_clip = logo_clip.set_position(logo_position)
 
-    # Resize the image to fit within the video dimensions while preserving aspect ratio
-    image_clip_resized = image_clip.resize(
-        height=video_clip.h
-    )  # Resize the image to match the video's height while preserving aspect ratio
+    # the fancy text animation is from
+    # https://moviepy-tburrows13.readthedocs.io/en/improve-docs/examples/moving_letters.html
 
-    # Loop the video to match the duration of the audio
-    looped_video_clip = video_clip.loop(duration=audio_clip.duration)
+    # helper function
+    rotMatrix = lambda a: np.array([[np.cos(a), np.sin(a)], [-np.sin(a), np.cos(a)]])  # noqa: E731
 
-    # Set opacity and duration for the image clip
-    image_clip_resized = (
-        image_clip_resized.set_position(("center", "center")).set_duration(looped_video_clip.duration).set_opacity(0.4)
-    )  # Adjust opacity as needed (0.0 for fully transparent, 1.0 for fully opaque)
+    def vortex(screenpos, i, nletters):  # noqa: D103
+        d = lambda t: 1.0 / (0.3 + t**8)  # damping # noqa: E731
+        a = i * np.pi / nletters  # angle of the movement
+        v = rotMatrix(a).dot([-1, 0])
+        if i % 2:
+            v[1] = -v[1]
+        return lambda t: screenpos + 400 * d(t) * rotMatrix(0.5 * d(t) * a).dot(v)
+
+    def vortexout(screenpos, i, nletters):  # noqa: D103
+        d = lambda t: max(0, t)  # damping # noqa: E731
+        a = i * np.pi / nletters  # angle of the movement
+        v = rotMatrix(a).dot([-1, 0])
+        if i % 2:
+            v[1] = -v[1]
+        return lambda t: screenpos + 400 * d(t - 0.1 * i) * rotMatrix(-0.2 * d(t) * a).dot(v)
 
     # Add text overlays
     text_duration = 12  # Duration of the text overlays (in seconds)
@@ -173,7 +185,8 @@ def create_video(image_overlay, logo, podcast_mp3, video_loop):
         ending_suffix = f" for episode {str(next_episode)}"
         output = f"{DATA_DIR}/{today_iso_fmt}_zed-news-podcast-ep{episode_number}.mp4"
     else:
-        episode_suffix = ""
+        # episode_suffix = ""
+        episode_suffix = "Welcome!"
         ending_suffix = ""
         output = f"{DATA_DIR}/{today_iso_fmt}_zed-news-podcast.mp4"
 
@@ -181,41 +194,56 @@ def create_video(image_overlay, logo, podcast_mp3, video_loop):
 
     text_start = (
         TextClip(
-            f"{today_human_readable}\nZed News Podcast{episode_suffix}",
-            fontsize=75,
+            # f"{today_human_readable}\nZed News Podcast{episode_suffix}",
+            f"{episode_suffix.strip()}",
+            fontsize=120,
+            kerning=5,
             color="white",
             # to get list of available fonts, use moviepy.video.VideoClip.TextClip.list('font')
-            font="Merriweather-Regular",
+            font="Cookie-Regular",
         )
-        .set_duration(text_duration)
-        .set_position(("center", "top"))
+        # .set_duration(text_duration)
+        # .set_position(("center", "top"))
     )
 
     # Text at the end
     text_end = (
-        TextClip(f"Please join us {next_day}{ending_suffix}!", fontsize=60, color="white", font="Vibur")
+        TextClip(
+            f"Please join us {next_day}{ending_suffix}!",
+            fontsize=80,
+            size=screensize,
+            method="caption",
+            kerning=5,
+            color="white",
+            font="Cookie-Regular",
+        )
         .set_duration(text_duration)
         .set_position(("center", "center"))
     )
 
-    # Overlay the image on top of the looped video
-    final_clip = CompositeVideoClip([looped_video_clip.set_opacity(1), image_clip_resized])
+    letters = findObjects(CompositeVideoClip([text_start.set_position("center", "center")], size=screensize))
 
-    # Overlay the logo on the final clip
+    def moveLetters(letters, funcpos):  # noqa D103
+        return [letter.set_pos(funcpos(letter.screenpos, i, len(letters))) for i, letter in enumerate(letters)]
+
+    clips = [
+        CompositeVideoClip(moveLetters(letters, funcpos), size=screensize).subclip(0, 5)
+        for funcpos in [vortex, vortexout]
+    ]
+    text_clip = concatenate_videoclips(clips)
+
     final_clip = CompositeVideoClip(
         [
-            final_clip,
+            video_clip.set_opacity(1),
+            text_clip,
             logo_clip.set_opacity(1),
-            text_start.set_start(0),
-            text_end.set_start(looped_video_clip.duration - text_duration),
+            # text_start.set_start(0),
+            text_end.set_start(video_clip.duration - text_duration),
         ]
     )
 
-    # Set audio for the final video
-    final_clip = final_clip.set_audio(audio_clip)
-
     # Set the duration of the final clip
-    final_clip = final_clip.set_duration(audio_clip.duration)
+    final_clip = final_clip.set_duration(video_clip.duration)
 
     # Write the final video to a file
     final_clip.write_videofile(output, codec="libx264", fps=video_clip.fps)
@@ -402,15 +430,10 @@ def main(args=None):
         if args.platform == "facebook" and podcast_is_live(podcast_url):
             try:
                 # First, we create a video and upload it
-                # option 0: programmatically create a video using moviepy
-                # video = create_video(
-                #     image_overlay=get_random_image(os.path.join(f"{DATA_DIR}/images/")),
-                #     logo=f"{ASSETS_DIR}/logo.png",
-                #     podcast_mp3=f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp3",
-                #     video_loop=get_random_video(os.path.join(f"{DATA_DIR}/videos/")),
-                # )
-                # option 1: use existing video created elsewhere
-                video = f"{DATA_DIR}/{today_iso_fmt}_podcast_dist.mp4"
+                video = create_video(
+                    source_video=f"{DATA_DIR}/video_{today_iso_fmt}.mp4",
+                    logo=f"{ASSETS_DIR}/logo.png",
+                )
                 episode_summary = create_episode_summary(get_content())
                 if video_link := upload_video_to_facebook(
                     video,
