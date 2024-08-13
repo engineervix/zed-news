@@ -65,8 +65,8 @@ send_healthcheck_success
 # Pause for 5 minutes
 sleep 300
 
-# Notify Admin via Telegram
+# Notify Admin via Apprise + ntfy.sh
 today_human_readable=$(date +"%a %d %b %Y")
 apprise -vv -t "🎙️ New Episode » ${today_human_readable}" \
   -b "📻 Listen now at ${BASE_URL}/episode/${today_iso}/" \
-  tgram://"${TELEGRAM_BOT_TOKEN}"
+  "${APPRISE_NTFY_URL}"

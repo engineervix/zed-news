@@ -175,7 +175,7 @@ By following these steps, you can automate the deployment process and keep your 
 
 > **Note**
 >
-> The `cron.sh` script uses [apprise](https://github.com/caronc/apprise) to notify the owner when a new episode is ready. You'll need to check the apprise docs on how to configure Telegram.
+> The `cron.sh` script uses [apprise](https://github.com/caronc/apprise) to notify the owner when a new episode is ready. You'll need to check the apprise docs on how to configure ntfy.sh or whatever apprise backend you choose.
 >
 > Feel free to adapt the deployment setup to your specific requirements and preferred hosting platforms.
 
