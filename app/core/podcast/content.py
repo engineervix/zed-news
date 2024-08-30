@@ -122,28 +122,25 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + content)
 
-    # model = "lmsys/vicuna-13b-v1.5-16k"
-    # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-    # model = "mistralai/Mixtral-8x22B-Instruct-v0.1"
-    # model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
-    model = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
-    # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT"
-    # model = "Qwen/Qwen1.5-14B-Chat"
+    model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
     temperature = 0.8
     # top_p = 0.7
     # top_k = 60
     # repetition_penalty = 1.1
-    max_tokens = 4096
+    # max_tokens = 4096
     client = Together(api_key=TOGETHER_API_KEY)
     response = client.chat.completions.create(
         model=model,
-        messages=[{"content": notes, "role": "user"}],
+        messages=[
+            {
+                "role": "user",
+                "content": notes,
+            }
+        ],
         temperature=temperature,
         # top_p=top_p,
         # top_k=top_k,
         # repetition_penalty=repetition_penalty,
-        max_tokens=max_tokens,
-        stop=["<|eot_id|>"],
     )
     logging.info(response)
 
