@@ -33,6 +33,11 @@ def get_episode_number() -> int:
     return count + 1
 
 
+def is_special_milestone(episode: int) -> bool:
+    """Special milestone occurs when the episode number is a multiple of 50"""
+    return episode % 50 == 0
+
+
 def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, summary: str):
     """Find an article by title, URL & date, and update it with the given summary"""
     article = Article.select().where((Article.title == title) & (Article.url == url) & (Article.date == date)).first()
@@ -83,10 +88,10 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    if today_iso_fmt == "2024-07-01":
-        prompt = f"You are {podcast_host}, a lively and funny scriptwriter, content creator, and the host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and you're gearing up for episode number {get_episode_number()} after a five-week holiday. Your task is to present the day's news in a conversational tone, covering everything logically and coherently without repetition. Consolidate information from different sources if needed. At the end of the podcast, leave your audience with a witty anecdote to end on a high note. Remember to cover all the news items from the sources provided below, but without repeating any content. Don't worry about sound effects, music, or captions – just speak directly, naturally and engagingly as if you're live on air. Start by sharing a few highlights from your holiday and express your genuine excitement to reconnect with your loyal listeners. Thank them for their patience during your absence.\n\n"
+    if is_special_milestone(get_episode_number()):
+        prompt = f"You are {podcast_host}, host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and we're celebrating a special milestone with episode number {get_episode_number()}! Your task is to produce the text for this milestone episode based on the news items below. Your text will be read as-is by a text-to-speech engine who will take on your persona. This means that you should not add any captions or placeholders for sound effects, music, etc -- all we want is just natural, plain text. Before you begin, take time to study the news items and group them into logical categories, so that your presentation is done in a logical and coherent manner. If there is any sports news, ensure that it is presented last. Ensure that you consolidate all news items without any repetion whatsoever. Start with a brief celebration of reaching this milestone, thanking the listeners for their support. Feel free to add constructive comments and jokes where necessary and appropriate, doing so in a courteous manner. End with a forward-looking statement about the future of the podcast and invite listener feedback.\n\n"
     else:
-        prompt = f"You are {podcast_host}, host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and your task is to produce the text for episode number {get_episode_number()} based on the news items below. Your text will be read as-is by a text-to-speech engine who will take on your persona. This means that you should not add any captions or placeholders for sound effects, music, etc -- all we want is just natural, plain text. Before you begin, take time to study the news items and group them into logical categories, so that your presentation is done in a logical and coherent manner. Ensure that you consolidate all news items without any repetion whatsoever. Feel free to add constructive comments and jokes where necessary and appropriate, doing so in a courteous manner.\n\n"
+        prompt = f"You are {podcast_host}, host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and your task is to produce the text for episode number {get_episode_number()} based on the news items below. Your text will be read as-is by a text-to-speech engine who will take on your persona. This means that you should not add any captions or placeholders for sound effects, music, etc -- all we want is just natural, plain text. Before you begin, take time to study the news items and group them into logical categories, so that your presentation is done in a logical and coherent manner. If there is any sports news, ensure that it is presented last. Ensure that you consolidate all news items without any repetion whatsoever. Feel free to add constructive comments and jokes where necessary and appropriate, doing so in a courteous manner.\n\n"
 
     metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
@@ -122,12 +127,12 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + content)
 
-    model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+    model = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
     temperature = 0.8
     # top_p = 0.7
     # top_k = 60
     # repetition_penalty = 1.1
-    # max_tokens = 4096
+    max_tokens = 4096
     client = Together(api_key=TOGETHER_API_KEY)
     response = client.chat.completions.create(
         model=model,
@@ -138,6 +143,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
             }
         ],
         temperature=temperature,
+        max_tokens=max_tokens,
         # top_p=top_p,
         # top_k=top_k,
         # repetition_penalty=repetition_penalty,
