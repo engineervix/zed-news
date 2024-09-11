@@ -53,7 +53,7 @@ def create_episode_summary(content: str, episode: str) -> str:
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
     # model = "openchat/openchat-3.5-1210"
     # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-    model = "mistralai/Mixtral-8x22B-Instruct-v0.1"
+    model = "mistralai/Mixtral-8x7B-v0.1"
     temperature = 0.75
     max_tokens = 512
 

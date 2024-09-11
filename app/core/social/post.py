@@ -263,7 +263,7 @@ def create_facebook_post(content: str, url: str) -> str:
     # model = "lmsys/vicuna-13b-v1.5-16k"
     # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
     # model = "openchat/openchat-3.5-1210"
-    model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    model = "mistralai/Mixtral-8x7B-v0.1"
     temperature = 0.75
     max_tokens = 1024
 
@@ -304,13 +304,10 @@ def create_episode_summary(content: str) -> str:
     date = f"Date: {today_human_readable}"
     host = f"Host: {podcast_host}"
     separator = "------------------------------------"
-    prompt = f"Given the transcript of today's episode below, write a very brief summary to use as a description for a facebook video post. Use bullet points and emojis as appropriate. Do not use markdown. At the end, mention that more details can be obtained from {podcast_url}.\n\n```{separator}\n\n{title}\n{date}\n{host}\n\n{separator}\n\n{content}\n```"
 
-    # model = "lmsys/vicuna-13b-v1.5-16k"
-    # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
-    # model = "openchat/openchat-3.5-1210"
-    # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-    model = "mistralai/Mixtral-8x22B-Instruct-v0.1"
+    prompt = f"You are a social media marketing guru. Your task is to write a very brief summary to use as a description for a facebook video post, given the transcript of today's episode below. Use bullet points, emojis and hashtags as appropriate. Do not use markdown. Please note that this video is just basically the audio with some looping animated background, therefore, your post shouldn't ask people to 'watch' the video per se, but rather to, 'check it out' or 'tune in to'. At the end, mention that more details can be obtained from {podcast_url}.\n\n```{separator}\n\n{title}\n{date}\n{host}\n\n{separator}\n\n{content}\n```"
+
+    model = "mistralai/Mixtral-8x7B-v0.1"
     temperature = 0.75
     max_tokens = 1024
 
