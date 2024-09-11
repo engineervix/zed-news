@@ -10,14 +10,13 @@ from typing import Callable
 from pydantic import HttpUrl
 
 # import replicate
-from together import Together
+from openai import OpenAI
 
 from app.core.db.models import Article, Episode
 from app.core.summarization.backends.together import brief_summary
 from app.core.utilities import (
     DATA_DIR,
     # OPENAI_API_KEY,
-    TOGETHER_API_KEY,
     podcast_host,
     today,
     today_human_readable,
@@ -88,11 +87,6 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
         # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
-    if is_special_milestone(get_episode_number()):
-        prompt = f"You are {podcast_host}, host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and we're celebrating a special milestone with episode number {get_episode_number()}! Your task is to produce the text for this milestone episode based on the news items below. Your text will be read as-is by a text-to-speech engine who will take on your persona. This means that you should not add any captions or placeholders for sound effects, music, etc -- all we want is just natural, plain text. Before you begin, take time to study the news items and group them into logical categories, so that your presentation is done in a logical and coherent manner. If there is any sports news, ensure that it is presented last. Ensure that you consolidate all news items without any repetion whatsoever. Start with a brief celebration of reaching this milestone, thanking the listeners for their support. Feel free to add constructive comments and jokes where necessary and appropriate, doing so in a courteous manner. End with a forward-looking statement about the future of the podcast and invite listener feedback.\n\n"
-    else:
-        prompt = f"You are {podcast_host}, host of the Zed News Podcast, which runs Monday to Friday. Today is {today_human_readable}, and your task is to produce the text for episode number {get_episode_number()} based on the news items below. Your text will be read as-is by a text-to-speech engine who will take on your persona. This means that you should not add any captions or placeholders for sound effects, music, etc -- all we want is just natural, plain text. Before you begin, take time to study the news items and group them into logical categories, so that your presentation is done in a logical and coherent manner. If there is any sports news, ensure that it is presented last. Ensure that you consolidate all news items without any repetion whatsoever. Feel free to add constructive comments and jokes where necessary and appropriate, doing so in a courteous manner.\n\n"
-
     metadata = f"Title: Zed News Podcast episode {get_episode_number()}\nDate: {today_human_readable}\nHost: {podcast_host}\n\n"
 
     content = ""
@@ -121,36 +115,45 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
             content += f"{counter}. '{title}' (source: {source})"
             content += f"\n{summary.strip()}\n\n"
 
-    notes = prompt + "```\n" + content + "```"
-
     # Write the content to a file
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + content)
 
-    model = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
+    model = "gpt-4o-mini"
     temperature = 0.8
-    # top_p = 0.7
-    # top_k = 60
-    # repetition_penalty = 1.1
     max_tokens = 4096
-    client = Together(api_key=TOGETHER_API_KEY)
-    response = client.chat.completions.create(
+
+    client = OpenAI()
+    completion = client.chat.completions.create(
         model=model,
         messages=[
             {
+                "role": "system",
+                "content": (
+                    f"You are {podcast_host}, host of the Zed News Podcast, which airs Monday to Friday. "
+                    "Your job is to create a natural, conversational script for a podcast episode, based on the news items given to you. "
+                    "Before you begin, take time to study the news items and group them into logical categories, so that your presentation is done in a logical and coherent manner, ensuring smooth transitions between stories. If there are any sports news items, ensure that they are presented last. "
+                    "Ensure that you consolidate all news items without any repetition. It is very important that all stories are covered."
+                    "Write in a casual, professional tone. Avoid adding captions, placeholders, or cues for sound effects or music. "
+                    "You can add light commentary or jokes when appropriate, but maintain a respectful and courteous tone. "
+                    "The script will be read by a text-to-speech engine who will take on your persona."
+                ),
+            },
+            {
                 "role": "user",
-                "content": notes,
-            }
+                "content": (
+                    f"Today is {today_human_readable}, and your task is to produce the text for episode {get_episode_number()} of the Zed News Podcast. "
+                    "End the episode by stating that any opinions and views expressed in the podcast are the product of artificial intelligence algorithms and do not necessarily reflect the beliefs, opinions, or positions of the podcast creator.\n\n"
+                    "**News Items**:\n\n" + f"{content}"
+                ),
+            },
         ],
         temperature=temperature,
         max_tokens=max_tokens,
-        # top_p=top_p,
-        # top_k=top_k,
-        # repetition_penalty=repetition_penalty,
     )
-    logging.info(response)
+    logging.info(completion)
 
-    transcript = response.choices[0].message.content
+    transcript = completion.choices[0].message.content
 
     if transcript := transcript.strip():
         # remove the first sentence if it is of the form "Here is ...:"
