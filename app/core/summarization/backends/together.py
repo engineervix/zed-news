@@ -1,7 +1,8 @@
 import logging
 import time
+import sys
 
-from together import Together
+from together import Together, error
 
 from app.core.utilities import TOGETHER_API_KEY
 
@@ -20,25 +21,38 @@ def summarize(content: str, title: str) -> str:
     temperature = 0.7
     max_tokens = 192
 
-    response = client.completions.create(
-        prompt=prompt,
-        model=model,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    time.sleep(1.5)
-    logging.info(response)
+    retries = 0
+    max_retries = 30  # 10 seconds x 30 times is approx 5 minutes
 
-    if result := response.choices[0].text.strip():
-        result = result.replace("```", "")  # Remove triple backticks
-        first_line = result.splitlines()[0].lower()
-        unwanted = ["summary:", "here's", "here is", "sure"]
+    while retries < max_retries:
+        try:
+            response = client.completions.create(
+                prompt=prompt,
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            time.sleep(1.5)
+            logging.info(response)
 
-        if any(string in first_line for string in unwanted):
-            # Remove the first line from result
-            result = "\n".join(result.split("\n")[1:])
+            if result := response.choices[0].text.strip():
+                result = result.replace("```", "")  # Remove triple backticks
+                first_line = result.splitlines()[0].lower()
+                unwanted = ["summary:", "here's", "here is", "sure"]
 
-        return result.replace("\n", "")  # Remove newlines
+                if any(string in first_line for string in unwanted):
+                    # Remove the first line from result
+                    result = "\n".join(result.split("\n")[1:])
+
+                return result.replace("\n", "")  # Remove newlines
+        except error.ServiceUnavailableError:
+            retries += 1
+            logging.error(f"Service unavailable. Retrying {retries}/{max_retries} in 10 seconds...")
+            time.sleep(10)
+
+    # If we exhausted the retries, give up
+    logging.error(f"Failed after {max_retries} attempts.")
+    sys.exit(1)
 
 
 def brief_summary(content: str, title: str) -> str:
@@ -53,13 +67,26 @@ def brief_summary(content: str, title: str) -> str:
     temperature = 0.7
     max_tokens = 96
 
-    response = client.completions.create(
-        prompt=prompt,
-        model=model,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    time.sleep(1.5)
-    logging.info(response)
+    retries = 0
+    max_retries = 30  # 10 seconds x 30 times is approx 5 minutes
 
-    return response.choices[0].text
+    while retries < max_retries:
+        try:
+            response = client.completions.create(
+                prompt=prompt,
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            time.sleep(1.5)
+            logging.info(response)
+
+            return response.choices[0].text
+        except error.ServiceUnavailableError:
+            retries += 1
+            logging.error(f"Service unavailable. Retrying {retries}/{max_retries} in 10 seconds...")
+            time.sleep(10)
+
+    # If we exhausted the retries, give up
+    logging.error(f"Failed after {max_retries} attempts.")
+    sys.exit(1)
