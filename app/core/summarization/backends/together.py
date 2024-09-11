@@ -17,7 +17,7 @@ def summarize(content: str, title: str) -> str:
     """
 
     prompt = f"You are a distinguished news editor and content publisher, your task is to summarize the following news entry. The summary should accurately reflect the main message and arguments presented in the original news entry, while also being concise and easy to understand. Your summary should not exceed two sentences.\n\n ```{content}```:"
-    model = "mistralai/Mixtral-8x22B-Instruct-v0.1"
+    model = "mistralai/Mixtral-8x7B-v0.1"
     temperature = 0.7
     max_tokens = 192
 
