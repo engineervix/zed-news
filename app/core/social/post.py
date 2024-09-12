@@ -13,17 +13,17 @@ import os
 import pathlib
 import random
 import sys
-import numpy as np
 from http import HTTPStatus
 
 import facebook
+import numpy as np
 import PIL
 import requests
 from dotenv import load_dotenv
 from moviepy.editor import CompositeVideoClip, ImageClip, TextClip, VideoFileClip
-from together import Together
 from moviepy.video.compositing.concatenate import concatenate_videoclips
 from moviepy.video.tools.segmenting import findObjects
+from together import Together
 
 from app.core.utilities import (
     ASSETS_DIR,  # noqa: F401
@@ -258,24 +258,32 @@ def create_facebook_post(content: str, url: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"You are a social media marketing guru. Your task is to immediately produce a short Facebook teaser post of today's podcast episode whose details are below. Use bullet points, emojis and hashtags as appropriate. Don't cover every news item, just the most interesting ones. Your post will accompany a video, whose URL is {url}. Please note that this video is just basically the audio with some looping animated background, therefore, your post shouldn't ask people to 'watch' the video per se, but rather to, 'check it out' or 'tune in to'. Do not use markdown.\n\n```\n{content}\n```"
+    system_prompt = f"You are a social media marketing expert. Your task is to produce a short Facebook teaser post for today's podcast episode based on the provided podcast episode details. The post should highlight only the most interesting news items, using bullet points, emojis, and hashtags where appropriate. Keep in mind that your post will accompany a video, whose URL is {url}, and which is primarily an audio recording with a looping animated background. Therefore, avoid asking people to 'watch' the video. Instead, encourage them to 'check it out' or 'tune in.'"
 
-    # model = "lmsys/vicuna-13b-v1.5-16k"
-    # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
-    # model = "openchat/openchat-3.5-1210"
-    model = "mistralai/Mixtral-8x7B-v0.1"
+    user_prompt = f"Produce a Facebook teaser post based on the following podcast episode details.\n\n\n{content}\n"
+
+    model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
     temperature = 0.75
     max_tokens = 1024
 
-    response = client.completions.create(
-        prompt=prompt,
+    completion = client.chat.completions.create(
         model=model,
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt,
+            },
+            {
+                "role": "user",
+                "content": user_prompt,
+            },
+        ],
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    logger.info(response)
+    logger.info(completion)
 
-    if result := response.choices[0].text.strip():
+    if result := completion.choices[0].message.content.strip():
         result = result.replace("```", "")  # Remove triple backticks
         first_line = result.splitlines()[0].lower()
         unwanted = ["facebook post:", "post:", "here's your", "here is"]
@@ -305,21 +313,32 @@ def create_episode_summary(content: str) -> str:
     host = f"Host: {podcast_host}"
     separator = "------------------------------------"
 
-    prompt = f"You are a social media marketing guru. Your task is to write a very brief summary to use as a description for a facebook video post, given the transcript of today's episode below. Use bullet points, emojis and hashtags as appropriate. Do not use markdown. Please note that this video is just basically the audio with some looping animated background, therefore, your post shouldn't ask people to 'watch' the video per se, but rather to, 'check it out' or 'tune in to'. At the end, mention that more details can be obtained from {podcast_url}.\n\n```{separator}\n\n{title}\n{date}\n{host}\n\n{separator}\n\n{content}\n```"
+    system_prompt = f"You are a social media marketing guru. Your task is to write a very brief summary to use as a description for a Facebook video post, given the transcript of today's episode below. Use bullet points, emojis, and hashtags as appropriate. Do not use markdown. Please note that this video is just basically the audio with some looping animated background, so your post shouldn't ask people to 'watch' the video, but rather to 'check it out' or 'tune in to'. At the end, mention that more details can be obtained from {podcast_url}."
 
-    model = "mistralai/Mixtral-8x7B-v0.1"
+    user_prompt = f"{separator}\n\n{title}\n{date}\n{host}\n\n{separator}\n\n{content}\n"
+
+    model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
     temperature = 0.75
     max_tokens = 1024
 
-    response = client.completions.create(
-        prompt=prompt,
+    completion = client.chat.completions.create(
         model=model,
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt,
+            },
+            {
+                "role": "user",
+                "content": user_prompt,
+            },
+        ],
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    logger.info(response)
+    logger.info(completion)
 
-    if result := response.choices[0].text.strip():
+    if result := completion.choices[0].message.content.strip():
         result = result.replace("```", "")  # Remove triple backticks
         first_line = result.splitlines()[0].lower()
         unwanted = ["summary:", "here's", "here is", "sure"]

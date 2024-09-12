@@ -1,6 +1,6 @@
 import logging
-import time
 import sys
+import time
 
 from together import Together, error
 
@@ -16,8 +16,11 @@ def summarize(content: str, title: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"You are a distinguished news editor and content publisher, your task is to summarize the following news entry. The summary should accurately reflect the main message and arguments presented in the original news entry, while also being concise and easy to understand. Your summary should not exceed two sentences.\n\n ```{content}```:"
-    model = "mistralai/Mixtral-8x7B-v0.1"
+    system_prompt = "You are a distinguished news editor and content publisher. Your task is to summarize the provided news entry. The summary should accurately reflect the main message and arguments presented in the original news entry, while also being concise and easy to understand."
+
+    user_prompt = f"Summarize the following news entry in not more than two sentences.\n\n ```{content}```"
+
+    model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
     temperature = 0.7
     max_tokens = 192
 
@@ -26,16 +29,25 @@ def summarize(content: str, title: str) -> str:
 
     while retries < max_retries:
         try:
-            response = client.completions.create(
-                prompt=prompt,
+            completion = client.chat.completions.create(
                 model=model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": system_prompt,
+                    },
+                    {
+                        "role": "user",
+                        "content": user_prompt,
+                    },
+                ],
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
             time.sleep(1.5)
-            logging.info(response)
+            logging.info(completion)
 
-            if result := response.choices[0].text.strip():
+            if result := completion.choices[0].message.content.strip():
                 result = result.replace("```", "")  # Remove triple backticks
                 first_line = result.splitlines()[0].lower()
                 unwanted = ["summary:", "here's", "here is", "sure"]
@@ -62,8 +74,11 @@ def brief_summary(content: str, title: str) -> str:
     https://docs.together.ai/reference/complete
     """
 
-    prompt = f"You are a distinguished news editor and content publisher, your task is to summarize the following news entry in one sentence.\n\n ```{content}```:"
-    model = "mistralai/Mixtral-8x7B-v0.1"
+    system_prompt = "You are a distinguished news editor and content publisher. Your task is to summarize the provided news entry. The summary should accurately reflect the main message and arguments presented in the original news entry, while also being concise and easy to understand."
+
+    user_prompt = f"Summarize the following news entry in one sentence.\n\n ```{content}```"
+
+    model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
     temperature = 0.7
     max_tokens = 96
 
@@ -72,16 +87,34 @@ def brief_summary(content: str, title: str) -> str:
 
     while retries < max_retries:
         try:
-            response = client.completions.create(
-                prompt=prompt,
+            completion = client.chat.completions.create(
                 model=model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": system_prompt,
+                    },
+                    {
+                        "role": "user",
+                        "content": user_prompt,
+                    },
+                ],
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
             time.sleep(1.5)
-            logging.info(response)
+            logging.info(completion)
 
-            return response.choices[0].text
+            if result := completion.choices[0].message.content.strip():
+                result = result.replace("```", "")  # Remove triple backticks
+                first_line = result.splitlines()[0].lower()
+                unwanted = ["summary:", "here's", "here is", "sure"]
+
+                if any(string in first_line for string in unwanted):
+                    # Remove the first line from result
+                    result = "\n".join(result.split("\n")[1:])
+
+                return result.replace("\n", "")  # Remove newlines
         except error.ServiceUnavailableError:
             retries += 1
             logging.error(f"Service unavailable. Retrying {retries}/{max_retries} in 10 seconds...")

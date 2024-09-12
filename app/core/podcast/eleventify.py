@@ -49,25 +49,26 @@ def create_episode_summary(content: str, episode: str) -> str:
 
     prompt = f"Given the transcript of today's episode below, write a very brief summary to use as a description for the media file. Your summary should be a single paragraph, not exceeding 2 sentences.\n\n```\n{content}\n```"
 
-    # model = "lmsys/vicuna-13b-v1.5-16k"
-    # model = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
-    # model = "openchat/openchat-3.5-1210"
-    # model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-    model = "mistralai/Mixtral-8x7B-v0.1"
+    model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
     temperature = 0.75
     max_tokens = 512
 
-    response = client.completions.create(
-        prompt=prompt,
+    completion = client.chat.completions.create(
         model=model,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            },
+        ],
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    logger.info(response)
+    logger.info(completion)
 
     fallback = f"This is episode {episode} of the Zed News Podcast."
 
-    if result := response.choices[0].text.strip():
+    if result := completion.choices[0].message.content.strip():
         result = result.replace("```", "")  # Remove triple backticks
         first_line = result.splitlines()[0].lower()
         unwanted = ["summary:", "here's", "here is", "sure"]
