@@ -3,27 +3,21 @@ import logging
 import re
 import sys
 
-# import time
 from typing import Callable
 
-# from langchain.llms import OpenAI
 from pydantic import HttpUrl
 
-# import replicate
 from openai import OpenAI
 
 from app.core.db.models import Article, Episode
 from app.core.summarization.backends.together import brief_summary
 from app.core.utilities import (
     DATA_DIR,
-    # OPENAI_API_KEY,
     podcast_host,
     today,
     today_human_readable,
     today_iso_fmt,
 )
-
-# llm = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
 
 
 def get_episode_number() -> int:
@@ -131,9 +125,10 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
                 "role": "system",
                 "content": (
                     f"You are {podcast_host}, host of the Zed News Podcast, which airs Monday to Friday. "
-                    "Your job is to create a natural, conversational script for a podcast episode, based on the news items given to you. "
-                    "Before you begin, take time to study the news items and group them into logical categories, so that your presentation is done in a logical and coherent manner, ensuring smooth transitions between stories. If there are any sports news items, ensure that they are presented last. "
-                    "Ensure that you consolidate all news items without any repetition. It is very important that all stories are covered."
+                    "Your job is to create a natural, conversational script for a podcast episode, based on ALL the news items given to you. "
+                    "Before you begin, take time to study the news items and group them into logical categories, so that your presentation is done in a logical and coherent manner, ensuring smooth transitions between stories. "
+                    "Ensure that you carefully consolidate ALL news items without any repetition. It is very important that ALL stories are covered. You are not allowed to ignore or omit any news item. "
+                    "If there are any sports news items, ensure that they are presented last. "
                     "Write in a casual, professional tone. Avoid adding captions, placeholders, or cues for sound effects or music. "
                     "You can add light commentary or jokes when appropriate, but maintain a respectful and courteous tone. "
                     "The script will be read by a text-to-speech engine who will take on your persona."
@@ -142,7 +137,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
             {
                 "role": "user",
                 "content": (
-                    f"Today is {today_human_readable}, and your task is to produce the text for episode {get_episode_number()} of the Zed News Podcast. "
+                    f"Produce the text for today's episode of the Zed News Podcast (Episode {get_episode_number()} – {today_human_readable}). "
                     "End the episode by stating that any opinions and views expressed in the podcast are the product of artificial intelligence algorithms and do not necessarily reflect the beliefs, opinions, or positions of the podcast creator.\n\n"
                     "**News Items**:\n\n" + f"{content}"
                 ),
@@ -165,43 +160,3 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
     else:
         logging.error("Transcript is empty")
         sys.exit(1)
-
-    # data = llm(notes)
-    # if data:
-    #     # Write the transcript to a file
-    #     with open(dest, "w") as f:
-    #         f.write(data)
-    # else:
-    #     logging.error("Transcript is empty")
-    #     sys.exit(1)
-
-    # model = replicate.models.get("meta/llama-2-70b-chat")
-    # version = model.versions.get("02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3")
-    # prediction = replicate.predictions.create(
-    #     version=version,
-    #     input={
-    #         "prompt": notes,
-    #         "temperature": 0.7,
-    #         "max_new_tokens": 4096,
-    #     },
-    # )
-
-    # # Check if the task is complete, then get the transcript
-    # while True:
-    #     logging.info("Checking if Replicate Task is completed...")
-    #     prediction.reload()
-    #     result = prediction.status
-    #     if result == "succeeded":
-    #         logging.info("Woohoo! Task completed!")
-    #         break
-    #     prediction.wait()
-
-    # transcript = prediction.output
-
-    # if transcript:
-    #     # Write the transcript to a file
-    #     with open(dest, "w") as f:
-    #         f.write(transcript)
-    # else:
-    #     logging.error("Transcript is empty")
-    #     sys.exit(1)
