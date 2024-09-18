@@ -219,6 +219,7 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 ### Frontend (Web)
 
 - [x] Create a **More ways to listen** button with a popup/modal so that people can choose multiple services
+- [ ] Create a dynamic `og:image` with episode number & date
 - [ ] Keep things DRY. For example, the **More ways to listen** modal on the _home_ and _about_ pages, the header and footer icons.
 - [ ] Toggle Dark/Light mode
 - [ ] Improve the mobile UI. For example, the audio player controls
