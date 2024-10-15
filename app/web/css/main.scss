@@ -78,3 +78,134 @@ $success: #188200;
   }
 }
 /* stylelint-enable selector-class-pattern */
+
+// Dark mode toggle styles
+// Mixin for shared dark mode toggle styles
+@mixin dark-mode-toggle($font-size) {
+  font-size: $font-size;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgb(0 0 0 / 10%);
+  border: none;
+  color: $body-color;
+
+  &:hover,
+  &:focus {
+    color: $primary;
+    background-color: rgb(0 0 0 / 20%);
+    outline: none;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+  }
+}
+
+// Mobile dark mode toggle
+#dark-mode-toggle {
+  @include dark-mode-toggle(1.25rem);
+}
+
+// Larger screen dark mode toggle
+#dark-mode-toggle-lg {
+  @include dark-mode-toggle(1.5rem);
+
+  display: none; // Hide on smaller screens
+}
+
+@include media-breakpoint-up(lg) {
+  #dark-mode-toggle {
+    display: none; // Hide mobile toggle on larger screens
+  }
+
+  #dark-mode-toggle-lg {
+    display: flex; // Show larger screen toggle
+  }
+
+  .navbar {
+    .navbar-nav {
+      align-items: center; // Center nav items vertically
+    }
+  }
+}
+
+// Dark mode styles
+body.dark-mode {
+  background-color: $gray-900;
+  color: $gray-100;
+
+  .navbar {
+    background-color: $gray-800 !important;
+  }
+
+  .nav-link,
+  .navbar-brand,
+  .text-body {
+    color: $gray-100 !important;
+  }
+
+  .card {
+    background-color: $gray-800;
+    border-color: $gray-700;
+  }
+
+  .text-muted {
+    color: $gray-400 !important;
+  }
+
+  .bg-light {
+    background-color: $gray-800 !important;
+  }
+
+  .border-bottom {
+    border-color: $gray-700 !important;
+  }
+
+  .list-group-item {
+    background-color: $gray-800;
+    border-color: $gray-700;
+  }
+
+  .modal-content {
+    background-color: $gray-800;
+    border-color: $gray-700;
+  }
+
+  .modal-header {
+    border-bottom-color: $gray-700;
+  }
+
+  .modal-footer {
+    border-top-color: $gray-700;
+  }
+
+  .accordion-button {
+    background-color: $gray-800;
+    color: $gray-100;
+
+    &:not(.collapsed) {
+      background-color: $gray-700;
+    }
+  }
+
+  .accordion-body {
+    background-color: $gray-800;
+  }
+
+  #dark-mode-toggle,
+  #dark-mode-toggle-lg {
+    background-color: rgb(255 255 255 / 10%);
+    color: $gray-100;
+
+    &:hover,
+    &:focus {
+      background-color: rgb(255 255 255 / 20%);
+    }
+  }
+}

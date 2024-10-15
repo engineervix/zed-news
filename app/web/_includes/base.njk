@@ -68,17 +68,26 @@
             height="40"
           />
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="d-flex align-items-center">
+          <button
+            id="dark-mode-toggle"
+            class="me-2"
+            aria-label="Toggle dark mode"
+          >
+            <i class="fa-solid fa-moon"></i>
+          </button>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
@@ -91,17 +100,8 @@
               <a class="nav-link {{ 'active' if page.url == '/episodes/' }}" href="/episodes">Episodes</a>
             </li>
           </ul>
-          {# TODO: add search #}
-          {# <form class="d-flex me-2" role="search">
-            <input
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-          </form> #}
-          <div>
-            <ul class="list-inline list-unstyled mb-0 mt-3 mt-lg-0">
+          <div class="d-flex align-items-center">
+            <ul class="list-inline list-unstyled mb-0 me-3">
               <li class="list-inline-item">
                 <a
                   class="social-gh"
@@ -143,6 +143,12 @@
                 </a>
               </li>
             </ul>
+            <button
+              id="dark-mode-toggle-lg"
+              aria-label="Toggle dark mode"
+            >
+              <i class="fa-solid fa-moon"></i>
+            </button>
           </div>
         </div>
       </div>

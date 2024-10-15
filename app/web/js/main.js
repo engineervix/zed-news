@@ -156,3 +156,37 @@ function updateButtonState(isPlaying) {
     homePlayButton.innerHTML = `<i class="fa-solid fa-circle-play me-2"></i>Play`;
   }
 }
+
+// Dark mode toggle functionality
+function initDarkMode() {
+  const darkModeToggles = document.querySelectorAll(
+    "#dark-mode-toggle, #dark-mode-toggle-lg"
+  );
+  const body = document.body;
+  const isDarkMode = localStorage.getItem("darkMode") === "enabled";
+
+  if (isDarkMode) {
+    body.classList.add("dark-mode");
+    darkModeToggles.forEach(
+      (toggle) => (toggle.innerHTML = '<i class="fa-solid fa-sun"></i>')
+    );
+  }
+
+  function toggleDarkMode() {
+    body.classList.toggle("dark-mode");
+    const isDark = body.classList.contains("dark-mode");
+    localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
+    darkModeToggles.forEach((toggle) => {
+      toggle.innerHTML = isDark
+        ? '<i class="fa-solid fa-sun"></i>'
+        : '<i class="fa-solid fa-moon"></i>';
+    });
+  }
+
+  darkModeToggles.forEach((toggle) => {
+    toggle.addEventListener("click", toggleDarkMode);
+  });
+}
+
+// Call the function to initialize dark mode
+initDarkMode();
