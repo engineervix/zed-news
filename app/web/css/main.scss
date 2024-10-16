@@ -99,6 +99,76 @@ header {
   }
 }
 
+// Plyr
+
+.plyr {
+  transition: all 0.3s ease-in-out;
+}
+
+// Hide some plyr controls on mobile due to space constraints
+/* stylelint-disable selector-class-pattern */
+@include media-breakpoint-down(sm) {
+  button.plyr__controls__item[data-plyr="restart"],
+  button.plyr__controls__item[data-plyr="rewind"],
+  button.plyr__controls__item[data-plyr="fast-forward"],
+  div.plyr__controls__item.plyr__menu {
+    display: none;
+  }
+}
+/* stylelint-enable selector-class-pattern */
+
+// Plyr dark mode styling
+[data-bs-theme="dark"] {
+  .plyr {
+    --plyr-color-main: var(--bs-primary);
+    --plyr-audio-controls-background: var(--bs-dark);
+    --plyr-audio-control-color: var(--bs-light);
+    --plyr-audio-control-color-hover: var(--bs-primary);
+    --plyr-menu-background: var(--bs-dark);
+    --plyr-menu-color: var(--bs-light);
+    --plyr-menu-border-color: var(--bs-border-color);
+    --plyr-tooltip-background: var(--bs-dark);
+    --plyr-tooltip-color: var(--bs-light);
+
+    .plyr__control {
+      background: var(--bs-dark);
+      color: var(--bs-light);
+
+      &:hover {
+        background: var(--bs-primary);
+        color: var(--bs-dark);
+      }
+    }
+
+    .plyr__control--pressed {
+      background: var(--bs-primary);
+      color: var(--bs-dark);
+    }
+
+    .plyr__menu__container {
+      .plyr__control--forward:hover,
+      .plyr__control--back:hover {
+        background: var(--bs-primary);
+        color: var(--bs-dark);
+      }
+    }
+
+    .plyr__progress__buffer {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .plyr__tooltip {
+      background: var(--bs-dark);
+      color: var(--bs-light);
+      border-color: var(--bs-border-color);
+    }
+
+    .plyr__time {
+      color: var(--bs-light);
+    }
+  }
+}
+
 /* stylelint-disable selector-class-pattern */
 .section__support {
   background: no-repeat center center;
@@ -139,18 +209,6 @@ header {
     }
   }
 }
-
-// Hide some plyr controls on mobile due to space constraints
-/* stylelint-disable selector-class-pattern */
-@include media-breakpoint-down(sm) {
-  button.plyr__controls__item[data-plyr="restart"],
-  button.plyr__controls__item[data-plyr="rewind"],
-  button.plyr__controls__item[data-plyr="fast-forward"],
-  div.plyr__controls__item.plyr__menu {
-    display: none;
-  }
-}
-/* stylelint-enable selector-class-pattern */
 
 // Dark mode toggle styles
 
