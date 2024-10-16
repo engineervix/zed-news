@@ -26,6 +26,48 @@ $success: #188200;
 @import "social";
 @import "plyr/src/sass/plyr";
 
+/* Custom styles
+ * -------------------------------------------------
+ */
+
+// Navbar theming
+.navbar {
+  --bs-navbar-bg: var(--bs-light-bg-subtle);
+  background-color: var(--bs-navbar-bg);
+
+  [data-bs-theme="dark"] & {
+    --bs-navbar-bg: var(--bs-dark-bg-subtle);
+  }
+}
+
+// Header theming
+header {
+  --bs-header-bg: var(--bs-light-bg-subtle);
+  background-color: var(--bs-header-bg);
+
+  // Button styles
+  .btn-outline-danger,
+  .btn-outline-dark {
+    &:hover {
+      color: var(--bs-light);
+    }
+  }
+
+  [data-bs-theme="dark"] & {
+    --bs-header-bg: var(--bs-dark-bg-subtle);
+
+    .btn-outline-dark {
+      color: var(--bs-light);
+      border-color: var(--bs-light);
+
+      &:hover {
+        color: var(--bs-dark);
+        background-color: var(--bs-light);
+      }
+    }
+  }
+}
+
 /* stylelint-disable selector-class-pattern */
 .section__support {
   background: no-repeat center center;
