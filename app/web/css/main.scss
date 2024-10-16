@@ -35,8 +35,29 @@ $success: #188200;
   --bs-navbar-bg: var(--bs-light-bg-subtle);
   background-color: var(--bs-navbar-bg);
 
+  .navbar-brand {
+    .logo {
+      display: block;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .logo-dark {
+      display: none;
+    }
+  }
+
   [data-bs-theme="dark"] & {
     --bs-navbar-bg: var(--bs-dark-bg-subtle);
+
+    .navbar-brand {
+      .logo-light {
+        display: none;
+      }
+
+      .logo-dark {
+        display: block;
+      }
+    }
   }
 }
 
