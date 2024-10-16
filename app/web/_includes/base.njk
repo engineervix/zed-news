@@ -29,6 +29,18 @@
     <meta name="robots" content="noindex"/>
     {% endif %}
 
+    <script>
+      // Immediately set the theme to avoid flash of wrong theme
+      (function() {
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme) {
+          document.documentElement.setAttribute('data-bs-theme', storedTheme);
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+      })();
+    </script>
+
     <!-- Stylesheet -->
     <link href="/css/main.min.css" rel="stylesheet" />
 

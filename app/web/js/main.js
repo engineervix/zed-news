@@ -157,36 +157,53 @@ function updateButtonState(isPlaying) {
   }
 }
 
-// Dark mode toggle functionality
-function initDarkMode() {
-  const darkModeToggles = document.querySelectorAll(
+/* ***** ----------------------------------------------- ***** **
+/* ***** Theme Toggle
+/* ***** ----------------------------------------------- ***** */
+
+function initThemeToggle() {
+  const themeToggles = document.querySelectorAll(
     "#dark-mode-toggle, #dark-mode-toggle-lg"
   );
-  const body = document.body;
-  const isDarkMode = localStorage.getItem("darkMode") === "enabled";
 
-  if (isDarkMode) {
-    body.classList.add("dark-mode");
-    darkModeToggles.forEach(
-      (toggle) => (toggle.innerHTML = '<i class="fa-solid fa-sun"></i>')
-    );
+  function setTheme(theme) {
+    document.documentElement.setAttribute("data-bs-theme", theme);
+    localStorage.setItem("theme", theme);
+    updateToggleIcons(theme);
   }
 
-  function toggleDarkMode() {
-    body.classList.toggle("dark-mode");
-    const isDark = body.classList.contains("dark-mode");
-    localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
-    darkModeToggles.forEach((toggle) => {
-      toggle.innerHTML = isDark
-        ? '<i class="fa-solid fa-sun"></i>'
-        : '<i class="fa-solid fa-moon"></i>';
+  function updateToggleIcons(theme) {
+    const iconClass = theme === "dark" ? "fa-sun" : "fa-moon";
+    themeToggles.forEach((toggle) => {
+      toggle.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
     });
   }
 
-  darkModeToggles.forEach((toggle) => {
-    toggle.addEventListener("click", toggleDarkMode);
+  function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute("data-bs-theme");
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+  }
+
+  // Set initial state
+  const storedTheme = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const initialTheme = storedTheme || (prefersDark ? "dark" : "light");
+  setTheme(initialTheme);
+
+  // Add event listeners
+  themeToggles.forEach((toggle) => {
+    toggle.addEventListener("click", toggleTheme);
   });
+
+  // Listen for system preference changes
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", (e) => {
+      if (!localStorage.getItem("theme")) {
+        setTheme(e.matches ? "dark" : "light");
+      }
+    });
 }
 
-// Call the function to initialize dark mode
-initDarkMode();
+initThemeToggle();
