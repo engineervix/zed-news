@@ -169,6 +169,15 @@ header {
   }
 }
 
+// Episode links
+.episode-link {
+  color: var(--bs-light-link-dark);
+
+  [data-bs-theme="dark"] & {
+    color: var(--bs-dark-link-light);
+  }
+}
+
 /* stylelint-disable selector-class-pattern */
 .section__support {
   background: no-repeat center center;
@@ -206,6 +215,40 @@ header {
       i {
         font-size: 4.5rem;
       }
+    }
+  }
+}
+
+// Footer
+.footer {
+  background-color: var(--bs-light-bg-subtle);
+  color: var(--bs-emphasis-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+
+  .text-emphasis-light {
+    color: var(--bs-secondary-color);
+  }
+
+  #build-date {
+    color: var(--bs-emphasis-color);
+  }
+
+  // Social media icons styling
+  .list-inline-item {
+    a {
+      transition: color 0.3s ease;
+    }
+  }
+
+  [data-bs-theme="dark"] & {
+    background-color: var(--bs-dark-bg-subtle);
+
+    .text-emphasis-light {
+      color: var(--bs-secondary-color);
+    }
+
+    #build-date {
+      color: var(--bs-emphasis-color);
     }
   }
 }
