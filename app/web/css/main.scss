@@ -33,6 +33,7 @@ $success: #188200;
 // Navbar theming
 .navbar {
   --bs-navbar-bg: var(--bs-light-bg-subtle);
+
   background-color: var(--bs-navbar-bg);
 
   .navbar-brand {
@@ -74,6 +75,7 @@ $success: #188200;
 // Header theming
 header {
   --bs-header-bg: var(--bs-light-bg-subtle);
+
   background-color: var(--bs-header-bg);
 
   // Button styles
@@ -115,7 +117,6 @@ header {
     display: none;
   }
 }
-/* stylelint-enable selector-class-pattern */
 
 // Plyr dark mode styling
 [data-bs-theme="dark"] {
@@ -154,7 +155,7 @@ header {
     }
 
     .plyr__progress__buffer {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgb(255 255 255 / 25%);
     }
 
     .plyr__tooltip {
@@ -168,6 +169,8 @@ header {
     }
   }
 }
+
+/* stylelint-enable selector-class-pattern */
 
 // Episode links
 .episode-link {
