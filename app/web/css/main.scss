@@ -61,6 +61,16 @@ $success: #188200;
   }
 }
 
+// GitHub icon styling
+.fa-github {
+  color: var(--bs-body-color);
+  transition: color 0.3s ease-in-out;
+
+  [data-bs-theme="dark"] & {
+    color: var(--bs-light);
+  }
+}
+
 // Header theming
 header {
   --bs-header-bg: var(--bs-light-bg-subtle);
@@ -160,13 +170,13 @@ header {
 
   &:hover,
   &:focus {
-    color: var(--bs-primary);
+    color: var(--bs-warning);
     background-color: var(--bs-secondary-bg);
     outline: none;
   }
 
   &:focus {
-    box-shadow: 0 0 0 0.25rem rgb(var(--bs-primary-rgb) 0.25);
+    box-shadow: 0 0 0 0.25rem rgb(var(--bs-warning-rgb) 0.25);
   }
 }
 
