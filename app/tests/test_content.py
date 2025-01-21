@@ -1,18 +1,14 @@
 import datetime
-
-# import os
-# import shutil
-# import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-# from unittest.mock import call, patch
 from peewee import SqliteDatabase
 
 from app.core.db.models import Article, Episode, Mp3
 from app.core.podcast.content import (
-    # create_transcript,
+    create_transcript,
     get_episode_number,
+    is_special_milestone,
     update_article_with_summary,
 )
 from app.core.utilities import lingo, podcast_host, today_human_readable, today_iso_fmt
@@ -146,155 +142,131 @@ class TestArticleUpdate(unittest.TestCase):
         )
 
 
-# class TestTranscriptCreation(unittest.TestCase):
-#     def setUp(self):
-#         self.temp_dir = tempfile.mkdtemp()
-#         self.text_file = os.path.join(self.temp_dir, "transcript_test.txt")
+class TestPodcastContent(unittest.TestCase):
+    def setUp(self):
+        """Set up test database before each test"""
+        # Bind model classes to test db
+        test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
 
-#         # Bind model classes to test db. Since we have a complete list of
-#         # all models, we do not need to recursively bind dependencies.
-#         test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
+        # Connect to database and create tables
+        test_db.connect()
+        test_db.create_tables(MODELS)
 
-#         test_db.connect()
-#         test_db.create_tables(MODELS)
+        # Sample data for tests
+        self.sample_news = [
+            {
+                "source": "Test Source 1",
+                "url": "http://test1.com",
+                "title": "Test Title 1",
+                "content": "Test Content 1",
+                "category": "News",
+            },
+            {
+                "source": "Test Source 2",
+                "url": "http://test2.com",
+                "title": "Test Title 2",
+                "content": "Test Content 2",
+                "category": "Sports",
+            },
+        ]
 
-#         self.article_data = [
-#             {
-#                 "source": "Source 1",
-#                 "url": "https://example.com/news-1",
-#                 "title": "News 1",
-#                 "content": "Content 1",
-#                 "category": "",
-#             },
-#             {
-#                 "source": "Source 2",
-#                 "url": "https://website.com/news-2",
-#                 "title": "News 2",
-#                 "content": "Content 2",
-#                 "category": "",
-#             },
-#             {
-#                 "source": "Source 2",
-#                 "url": "https://website.com/news-3",
-#                 "title": "News 3",
-#                 "content": "Content 3",
-#                 "category": "",
-#             },
-#             {
-#                 "source": "Source 3",
-#                 "url": "https://anothersite.co.zm/news-4",
-#                 "title": "News 4",
-#                 "content": "Content 4",
-#                 "category": "Sports",
-#             },
-#         ]
+        # Create a sample episode and mp3 for testing
+        self.mp3 = Mp3.create(url="http://example.com/test.mp3", filesize=1000, duration=300)
+        self.episode = Episode.create(
+            number=1,
+            live=True,
+            title="Test Episode",
+            description="Test Description",
+            presenter="Test Presenter",
+            locale="en_ZA",
+            mp3=self.mp3,
+            time_to_produce=60,
+            word_count=1000,
+        )
 
-#         # add more articles so that Source 3 has 10 articles
-#         for i in range(len(self.article_data) + 1, 14):
-#             self.article_data.append(
-#                 {
-#                     "source": "Source 3",
-#                     "url": f"https://anothersite.co.zm/news-{i}",
-#                     "title": f"News {i}",
-#                     "content": f"Content {i}",
-#                     "category": "Sports",
-#                 }
-#             )
+    def tearDown(self):
+        """Clean up test database after each test"""
+        test_db.drop_tables(MODELS)
+        test_db.close()
 
-#         for data in self.article_data:
-#             Article(**data).save()
+    def test_is_special_milestone(self):
+        """Test special milestone detection"""
+        self.assertTrue(is_special_milestone(50))
+        self.assertTrue(is_special_milestone(100))
+        self.assertFalse(is_special_milestone(49))
+        self.assertFalse(is_special_milestone(51))
 
-#     def tearDown(self):
-#         shutil.rmtree(self.temp_dir)
+    def test_get_episode_number(self):
+        """Test episode number generation"""
+        # Since we created one episode in setUp, next number should be 2
+        self.assertEqual(get_episode_number(), 2)
 
-#         # Not strictly necessary since SQLite in-memory databases only live
-#         # for the duration of the connection, and in the next step we close
-#         # the connection...but a good practice all the same.
-#         test_db.drop_tables(MODELS)
+    @patch("app.core.podcast.content.logging")
+    def test_update_article_with_nonexistent_article(self, mock_logging):
+        """Test updating summary for non-existent article"""
+        update_article_with_summary(
+            title="Non-existent", url="http://test.com", date=datetime.date.today(), summary="Test Summary"
+        )
+        mock_logging.warning.assert_called_once()
 
-#         # Close connection to db.
-#         test_db.close()
+    def test_update_article_with_summary(self):
+        """Test article summary updates"""
+        article = Article.create(
+            title="Test Title",
+            url="http://test.com",
+            source="Test Source",
+            content="Test Content",
+            date=datetime.date.today(),
+        )
 
-#         # If we wanted, we could re-bind the models to their original
-#         # database here. But for tests this is probably not necessary.
+        update_article_with_summary(
+            title="Test Title", url="http://test.com", date=datetime.date.today(), summary="Updated Summary"
+        )
 
-#     @patch("app.core.podcast.content.get_episode_number")
-#     @patch("app.core.summarization.backends.openai.summarize")
-#     def test_create_transcript_with_openai(self, mock_summarizer, mock_get_episode_number):
-#         mock_get_episode_number.return_value = 22
-#         summary = "This is a summary of the content"
-#         mock_summarizer.return_value = summary
+        updated_article = Article.get(Article.id == article.id)
+        self.assertEqual(updated_article.summary, "Updated Summary")
 
-#         destination = self.text_file
-#         news = self.article_data
+    @patch("app.core.podcast.content.OpenAI")
+    def test_create_transcript(self, mock_openai):
+        """Test transcript creation"""
+        # Setup mock for OpenAI
+        mock_completion = MagicMock()
+        mock_completion.choices[0].message.content = "Test transcript"
+        mock_openai.return_value.chat.completions.create.return_value = mock_completion
 
-#         create_transcript(news, destination, mock_summarizer)
+        # Mock summarizer function
+        mock_summarizer = MagicMock(return_value="Summarized content")
 
-#         with open(destination, "r") as file:
-#             transcript_content = file.read()
+        # Test
+        with patch("builtins.open", unittest.mock.mock_open()) as mock_file:
+            create_transcript(self.sample_news, "test_transcript.txt", mock_summarizer)
 
-#         expected_calls = [call(item["content"], item["title"]) for item in news]
+        # Verify
+        mock_summarizer.assert_called()
+        self.assertEqual(mock_summarizer.call_count, len(self.sample_news))
+        mock_file().write.assert_called()
 
-#         mock_summarizer.assert_has_calls(expected_calls)
-#         self.assertIn(summary, transcript_content)
-#         self.assertEqual(len(news), transcript_content.count(summary))
-#         self.assertIn("We are going to start with news from", transcript_content)
-#         self.assertIn("Next up, we have news from", transcript_content)
-#         self.assertIn("To wrap up today's edition", transcript_content)
-#         self.assertIn(today_human_readable, transcript_content)
-#         self.assertIn("twenty-second", transcript_content)
+    @patch("app.core.podcast.content.OpenAI")
+    def test_create_transcript_with_empty_news(self, mock_openai):
+        """Test transcript creation with empty news list"""
+        # Setup mock for OpenAI
+        mock_completion = MagicMock()
+        mock_completion.choices[0].message.content = "Test generic content"
+        mock_openai.return_value.chat.completions.create.return_value = mock_completion
 
-#     @patch("app.core.podcast.content.get_episode_number")
-#     @patch("app.core.summarization.backends.cohere.summarize")
-#     def test_create_transcript_with_cohere(self, mock_summarizer, mock_get_episode_number):
-#         mock_get_episode_number.return_value = 11
-#         summary = "This is a summary of the content"
-#         mock_summarizer.return_value = summary
+        mock_summarizer = MagicMock()
 
-#         destination = self.text_file
-#         news = self.article_data
+        with patch("builtins.open", unittest.mock.mock_open()) as mock_file:
+            create_transcript([], "test_transcript.txt", mock_summarizer)
 
-#         create_transcript(news, destination, mock_summarizer)
+        # Verify
+        mock_summarizer.assert_not_called()
 
-#         with open(destination, "r") as file:
-#             transcript_content = file.read()
+        # GPT should have been called to generate content for empty news
+        mock_openai.return_value.chat.completions.create.assert_called_once()
 
-#         expected_calls = [call(item["content"], item["title"]) for item in news]
-
-#         mock_summarizer.assert_has_calls(expected_calls)
-#         self.assertIn(summary, transcript_content)
-#         self.assertEqual(len(news), transcript_content.count(summary))
-#         self.assertIn("We are going to start with news from", transcript_content)
-#         self.assertIn("Next up, we have news from", transcript_content)
-#         self.assertIn("To wrap up today's edition", transcript_content)
-#         self.assertIn(today_human_readable, transcript_content)
-#         self.assertIn("eleventh", transcript_content)
-
-#     @patch("app.core.podcast.content.get_episode_number")
-#     @patch("app.core.summarization.backends.together.summarize")
-#     def test_create_transcript_with_together(self, mock_summarizer, mock_get_episode_number):
-#         mock_get_episode_number.return_value = 8
-#         summary = "This is a summary of the content"
-#         mock_summarizer.return_value = summary
-
-#         destination = self.text_file
-#         news = self.article_data
-
-#         create_transcript(news, destination, mock_summarizer)
-
-#         with open(destination, "r") as file:
-#             transcript_content = file.read()
-
-#         expected_calls = [call(item["content"], item["title"]) for item in news]
-
-#         mock_summarizer.assert_has_calls(expected_calls)
-#         self.assertIn(summary, transcript_content)
-#         self.assertEqual(len(news), transcript_content.count(summary))
-#         self.assertIn("We are going to start with news from", transcript_content)
-#         self.assertIn("Next up, we have news from", transcript_content)
-#         self.assertIn("To wrap up today's edition", transcript_content)
-#         self.assertIn(today_human_readable, transcript_content)
-#         self.assertIn("eighth", transcript_content)
+        # Verify the GPT-generated content was written to file
+        mock_file().write.assert_called_with("Test generic content")
 
 
 if __name__ == "__main__":
