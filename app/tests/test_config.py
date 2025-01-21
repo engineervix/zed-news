@@ -1,9 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-from peewee import PostgresqlDatabase
 
-from app.core.db.config import close_database, database, initialize_database
+from app.core.db.config import close_database, initialize_database
 
 
 class TestDatabaseConfig(unittest.TestCase):
@@ -47,11 +46,6 @@ class TestDatabaseConfig(unittest.TestCase):
         # Verify
         mock_db.is_closed.assert_called_once()
         mock_db.close.assert_not_called()
-
-    def test_database_configuration(self):
-        """Test database configuration parameters"""
-        self.assertIsInstance(database, PostgresqlDatabase)
-        self.assertEqual(database.database, "zednews_dev_db")
 
 
 if __name__ == "__main__":

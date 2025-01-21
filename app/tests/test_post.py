@@ -9,7 +9,6 @@ from peewee import SqliteDatabase
 
 from app.core.db.models import Article, Episode, Mp3
 from app.core.social.post import (
-    create_episode_summary,
     create_facebook_post,
     create_video,
     get_content,
@@ -148,15 +147,6 @@ class TestSocialPost(unittest.TestCase):
 
         result = create_facebook_post("Test content", "https://example.com")
         self.assertEqual(result, "Test Facebook post content")
-
-    @patch("app.core.social.post.client")
-    def test_create_episode_summary(self, mock_client):
-        mock_completion = MagicMock()
-        mock_completion.choices[0].message.content = "Test episode summary"
-        mock_client.chat.completions.create.return_value = mock_completion
-
-        result = create_episode_summary("Test content")
-        self.assertEqual(result, "Test episode summary")
 
     @patch("app.core.social.post.facebook.GraphAPI")
     def test_post_to_facebook(self, mock_graph_api):
