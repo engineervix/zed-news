@@ -30,19 +30,25 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Create virtual environment
+        run: python -m venv .venv
+
       - id: poetry-cache
         uses: actions/cache@v4
         with:
           path: .venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
 
-      - if: steps.poetry-cache.outputs.cache-hit != 'true'
-        name: Install Poetry and Dependencies
+      - name: Install Poetry
         shell: bash
         run: |
           pip install --upgrade pip
           pip install poetry==$POETRY_VERSION
-          python -m venv .venv
+
+      - if: steps.poetry-cache.outputs.cache-hit != 'true'
+        name: Install Dependencies
+        shell: bash
+        run: |
           source .venv/bin/activate
           poetry install --with dev
 
@@ -64,19 +70,25 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Create virtual environment
+        run: python -m venv .venv
+
       - id: poetry-cache
         uses: actions/cache@v4
         with:
           path: .venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
 
-      - if: steps.poetry-cache.outputs.cache-hit != 'true'
-        name: Install Poetry and Dependencies
+      - name: Install Poetry
         shell: bash
         run: |
           pip install --upgrade pip
           pip install poetry==$POETRY_VERSION
-          python -m venv .venv
+
+      - if: steps.poetry-cache.outputs.cache-hit != 'true'
+        name: Install Dependencies
+        shell: bash
+        run: |
           source .venv/bin/activate
           poetry install --with dev
 
@@ -193,11 +205,20 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Create virtual environment
+        run: python -m venv .venv
+
       - id: poetry-cache
         uses: actions/cache@v4
         with:
           path: .venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Poetry
+        shell: bash
+        run: |
+          pip install --upgrade pip
+          pip install poetry==$POETRY_VERSION
 
       - name: System Dependencies
         shell: bash
@@ -215,12 +236,9 @@ jobs:
           export LC_ALL=en_US.UTF-8
 
       - if: steps.poetry-cache.outputs.cache-hit != 'true'
-        name: Install Poetry and Dependencies
+        name: Install Dependencies
         shell: bash
         run: |
-          pip install --upgrade pip
-          pip install poetry==$POETRY_VERSION
-          python -m venv .venv
           source .venv/bin/activate
           poetry install --with dev
 
@@ -257,19 +275,25 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Create virtual environment
+        run: python -m venv .venv
+
       - id: poetry-cache
         uses: actions/cache@v4
         with:
           path: .venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
 
-      - if: steps.poetry-cache.outputs.cache-hit != 'true'
-        name: Install Poetry and Dependencies
+      - name: Install Poetry
         shell: bash
         run: |
           pip install --upgrade pip
           pip install poetry==$POETRY_VERSION
-          python -m venv .venv
+
+      - if: steps.poetry-cache.outputs.cache-hit != 'true'
+        name: Install Dependencies
+        shell: bash
+        run: |
           source .venv/bin/activate
           poetry install --with dev
 
@@ -320,19 +344,25 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Create virtual environment
+        run: python -m venv .venv
+
       - id: poetry-cache
         uses: actions/cache@v4
         with:
           path: .venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
 
-      - if: steps.poetry-cache.outputs.cache-hit != 'true'
-        name: Install Poetry and Dependencies
+      - name: Install Poetry
         shell: bash
         run: |
           pip install --upgrade pip
           pip install poetry==$POETRY_VERSION
-          python -m venv .venv
+
+      - if: steps.poetry-cache.outputs.cache-hit != 'true'
+        name: Install Dependencies
+        shell: bash
+        run: |
           source .venv/bin/activate
           poetry install --with dev
 
