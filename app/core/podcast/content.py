@@ -138,7 +138,7 @@ def create_transcript(news: list[dict[str, str]], dest: str, summarizer: Callabl
                 "role": "user",
                 "content": (
                     f"Produce the text for today's episode of the Zed News Podcast (Episode {get_episode_number()} – {today_human_readable}). "
-                    "End the episode by stating that any opinions and views expressed in the podcast are the product of artificial intelligence algorithms and do not necessarily reflect the beliefs, opinions, or positions of the podcast creator.\n\n"
+                    "End the episode with a relevant anecdote, a quote, or a fun fact either related to the news or something that happened on this date in the past.\n\n"
                     "**News Items**:\n\n" + f"{content}"
                 ),
             },
