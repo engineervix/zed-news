@@ -50,8 +50,8 @@ class TestEpisodeInDB(unittest.TestCase):
             presenter=podcast_host,
             locale=lingo.replace("-", "_"),
             mp3=self.mp3,
-            word_count=3600,
-            time_to_produce=5000,
+            word_count=5000,
+            time_to_produce=3600,
         )
         mock_logging.info.assert_called_once_with("Adding episode 001 to the database")
 
