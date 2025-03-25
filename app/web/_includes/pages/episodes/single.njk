@@ -71,19 +71,21 @@
                         <p class="lead mb-0">{{ locale.name }}</p>
                         </div>
                     </div>
+                    {% if production_time %}
                     <!-- time to produce -->
                     <div class="col-lg-4 col-md-6">
                         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
-                        <div class="features-icons-icon d-flex">
-                            <i class="fa-solid fa-stopwatch m-auto text-primary"></i>
-                        </div>
-                        <h4 class="fs-5">Production time</h4>
-                        <p class="lead mb-0">
-                            It took {{ production_time }} to produce this
-                            episode.
-                        </p>
+                            <div class="features-icons-icon d-flex">
+                                <i class="fa-solid fa-stopwatch m-auto text-primary"></i>
+                            </div>
+                            <h4 class="fs-5">Production time</h4>
+                            <p class="lead mb-0">
+                                It took {{ production_time }} to produce this
+                                episode.
+                            </p>
                         </div>
                     </div>
+                    {% endif %}
                     <!-- audio file -->
                     <div class="col-lg-4 col-md-6">
                         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
@@ -98,18 +100,20 @@
                         </p>
                         </div>
                     </div>
+                    {% if words %}
                     <!-- number of words -->
                     <div class="col-lg-4 col-md-6">
                         <div class="features-icons-item mx-auto mb-0 mb-lg-3">
-                        <div class="features-icons-icon d-flex">
-                            <i class="fa-solid fa-keyboard m-auto text-primary"></i>
-                        </div>
-                        <h4 class="fs-5">Word count</h4>
-                        <p class="lead mb-0">
-                            {{ words.count }} words. This means that the presenter spoke at a rate of {{ words.rate }}.
-                        </p>
+                            <div class="features-icons-icon d-flex">
+                                <i class="fa-solid fa-keyboard m-auto text-primary"></i>
+                            </div>
+                            <h4 class="fs-5">Word count</h4>
+                            <p class="lead mb-0">
+                                {{ words.count }} words. This means that the presenter spoke at a rate of {{ words.rate }}.
+                            </p>
                         </div>
                     </div>
+                    {% endif %}
                     <!-- number of articles -->
                     <div class="col-lg-4 col-md-6">
                         <div class="features-icons-item mx-auto mb-0 mb-lg-3">
