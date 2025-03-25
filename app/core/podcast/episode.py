@@ -21,8 +21,8 @@ def add_episode_to_db(time_to_produce: int, word_count: int):
         "presenter": podcast_host,
         "locale": lingo.replace("-", "_"),
         "mp3": mp3,
-        "time_to_produce": word_count,
-        "word_count": time_to_produce,
+        "time_to_produce": time_to_produce,
+        "word_count": word_count,
     }
     Episode.create(**data)
 
