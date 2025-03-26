@@ -46,9 +46,12 @@
                 <h2 class="pb-3">Episode notes 📋</h2>
 
                 <h3 class="fs-4 pb-3 border-bottom">Overview 📈</h3>
+                {% set has_production = production_time is defined and production_time %}
+                {% set has_words = words is defined and words %}
+                {% set has_full_cards = has_production and has_words %}
                 <div class="row features-icons text-center pb-3">
                     <!-- presenter -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-{% if has_full_cards %}4{% else %}6{% endif %} col-md-6">
                         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
                         <div class="features-icons-icon d-flex">
                             <i
@@ -62,7 +65,7 @@
                         </div>
                     </div>
                     <!-- locale -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-{% if has_full_cards %}4{% else %}6{% endif %} col-md-6">
                         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
                         <div class="features-icons-icon d-flex">
                             <i class="fa-solid fa-language m-auto text-primary"></i>
@@ -87,7 +90,7 @@
                     </div>
                     {% endif %}
                     <!-- audio file -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-{% if has_full_cards %}4{% else %}6{% endif %} col-md-6">
                         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
                         <div class="features-icons-icon d-flex">
                             <i
@@ -115,7 +118,7 @@
                     </div>
                     {% endif %}
                     <!-- number of articles -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-{% if has_full_cards %}4{% else %}6{% endif %} col-md-6">
                         <div class="features-icons-item mx-auto mb-0 mb-lg-3">
                         <div class="features-icons-icon d-flex">
                             <i
