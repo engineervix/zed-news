@@ -3770,13 +3770,13 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "vastai"
-version = "0.2.5"
+version = "0.2.8"
 description = "Vast.ai Python CLI"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "vastai-0.2.5-py3-none-any.whl", hash = "sha256:fb23baea165dd71bdc831b915639a93429ddd9968547987350bf50404f8e92f9"},
-    {file = "vastai-0.2.5.tar.gz", hash = "sha256:cccd3ea4da38cda820c52051e3eac514988f349a51bb71d83d445d8e95819ffc"},
+    {file = "vastai-0.2.8-py3-none-any.whl", hash = "sha256:1818e448fef894f35ba9e3c0a7a79621fd01342bdd60afd1b20d38ab19f3af3b"},
+    {file = "vastai-0.2.8.tar.gz", hash = "sha256:efbc9976c01709bf5bdb604b9c8e192f34bbbed273ca10b484bd885e01c69303"},
 ]
 
 [package.dependencies]
