@@ -12,7 +12,7 @@
 set -e
 
 # 1. cd to data directory
-cd "${HOME}/SITES/zed-news/data" || { echo "Failed to change directory."; exit 1; }
+cd "${HOME}/SITES/tools/zed-news/data" || { echo "Failed to change directory."; exit 1; }
 
 # Source the .env file so we can retrieve healthchecks.io ping URL
 # shellcheck source=/dev/null
@@ -58,7 +58,7 @@ ffmpeg \
     "video_$(date --iso).mp4"
 
 # post the video to social platform
-cd "${HOME}/SITES/zed-news/" || { echo "Failed to change directory."; exit 1; }
+cd "${HOME}/SITES/tools/zed-news/" || { echo "Failed to change directory."; exit 1; }
 invoke facebook-post
 
 # cleanup
