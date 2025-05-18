@@ -12,17 +12,14 @@ import logging
 import os
 import pathlib
 import random
+import subprocess
 import sys
+import tempfile
 from http import HTTPStatus
 
 import facebook
-import numpy as np
-import PIL
 import requests
 from dotenv import load_dotenv
-from moviepy.editor import CompositeVideoClip, ImageClip, TextClip, VideoFileClip
-from moviepy.video.compositing.concatenate import concatenate_videoclips
-from moviepy.video.tools.segmenting import findObjects
 from together import Together
 
 from app.core.utilities import (
@@ -58,9 +55,6 @@ client = Together(api_key=TOGETHER_API_KEY)
 news_headlines = f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt"
 transcript = f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}_podcast-content.txt"
 podcast_url = f"https://zednews.pages.dev/episode/{today_iso_fmt}/"
-
-# https://stackoverflow.com/questions/76616042/attributeerror-module-pil-image-has-no-attribute-antialias
-PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
 
 
 def setup():
@@ -134,121 +128,103 @@ def get_random_image(path):
 
 
 def create_video(source_video, logo):
-    # Load the video clip
-    video_clip = VideoFileClip(source_video)
+    """Create video using ffmpeg"""
 
-    width, height = video_clip.size
-    screensize = (width, height)
-
-    # Load the logo image
-    logo_clip = ImageClip(logo, transparent=True)
-
-    # Resize the logo to desired size (optional)
-    logo_clip = logo_clip.resize(height=100)  # Resize the logo to a height of 100 pixels while preserving aspect ratio
-
-    # Position the logo at the bottom right corner
-    logo_position = (
-        video_clip.size[0] - logo_clip.size[0],
-        video_clip.size[1] - logo_clip.size[1],
-    )
-    logo_clip = logo_clip.set_position(logo_position)
-
-    # the fancy text animation is from
-    # https://moviepy-tburrows13.readthedocs.io/en/improve-docs/examples/moving_letters.html
-
-    # helper function
-    rotMatrix = lambda a: np.array([[np.cos(a), np.sin(a)], [-np.sin(a), np.cos(a)]])  # noqa: E731
-
-    def vortex(screenpos, i, nletters):  # noqa: D103
-        d = lambda t: 1.0 / (0.3 + t**8)  # damping # noqa: E731
-        a = i * np.pi / nletters  # angle of the movement
-        v = rotMatrix(a).dot([-1, 0])
-        if i % 2:
-            v[1] = -v[1]
-        return lambda t: screenpos + 400 * d(t) * rotMatrix(0.5 * d(t) * a).dot(v)
-
-    def vortexout(screenpos, i, nletters):  # noqa: D103
-        d = lambda t: max(0, t)  # damping # noqa: E731
-        a = i * np.pi / nletters  # angle of the movement
-        v = rotMatrix(a).dot([-1, 0])
-        if i % 2:
-            v[1] = -v[1]
-        return lambda t: screenpos + 400 * d(t - 0.1 * i) * rotMatrix(-0.2 * d(t) * a).dot(v)
-
-    # Add text overlays
-    text_duration = 12  # Duration of the text overlays (in seconds)
-
-    # Text at the beginning
-    if episode_number := get_episode_number(news_headlines):
-        episode_suffix = f" Episode {episode_number}"
+    # Get episode number
+    try:
+        episode_number = get_episode_number()
+        episode_suffix = f"Episode {episode_number}"
         next_episode = int(episode_number) + 1
-        ending_suffix = f" for episode {str(next_episode)}"
+        ending_suffix = f"for episode {str(next_episode)}"
         output = f"{DATA_DIR}/{today_iso_fmt}_zed-news-podcast-ep{episode_number}.mp4"
-    else:
-        # episode_suffix = ""
+    except Exception as e:
+        logger.warning(f"Could not get episode number: {e}")
         episode_suffix = "Welcome!"
         ending_suffix = ""
         output = f"{DATA_DIR}/{today_iso_fmt}_zed-news-podcast.mp4"
 
+    # Determine next episode day
     next_day = determine_next_episode(today)
 
-    text_start = (
-        TextClip(
-            # f"{today_human_readable}\nZed News Podcast{episode_suffix}",
-            f"{episode_suffix.strip()}",
-            fontsize=120,
-            kerning=5,
-            color="white",
-            # to get list of available fonts, use moviepy.video.VideoClip.TextClip.list('font')
-            font="Cookie-Regular",
-        )
-        # .set_duration(text_duration)
-        # .set_position(("center", "top"))
-    )
+    # Create temporary directory for intermediate files
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Create text for intro
+        intro_text = episode_suffix.strip()
+        intro_file = os.path.join(temp_dir, "intro_text.txt")
+        with open(intro_file, "w") as f:
+            f.write(intro_text)
 
-    # Text at the end
-    text_end = (
-        TextClip(
-            f"Please join us {next_day}{ending_suffix}!",
-            fontsize=80,
-            size=screensize,
-            method="caption",
-            kerning=5,
-            color="white",
-            font="Cookie-Regular",
-        )
-        .set_duration(text_duration)
-        .set_position(("center", "center"))
-    )
+        # Create text for outro - split into two lines
+        outro_line1 = f"Please join us {next_day}"
+        outro_line2 = f"{ending_suffix}!"
+        outro_file1 = os.path.join(temp_dir, "outro_text1.txt")
+        outro_file2 = os.path.join(temp_dir, "outro_text2.txt")
+        with open(outro_file1, "w") as f:
+            f.write(outro_line1)
+        with open(outro_file2, "w") as f:
+            f.write(outro_line2)
 
-    letters = findObjects(CompositeVideoClip([text_start.set_position("center", "center")], size=screensize))
-
-    def moveLetters(letters, funcpos):  # noqa D103
-        return [letter.set_pos(funcpos(letter.screenpos, i, len(letters))) for i, letter in enumerate(letters)]
-
-    clips = [
-        CompositeVideoClip(moveLetters(letters, funcpos), size=screensize).subclip(0, 5)
-        for funcpos in [vortex, vortexout]
-    ]
-    text_clip = concatenate_videoclips(clips)
-
-    final_clip = CompositeVideoClip(
-        [
-            video_clip.set_opacity(1),
-            text_clip,
-            logo_clip.set_opacity(1),
-            # text_start.set_start(0),
-            text_end.set_start(video_clip.duration - text_duration),
+        # Get video duration
+        ffprobe_cmd = [
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            source_video,
         ]
-    )
 
-    # Set the duration of the final clip
-    final_clip = final_clip.set_duration(video_clip.duration)
+        video_duration = float(subprocess.check_output(ffprobe_cmd).decode().strip())
 
-    # Write the final video to a file
-    final_clip.write_videofile(output, codec="libx264", fps=video_clip.fps)
+        # Create video with intro animation, logo overlay, and outro text
+        ffmpeg_cmd = [
+            "ffmpeg",
+            "-y",
+            "-i",
+            source_video,
+            "-i",
+            logo,
+            "-filter_complex",
+            f"""
+            [0:v]split=3[bg1][bg2][bg3];
 
-    return output
+            [bg1]trim=0:5,setpts=PTS-STARTPTS[bg_intro];
+            [bg_intro]drawtext=fontfile='{ASSETS_DIR}/Cookie-Regular.ttf':textfile='{intro_file}':fontsize=120:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:enable='between(t,0,5)':alpha='if(lt(t,1),t,if(lt(t,4),1,5-t))':box=0[intro];
+
+            [bg2]trim=0:{video_duration - 5},setpts=PTS-STARTPTS[bg_main];
+            [bg_main][1:v]overlay=x=W-w:y=H-h[main];
+
+            [bg3]trim={video_duration - 5}:{video_duration},setpts=PTS-STARTPTS[bg_outro];
+            [bg_outro]drawtext=fontfile='{ASSETS_DIR}/Cookie-Regular.ttf':textfile='{outro_file1}':fontsize=80:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2-40:box=0,
+            drawtext=fontfile='{ASSETS_DIR}/Cookie-Regular.ttf':textfile='{outro_file2}':fontsize=80:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2+40:box=0[outro];
+
+            [intro][main][outro]concat=n=3:v=1:a=0[outv];
+            [0:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo[outa]
+            """,
+            "-map",
+            "[outv]",
+            "-map",
+            "[outa]",
+            "-c:v",
+            "libx264",
+            "-c:a",
+            "aac",
+            "-strict",
+            "experimental",
+            output,
+        ]
+
+        # Execute ffmpeg command
+        try:
+            subprocess.run(ffmpeg_cmd, check=True)
+            logger.info(f"Video successfully created at {output}")
+            return output
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Error creating video: {e}")
+            requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
+            sys.exit(1)
 
 
 def create_facebook_post(content: str, url: str) -> str:
