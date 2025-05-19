@@ -12,6 +12,7 @@ import logging
 import os
 import pathlib
 import random
+import re
 import subprocess
 import sys
 import tempfile
@@ -132,7 +133,7 @@ def create_video(source_video, logo):
 
     # Get episode number
     try:
-        episode_number = get_episode_number()
+        episode_number = get_episode_number(news_headlines)
         episode_suffix = f"Episode {episode_number}"
         next_episode = int(episode_number) + 1
         ending_suffix = f"for episode {str(next_episode)}"
@@ -238,7 +239,7 @@ def create_facebook_post(content: str, url: str) -> str:
 
     user_prompt = f"Produce a Facebook teaser post based on the following podcast episode details.\n\n\n{content}\n"
 
-    model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
+    model = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
     temperature = 0.75
     max_tokens = 1024
 
@@ -289,11 +290,14 @@ def create_episode_summary(content: str) -> str:
     host = f"Host: {podcast_host}"
     separator = "------------------------------------"
 
-    system_prompt = f"You are a social media marketing guru. Your task is to write a very brief summary to use as a description for a Facebook video post, given the transcript of today's episode below. Use bullet points, emojis, and hashtags as appropriate. Do not use markdown. Please note that this video is just basically the audio with some looping animated background, so your post shouldn't ask people to 'watch' the video, but rather to 'check it out' or 'tune in to'. At the end, mention that more details can be obtained from {podcast_url}."
+    system_prompt = f"You are a social media marketing guru. Your task is to write a very brief summary to use as a description for a Facebook video post, given the transcript of today's episode below. Format your response as plain text only - no markdown, no code blocks, and no special formatting. Use bullet points (•), emojis, and hashtags as appropriate. Do not use markdown symbols like asterisks or backticks. Please note that this video is basically the audio with some looping animated background, so your post shouldn't ask people to 'watch' the video, but rather to 'check it out' or 'tune in to'. At the end, mention that more details can be obtained from {podcast_url}."
 
     user_prompt = f"{separator}\n\n{title}\n{date}\n{host}\n\n{separator}\n\n{content}\n"
 
-    model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
+    model = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+    # NOTE: free models tend to have unpredictable rate-limits
+    # model = "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
+    # model = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free"
     temperature = 0.75
     max_tokens = 1024
 
@@ -323,7 +327,8 @@ def create_episode_summary(content: str) -> str:
             # Remove the first line from result
             result = "\n".join(result.split("\n")[1:])
 
-        return result
+        # Remove everything between <think> and </think> tags
+        return re.sub(r"<think>.*?</think>", "", result, flags=re.DOTALL)
     else:
         logger.error("Podcast episode summary is empty")
         requests.get(f"{HEALTHCHECKS_FACEBOOK_PING_URL}/fail", timeout=10)
