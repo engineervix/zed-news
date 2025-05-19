@@ -8,7 +8,6 @@ from unittest.mock import patch
 from peewee import SqliteDatabase
 
 from app.core.db.models import Article, Episode, Mp3
-from app.core.podcast.eleventify import render_jinja_template
 from app.core.utilities import lingo, podcast_host, today, today_human_readable, today_iso_fmt
 
 MODELS = [Article, Episode, Mp3]
@@ -17,6 +16,13 @@ test_db = SqliteDatabase(":memory:")
 
 class TestEleventify(unittest.TestCase):
     def setUp(self):
+        # Patch genai.Client before importing render_jinja_template
+        self.genai_patch = patch("app.core.podcast.eleventify.genai.Client")
+        self.genai_patch.start()
+        from app.core.podcast.eleventify import render_jinja_template
+
+        self.render_jinja_template = render_jinja_template
+
         self.temp_dir = tempfile.mkdtemp()
         self.dist_file = os.path.join(self.temp_dir, f"{today_iso_fmt}.njk")
         self.transcript = os.path.join(self.temp_dir, f"{today_iso_fmt}_transcript.txt")
@@ -89,6 +95,7 @@ class TestEleventify(unittest.TestCase):
 
         self.patch_dist_file.stop()
         self.patch_transcript.stop()
+        self.genai_patch.stop()
 
     @patch("app.core.podcast.eleventify.get_content")
     @patch("app.core.podcast.eleventify.create_episode_summary")
@@ -101,7 +108,7 @@ class TestEleventify(unittest.TestCase):
             "local squirrel who claims to have invented a new dance craze sweeping the forest floor."
         )
         mock_get_content.return_value = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        render_jinja_template(production_time=120, word_count=5000)
+        self.render_jinja_template(production_time=120, word_count=5000)
 
         mock_logging.info.assert_called_once_with("Rendering Jinja template ...")
         self.assertTrue(os.path.exists(self.dist_file))
