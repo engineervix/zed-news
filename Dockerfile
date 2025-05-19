@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Add user that will be used in the container
 RUN groupadd zednews && \
@@ -42,7 +42,7 @@ ENV LC_ALL en_US.UTF-8
 USER zednews
 
 # set up virtual environment & install python dependencies
-ARG POETRY_VERSION=1.8.3
+ARG POETRY_VERSION=1.8.5
 ARG DEVELOPMENT
 ENV VIRTUAL_ENV=/home/zednews/venv \
     DEVELOPMENT=${DEVELOPMENT}

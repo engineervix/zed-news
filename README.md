@@ -9,7 +9,7 @@
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/engineervix/f4b1128b188c4e29722bc879e4ab6574/raw/covbadge.json)](https://github.com/engineervix/zed-news/actions?query=workflow%3A%22CI%2FCD%22)
 [![healthchecks.io](https://healthchecks.io/badge/24d88c7e-cc91-4dac-b9a5-d50e52/ewRXZ-TO/zed-news.svg)](https://healthchecks.io)
 
-[![python3](https://img.shields.io/badge/python-3.10-brightgreen.svg)](https://www.python.org/downloads/)
+[![python3](https://img.shields.io/badge/python-3.12-brightgreen.svg)](https://www.python.org/downloads/)
 [![Node v18](https://img.shields.io/badge/Node-v18-teal.svg)](https://nodejs.org/en/blog/release/v18.0.0)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![code style: prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)](https://prettier.io/)

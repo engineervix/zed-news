@@ -4,7 +4,7 @@ name: CI/CD
 env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
-  POETRY_VERSION: 1.8.3 # Make sure this matches the Dockerfile
+  POETRY_VERSION: 1.8.5 # Make sure this matches the Dockerfile
 
 on:
   pull_request:
@@ -19,7 +19,7 @@ on:
 
 jobs:
   ruff:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Code Repository
@@ -28,7 +28,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Create virtual environment
         run: python -m venv .venv
@@ -59,7 +59,7 @@ jobs:
           ruff check . --output-format=github
 
   black:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Code Repository
@@ -68,7 +68,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Create virtual environment
         run: python -m venv .venv
@@ -99,7 +99,7 @@ jobs:
           black . --check
 
   stylelint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Code Repository
@@ -124,7 +124,7 @@ jobs:
           npm run lint:style
 
   eslint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Code Repository
@@ -149,7 +149,7 @@ jobs:
           npm run lint:js
 
   prettier:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Code Repository
@@ -174,7 +174,7 @@ jobs:
           npm run lint:format
 
   shellcheck:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Code Repository
@@ -193,7 +193,7 @@ jobs:
 
   # Runs the python test suite on the VM
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ruff, black, stylelint, eslint, prettier, shellcheck]
 
     steps:
@@ -203,7 +203,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Create virtual environment
         run: python -m venv .venv
@@ -265,7 +265,7 @@ jobs:
   coverage:
     name: Coverage
     needs: test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
@@ -273,7 +273,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Create virtual environment
         run: python -m venv .venv
@@ -333,7 +333,7 @@ jobs:
 
     if: needs.test.result == 'success' && startsWith( github.ref, 'refs/tags/v' )
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Check out the repo

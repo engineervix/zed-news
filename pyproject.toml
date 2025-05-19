@@ -11,7 +11,7 @@ readme = "README.md"
 packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
-python = "~=3.10"
+python = "~=3.12"
 
 apprise = "^1.4.0"
 babel = "^2.12.1"
@@ -38,14 +38,9 @@ psycopg2 = "^2.9.9"
 python-dateutil = "^2.8.2"
 python-dotenv = "^1.0.0"
 pytz = "^2023.3"
-replicate = "^0.22.0"
 requests = "^2.32.0"
-tiktoken = "^0.8.0"
 together = "^1.2.1"
 tomli = "^2.0.1"
-torch = "^2.1.1"
-transformers = "^4.38.0"
-vastai = "^0.2.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"
@@ -57,7 +52,7 @@ ruff = "^0.5.3"
 
 [tool.black]
 line-length = 120
-target-version = ['py38', 'py39', 'py310', 'py311']
+target-version = ['py310', 'py311', 'py12']
 include = '\.pyi?$'
 exclude = '''
 
@@ -88,7 +83,7 @@ exclude = [
   ".venv",
 ]
 line-length = 120
-target-version = "py310"
+target-version = "py312"
 
 [tool.ruff.lint]
 ignore = ["E203", "E266", "E501"]
