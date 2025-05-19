@@ -7,6 +7,8 @@ coverage*
 .coverage
 htmlcov
 .pytest_cache
+.ruff_cache
+.mypy_cache
 *.egg-info/
 *.log
 
