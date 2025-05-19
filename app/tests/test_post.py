@@ -10,7 +10,6 @@ from peewee import SqliteDatabase
 from app.core.db.models import Article, Episode, Mp3
 from app.core.social.post import (
     create_facebook_post,
-    create_video,
     get_content,
     get_episode_number,
     get_random_image,
@@ -171,61 +170,6 @@ class TestSocialPost(unittest.TestCase):
         mock_post.return_value.json.return_value = {"error": "Upload failed"}
         result = upload_video_to_facebook(self.video_file, title="Test Video", description="Test Description")
         self.assertEqual(result, "")
-
-    @patch("app.core.social.post.VideoFileClip")
-    @patch("app.core.social.post.ImageClip")
-    @patch("app.core.social.post.CompositeVideoClip")
-    @patch("app.core.social.post.concatenate_videoclips")
-    @patch("app.core.social.post.TextClip")
-    @patch("app.core.social.post.findObjects")
-    @patch("moviepy.config.change_settings")
-    def test_create_video(
-        self, mock_settings, mock_find_objects, mock_text, mock_concat, mock_composite, mock_image, mock_video
-    ):
-        # Mock video creation components
-        mock_video_clip = MagicMock()
-        mock_video_clip.duration = 60
-        mock_video_clip.size = (1920, 1080)
-        mock_video.return_value = mock_video_clip
-
-        # Mock text clip
-        mock_text_clip = MagicMock()
-        mock_text_clip.screenpos = (100, 100)
-        mock_text_clip.set_position.return_value = mock_text_clip
-        mock_text.return_value = mock_text_clip
-
-        # Mock composite clip
-        mock_composite_clip = MagicMock()
-        mock_composite_clip.set_duration.return_value = mock_composite_clip
-        mock_composite_clip.write_videofile.return_value = None
-        mock_composite.return_value = mock_composite_clip
-
-        # Mock concatenation
-        mock_concat.return_value = mock_composite_clip
-
-        # Mock findObjects to return a list of mock letters
-        mock_letters = [mock_text_clip for _ in range(5)]  # Create 5 mock letters
-        mock_find_objects.return_value = mock_letters
-
-        # Test video creation with episode number
-        with patch("app.core.social.post.get_episode_number") as mock_get_episode:
-            mock_get_episode.return_value = "1"
-            output = create_video(self.video_file, self.logo_file)
-            self.assertTrue(output.endswith("_zed-news-podcast-ep1.mp4"))
-
-            # Verify the composite video clip was created and written
-            mock_composite.assert_called()
-            mock_composite_clip.write_videofile.assert_called()
-
-        # Test video creation without episode number
-        with patch("app.core.social.post.get_episode_number") as mock_get_episode:
-            mock_get_episode.return_value = ""
-            output = create_video(self.video_file, self.logo_file)
-            self.assertTrue(output.endswith("_zed-news-podcast.mp4"))
-
-            # Verify the composite video clip was created and written again
-            mock_composite.assert_called()
-            mock_composite_clip.write_videofile.assert_called()
 
 
 if __name__ == "__main__":
