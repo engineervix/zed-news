@@ -4,6 +4,138 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.10.0](https://github.com/engineervix/zed-news/compare/v0.9.0...v0.10.0) (2025-05-19)
+
+
+### 🚀 Features
+
+* attempt to use meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo ([27c2e18](https://github.com/engineervix/zed-news/commit/27c2e18215eae01122183dc1be8953098da226d4))
+* create video using SadTalker ([a6ec058](https://github.com/engineervix/zed-news/commit/a6ec058f9c71167450a387d83953799c745e7284))
+* dark mode ([11a15a6](https://github.com/engineervix/zed-news/commit/11a15a6032ae02241302b2e3309ed4c5ccb3fb7f))
+* dark mode logo ([b003046](https://github.com/engineervix/zed-news/commit/b0030468addc64816a6542c6bfd7935e358bcfec))
+* special milestones ([0909a6d](https://github.com/engineervix/zed-news/commit/0909a6df1f3fdc53114356cb8f6677db24bc159b))
+* use Meta Llama 3.1 and update prompt ([e04fe6c](https://github.com/engineervix/zed-news/commit/e04fe6c49895a4296e24d08e0139168a0a78d1ea))
+* use meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo ([f972307](https://github.com/engineervix/zed-news/commit/f9723072564b9e771f694cef6c6a6ed0adf794a7))
+
+
+### 💄 Styling
+
+* add dark mode styling for footer and episode links ([5374031](https://github.com/engineervix/zed-news/commit/537403144760aab84b571838f8c1cd028b07a93f))
+* improve colours on icon, dark-mode toggle and header img ([f9715fe](https://github.com/engineervix/zed-news/commit/f9715fe7920ae26c3ccbfa9bb01395a71d4de944))
+* plyr dark mode ([c1ea409](https://github.com/engineervix/zed-news/commit/c1ea409a363cb0f35f15deae34161692e0d9733e))
+
+
+### 🐛 Bug Fixes
+
+* add missing namespace to model name ([0e56436](https://github.com/engineervix/zed-news/commit/0e56436e408d7499642042c80d4c177e3c15ed92))
+* broken og:image ([6b3430a](https://github.com/engineervix/zed-news/commit/6b3430aefb4c7b914cca4ec7be4d5dd9d8c728ef))
+* broken YAML due to double quotes inside description ([fcb7273](https://github.com/engineervix/zed-news/commit/fcb7273ec0f57395fd44fd51518dd1b116506da7))
+* broken yaml file ([4b0146f](https://github.com/engineervix/zed-news/commit/4b0146fb9657dcb0bab535800ee612b20ff03f05))
+* **deps:** update dependency bootstrap to v5.3.6 ([#148](https://github.com/engineervix/zed-news/issues/148)) ([5dcaf4c](https://github.com/engineervix/zed-news/commit/5dcaf4c0a5130eeced1a82a2e4c9e84cb440ae8f))
+* **deps:** update dependency scipy to v1.15.3 ([#149](https://github.com/engineervix/zed-news/issues/149)) ([3e00c0d](https://github.com/engineervix/zed-news/commit/3e00c0dc66daab8aea9002eed9a1af5b9971ddf3))
+* **deps:** update dependency ua-parser-js to v1.0.40 ([#150](https://github.com/engineervix/zed-news/issues/150)) ([0cb6275](https://github.com/engineervix/zed-news/commit/0cb62753b7377e672312864d94cbf9ca5394fd50))
+* **deps:** update dependency vastai to v0.2.9 ([#151](https://github.com/engineervix/zed-news/issues/151)) ([82033ed](https://github.com/engineervix/zed-news/commit/82033ed2e74489cbd77c3f002ad24efd05eea82b))
+* ensure the .env file is loaded correctly ([26793d9](https://github.com/engineervix/zed-news/commit/26793d97a99ce725cf494fe4405566a30ca0497a))
+* episode metadata ([4521285](https://github.com/engineervix/zed-news/commit/45212854cb824ac76180b7aa39d246b365a4d0fa))
+* handle ServiceUnavailableErrors ([cc3fe63](https://github.com/engineervix/zed-news/commit/cc3fe6388079df0cfb2cd59252361980ce1f3131))
+* json string serialization ([ff8c8ca](https://github.com/engineervix/zed-news/commit/ff8c8ca49332a8a195acafad6f38da879e9b43db))
+* run the facebook_post task using module notation ([8ee1ea5](https://github.com/engineervix/zed-news/commit/8ee1ea52e1abbafa113edca1052d4a1306b3453e))
+* update layout depending on available metadata ([3f9b4ba](https://github.com/engineervix/zed-news/commit/3f9b4ba6d5e075f74b5b7a9759a60795c2e5956e))
+* video filename ([4a50325](https://github.com/engineervix/zed-news/commit/4a50325d52fcee2ad05a1ff91fb50ea70859ea43))
+* yaml ([8b2f8b0](https://github.com/engineervix/zed-news/commit/8b2f8b063be825706c2e2d49de8de67b6658c819))
+* YAML ([0c925db](https://github.com/engineervix/zed-news/commit/0c925db200b1c32ef33e1397eef951f4156da4a0))
+
+
+### ⚙️ Build System
+
+* add missing scipy ([f2a2a88](https://github.com/engineervix/zed-news/commit/f2a2a88a37fbbe22bf913be295df554c1e314178))
+* add more files to dockerignore list ([374d92f](https://github.com/engineervix/zed-news/commit/374d92f4a6ed4e1e98e834457d7614c20b0abbc9))
+* bump openai to latest version as of 2024-09-11 ([ab2e4e4](https://github.com/engineervix/zed-news/commit/ab2e4e481df170fea9addfeeb9b574144edbc669))
+* **deps-dev:** update dependency babel to v2.15.0 ([#108](https://github.com/engineervix/zed-news/issues/108)) ([caf2a94](https://github.com/engineervix/zed-news/commit/caf2a945886419a3be8ace1c65d2c6fecee26fea))
+* **deps-dev:** update dependency dotenv to v16.5.0 ([#131](https://github.com/engineervix/zed-news/issues/131)) ([34b633b](https://github.com/engineervix/zed-news/commit/34b633b9de3871bb3964100527021b2846f67e85))
+* **deps-dev:** update dependency postcss-custom-properties to v13.3.12 ([#98](https://github.com/engineervix/zed-news/issues/98)) ([2de6c86](https://github.com/engineervix/zed-news/commit/2de6c867a777e819d8173f1db1ba0caa3df04d6b))
+* **deps-dev:** update dependency postcss-loader to v7.3.4 ([#136](https://github.com/engineervix/zed-news/issues/136)) ([2804348](https://github.com/engineervix/zed-news/commit/2804348960de236c397832f88e65480ef7fa1966))
+* **deps-dev:** update dependency postcss-preset-env to v8.5.1 ([#99](https://github.com/engineervix/zed-news/issues/99)) ([98afb6f](https://github.com/engineervix/zed-news/commit/98afb6f78455e9bd26fb201f72392844a1effe14))
+* **deps-dev:** update dependency pre-commit to v3.7.1 ([#100](https://github.com/engineervix/zed-news/issues/100)) ([a2e8ce7](https://github.com/engineervix/zed-news/commit/a2e8ce75524a74197414aa02107f78696f163853))
+* **deps-dev:** update dependency rimraf to v5.0.10 ([#137](https://github.com/engineervix/zed-news/issues/137)) ([1293ea5](https://github.com/engineervix/zed-news/commit/1293ea5bf7f010aec1091ae338c56093714dfb50))
+* **deps-dev:** update dependency stylelint to v15.11.0 ([#102](https://github.com/engineervix/zed-news/issues/102)) ([ac3348b](https://github.com/engineervix/zed-news/commit/ac3348bb96624f4f93ae204cf4ebbd81bdde408c))
+* **deps-dev:** update dependency webpack to v5.93.0 ([#103](https://github.com/engineervix/zed-news/issues/103)) ([279d88e](https://github.com/engineervix/zed-news/commit/279d88ecaaf8526c69fa26cd21dd8eeb89872723))
+* **deps-dev:** update sosedoff/pgweb docker tag to v0.15.0 ([#105](https://github.com/engineervix/zed-news/issues/105)) ([18f7bb4](https://github.com/engineervix/zed-news/commit/18f7bb4b647710f4e11a454e7f11163b90ba6f3c))
+* **deps:** update babel monorepo ([#79](https://github.com/engineervix/zed-news/issues/79)) ([4940405](https://github.com/engineervix/zed-news/commit/494040562d0f51eaf6fca84e14a6893c8b922b68))
+* **deps:** update dependency @fortawesome/fontawesome-free to v6.6.0 ([#106](https://github.com/engineervix/zed-news/issues/106)) ([8123136](https://github.com/engineervix/zed-news/commit/81231369ba66e0b763050c76766f30a271ba16a4))
+* **deps:** update dependency apprise to v1.8.0 ([#107](https://github.com/engineervix/zed-news/issues/107)) ([0e6318c](https://github.com/engineervix/zed-news/commit/0e6318c3a65cd0d5e06e9056ddaba67bad4ba42d))
+* **deps:** update dependency bootstrap to v5.3.5 ([#138](https://github.com/engineervix/zed-news/issues/138)) ([935f93b](https://github.com/engineervix/zed-news/commit/935f93b51f3ad8d9e42904fedaa293ded1ea31be))
+* **deps:** update dependency cohere to v4.57 ([#109](https://github.com/engineervix/zed-news/issues/109)) ([4ac038e](https://github.com/engineervix/zed-news/commit/4ac038e21480dfaf2bc0a9a60a9ff637cc28b562))
+* **deps:** update dependency eyed3 to v0.9.8 ([#144](https://github.com/engineervix/zed-news/issues/144)) ([5ebe650](https://github.com/engineervix/zed-news/commit/5ebe650563070df59c168f5588af0a5a80aef066))
+* **deps:** update dependency fake-useragent to v1.5.1 ([#110](https://github.com/engineervix/zed-news/issues/110)) ([e287438](https://github.com/engineervix/zed-news/commit/e287438c12d1796316428f101b1e25b505b4218e))
+* **deps:** update dependency invoke to v2.2.0 ([#111](https://github.com/engineervix/zed-news/issues/111)) ([0236930](https://github.com/engineervix/zed-news/commit/02369308d939392c51ab75c94bdff80c77e983c7))
+* **deps:** update dependency jinja2 to v3.1.6 [security] ([#133](https://github.com/engineervix/zed-news/issues/133)) ([2198f81](https://github.com/engineervix/zed-news/commit/2198f814282c7822b2a23e91e74b1a224edefbd8))
+* **deps:** update dependency langchain to v0.3.24 ([#139](https://github.com/engineervix/zed-news/issues/139)) ([dca658e](https://github.com/engineervix/zed-news/commit/dca658e7ef3e7e46e42796dc0d4e0233f894e21b))
+* **deps:** update dependency langchain to v0.3.25 ([#145](https://github.com/engineervix/zed-news/issues/145)) ([9e9e666](https://github.com/engineervix/zed-news/commit/9e9e666c68d0f70df9b544752352e19364a413f0))
+* **deps:** update dependency langchain-community to v0.3.23 ([#140](https://github.com/engineervix/zed-news/issues/140)) ([e6b3e32](https://github.com/engineervix/zed-news/commit/e6b3e3204704cb38d7e0a15a1f19df5eae9624b0))
+* **deps:** update dependency langchain-openai to v0.3.16 ([#141](https://github.com/engineervix/zed-news/issues/141)) ([14a5960](https://github.com/engineervix/zed-news/commit/14a5960a0c6d909386a528af24b17419c3d86179))
+* **deps:** update dependency mutagen to v1.47.0 ([#112](https://github.com/engineervix/zed-news/issues/112)) ([4b76bbb](https://github.com/engineervix/zed-news/commit/4b76bbb0b62672de023d5f2cc6962f703d962e9d))
+* **deps:** update dependency num2words to v0.5.14 ([#142](https://github.com/engineervix/zed-news/issues/142)) ([c62b49b](https://github.com/engineervix/zed-news/commit/c62b49b4361c02134bdb67fffb66f62419e3c140))
+* **deps:** update dependency peewee to v3.17.9 ([#128](https://github.com/engineervix/zed-news/issues/128)) ([3a93449](https://github.com/engineervix/zed-news/commit/3a9344912342f544338cda1e355d2799098de053))
+* **deps:** update dependency python-dateutil to v2.9.0 ([#114](https://github.com/engineervix/zed-news/issues/114)) ([421c2fa](https://github.com/engineervix/zed-news/commit/421c2fac8621e9c4fc82fc6367ed59c525214bec))
+* **deps:** update dependency scipy to v1.15.2 ([#143](https://github.com/engineervix/zed-news/issues/143)) ([3353d56](https://github.com/engineervix/zed-news/commit/3353d56a543c0f1050fea7684796d9bac1a3725f))
+* **deps:** update dependency sharer.js to v0.5.3 ([#146](https://github.com/engineervix/zed-news/issues/146)) ([c142a00](https://github.com/engineervix/zed-news/commit/c142a006c5d9e9c60cee15be7966c9273f91276f))
+* **deps:** update dependency together to v1.5.5 ([#121](https://github.com/engineervix/zed-news/issues/121)) ([c79154e](https://github.com/engineervix/zed-news/commit/c79154ef6543023a44d2671c36de71b60ddaa697))
+* **deps:** update dependency torch to v2.2.0 [security] ([#115](https://github.com/engineervix/zed-news/issues/115)) ([60d6301](https://github.com/engineervix/zed-news/commit/60d630151a5d0fb1a5136939fa0ef61f562ed8ec))
+* **deps:** update dependency torch to v2.6.0 [security] ([#135](https://github.com/engineervix/zed-news/issues/135)) ([980b191](https://github.com/engineervix/zed-news/commit/980b191099ad8ec79d797c70ed6376b3e08ede9b))
+* **deps:** update dependency transformers to v4.48.0 [security] ([#134](https://github.com/engineervix/zed-news/issues/134)) ([2559765](https://github.com/engineervix/zed-news/commit/255976575511917e666d6d060d7425073323a57f))
+* **deps:** update dependency transformers to v4.51.3 ([#147](https://github.com/engineervix/zed-news/issues/147)) ([b2f7e89](https://github.com/engineervix/zed-news/commit/b2f7e8967cd5bc4c05c2311210231cc52d22f0b4))
+* **deps:** update dependency webpack to v5.94.0 [security] ([#116](https://github.com/engineervix/zed-news/issues/116)) ([40cd1bc](https://github.com/engineervix/zed-news/commit/40cd1bcd8a4739265cce9f54cb53311ba326fb94))
+* **deps:** update postgres docker tag to v15.8 ([#104](https://github.com/engineervix/zed-news/issues/104)) ([a77db10](https://github.com/engineervix/zed-news/commit/a77db10cc928548a43c12c533ebc69e59490b35b))
+* ensure moviepy is specified as a dependency ([b17f952](https://github.com/engineervix/zed-news/commit/b17f9523d922f9ce4304d43920b8a8657276a389))
+* google-genai ([2886675](https://github.com/engineervix/zed-news/commit/2886675cd5391362f0f607a19e364f07298f2e6b))
+* install vastai CLi tool ([1517e97](https://github.com/engineervix/zed-news/commit/1517e97625ca74d0557aa8377e6150f0d684209c))
+* update dependencies ([9f73318](https://github.com/engineervix/zed-news/commit/9f73318990cee092d888d6aadce81b4a89b94806))
+* upgrade to python 3.12 and ubuntu 24.04 ([8ffb01f](https://github.com/engineervix/zed-news/commit/8ffb01f41ca797a78282cc3b1dc946bd2ee311b5))
+
+
+### ♻️ Code Refactoring
+
+* a simpler way to generate videos ([d3e5293](https://github.com/engineervix/zed-news/commit/d3e5293921eee57fccd2a8f410f2419477c662e2))
+* add newer GPT model, improve prompt, fix black config ([a3327b1](https://github.com/engineervix/zed-news/commit/a3327b163ea54db69611c316da3600139b52adf4))
+* be more specific when commiting changes ([209812f](https://github.com/engineervix/zed-news/commit/209812f5af3a072c0dc2549b9372d9bae6e043c4))
+* conditionally show some time stats ([0f1ff17](https://github.com/engineervix/zed-news/commit/0f1ff17fc353c31e59bab112a40ca13e7dd5a34f))
+* dark mode -- navbar and header ([bff2e8a](https://github.com/engineervix/zed-news/commit/bff2e8a394fcd4e821473231f0c3e0c8569ab304))
+* improve dark mode implementation ([bafae15](https://github.com/engineervix/zed-news/commit/bafae155e579bf2541fd295e6c6d76663a7eb580))
+* improve prompt and cleanup ([b300faa](https://github.com/engineervix/zed-news/commit/b300faa926c54cb04667a94f10673941764f7d00))
+* **make_video.sh:** ensure that the python virtual environment is activated ([98a7bcd](https://github.com/engineervix/zed-news/commit/98a7bcdd51d18e54abae1a1c52bf13845a6452b3))
+* simplify video creation ([643393b](https://github.com/engineervix/zed-news/commit/643393b159a1643aa72628b8d8b8acc238f561fe))
+* SSH key id to be more unique ([7964af0](https://github.com/engineervix/zed-news/commit/7964af09838b423b371776cf391af6593a4ec2bf))
+* synthesize rather than summarise ([f6bb372](https://github.com/engineervix/zed-news/commit/f6bb372add869bc7b33328929cd6b28ce41f8e65))
+* udpate models and fix invocation of get_episode_number ([e446f03](https://github.com/engineervix/zed-news/commit/e446f034df1709126c022de7e968b162f341f15f))
+* use `mistralai/Mixtral-8x7B-v0.1` for summaries ([b9edb7f](https://github.com/engineervix/zed-news/commit/b9edb7f6b75d7b6829486cbddf5e355de1d7a5c9))
+* use client.chat.completions everywhere ([f9803c3](https://github.com/engineervix/zed-news/commit/f9803c373a5b27be8bbed5c240e3e9caed45a119))
+* use Google's Gemini API for podcast episode summary ([52e99cd](https://github.com/engineervix/zed-news/commit/52e99cd7673d805387010289ced3c45f976f42bf))
+* use mistralai/Mixtral-8x7B-v0.1 for everything else ([fc918ac](https://github.com/engineervix/zed-news/commit/fc918ac194ff06757dabad01fefdd7426645152b))
+* use mistralai/Mixtral-8x7B-v0.1 instead of garage-bAInd/Platypus2-70B-instruct for individual articles ([25b3dab](https://github.com/engineervix/zed-news/commit/25b3dab8031848e83c132c48de1273ada7ab0287))
+* use Mixtral-8x22B-Instruct-v0.1 for article summarisation ([da0d675](https://github.com/engineervix/zed-news/commit/da0d6753c6fa4a4c66f142047b9ad86173cd2e9a))
+* use ntfy.sh for notifications ([504aed6](https://github.com/engineervix/zed-news/commit/504aed6eb3ae65b49927b073742a69e04cef6f6a))
+* use openai for the transcript, and update prompts ([99a1ff6](https://github.com/engineervix/zed-news/commit/99a1ff6775636f8a0d11abd47a86dab05b86c82e))
+* use updated langchain openai package ([0a379ad](https://github.com/engineervix/zed-news/commit/0a379adaa1dfed3c7e6b94d68595019e0e7771bc))
+
+
+### ✅ Tests
+
+* add tests for social posting ([3c751c1](https://github.com/engineervix/zed-news/commit/3c751c17b79b1b6e1da6a85387d4fafff37e71ee))
+* add unit tests for together summarization ([86359e4](https://github.com/engineervix/zed-news/commit/86359e4c0d10d4d33c36a18017db71992441ab05))
+* fix broken test ([eca18b3](https://github.com/engineervix/zed-news/commit/eca18b37d7095378c5695ffe7e45323c6a0729da))
+* fix broken test after 45212854cb824ac76180b7aa39d246b365a4d0fa ([823b40a](https://github.com/engineervix/zed-news/commit/823b40ae49c5eb74c5096a48cdefa8b88feb3da2))
+* write more unit tests ([9c95809](https://github.com/engineervix/zed-news/commit/9c958095cae50b2b4f2fa920a2d5c7fe36547ff2))
+* write unit tests for summarization ([14d1d0b](https://github.com/engineervix/zed-news/commit/14d1d0b98832c37473507462b27a8c421f97b4cc))
+
+
+### 👷 CI/CD
+
+* add missing GEMINI_API_KEY ([60443be](https://github.com/engineervix/zed-news/commit/60443befda2812d94de1c1f2fcfca2807695f2a4))
+* ensure proper venv creation and activation in GitHub Actions ([dac0f04](https://github.com/engineervix/zed-news/commit/dac0f0417080fded30c86c93567b527ba01b13d0))
+* ensure sass is not updated, for now ([6361917](https://github.com/engineervix/zed-news/commit/6361917471df4445d99ca7f705f72ca98a9ad466)), closes [twbs/bootstrap#34051](https://github.com/twbs/bootstrap/issues/34051)
+* fix failing tests ([8366ce1](https://github.com/engineervix/zed-news/commit/8366ce10ad446e6c7fb1465707935807ecbbfd79))
+
 ## [v0.9.0](https://github.com/engineervix/zed-news/compare/v0.8.0...v0.9.0) (2024-07-20)
 
 
