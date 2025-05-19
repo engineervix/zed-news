@@ -1,6 +1,6 @@
 ---
 title: "{{ title }}"
-description: "{{ description }}"
+description: {{ description | tojson }}
 tags: episode
 episode: "{{ episode }}"
 date: {{ date }}
@@ -26,6 +26,6 @@ articles:
     {%- for article in articles %}
     - source: {{ article.source }}
       url: {{ article.url }}
-      title: {{ article.title }}
+      title: {{ article.title | tojson }}
     {%- endfor %}
 ---
