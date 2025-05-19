@@ -4,8 +4,8 @@ from datetime import datetime, timedelta, timezone
 
 import pytz
 from babel import Locale
+from google import genai
 from jinja2 import Environment, PackageLoader, select_autoescape
-from together import Together
 
 # from num2words import num2words
 from app.core.db.models import Article, Episode, Mp3
@@ -30,9 +30,9 @@ env = Environment(
 base_template = env.get_template("episode.njk.jinja")
 dist_file = f"{EPISODE_TEMPLATE_DIR}/{today_iso_fmt}.njk"
 
-# Together
-TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-client = Together(api_key=TOGETHER_API_KEY)
+# Google
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+gemini_client = genai.Client(api_key=GEMINI_API_KEY, http_options={"api_version": "v1alpha"})
 
 transcript = f"{DATA_DIR}/{today_iso_fmt}_podcast-content.txt"
 
@@ -41,48 +41,53 @@ logger = logging.getLogger(__name__)
 
 def create_episode_summary(content: str, episode: str) -> str:
     """
-    Using Together AI's Inference API, create a summary to use as episode description.
+    Using Google's Gemini API, create a summary to use as episode description.
 
+    Args:
+        content: The content to summarize
+        episode: The episode number/identifier
 
-    https://docs.together.ai/reference/complete
+    Returns:
+        str: The generated summary or fallback text if generation fails
     """
-
-    prompt = f"Given the transcript of today's episode below, write a very brief summary to use as a description for the media file. Your summary should be a single paragraph, not exceeding 2 sentences.\n\n```\n{content}\n```"
-
-    model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
-    temperature = 0.75
-    max_tokens = 512
-
-    completion = client.chat.completions.create(
-        model=model,
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    logger.info(completion)
-
     fallback = f"This is episode {episode} of the Zed News Podcast."
 
-    if result := completion.choices[0].message.content.strip():
-        result = result.replace("```", "")  # Remove triple backticks
-        first_line = result.splitlines()[0].lower()
-        unwanted = ["summary:", "here's", "here is", "sure"]
+    try:
+        prompt = f"""Given the details of today's episode below, write a very brief summary to use as a description for the media file. Your summary should be a single paragraph, not exceeding 2 sentences. Focus on the most significant news stories and their impact.
 
-        if any(string in first_line for string in unwanted):
-            # Remove the first line from result
-            result = "\n".join(result.split("\n")[1:])
-            if result.strip() == "":
-                logger.warning("Podcast episode summary is empty after removing unwanted text")
-                result = fallback
+Content:
+{content}"""
 
-        return result.replace("\n", "")  # Remove newlines
-    else:
-        logger.error("Podcast episode summary is empty")
+        # Create request for Gemini
+        model = "gemini-2.0-flash"
+        response = gemini_client.models.generate_content(
+            model=model,
+            contents=prompt,
+        )
+
+        logger.info(response)
+
+        if result := response.text.strip():
+            result = result.replace("```", "")  # Remove triple backticks
+            first_line = result.splitlines()[0].lower() if result.splitlines() else ""
+            unwanted = ["summary:", "here's", "here is", "sure"]
+
+            if any(string in first_line for string in unwanted):
+                # Remove the first line from result
+                result = "\n".join(result.split("\n")[1:])
+                if result.strip() == "":
+                    logger.warning("Podcast episode summary is empty after removing unwanted text")
+                    return fallback
+
+            return result.replace("\n", "")  # Remove newlines
+        else:
+            logger.error("Podcast episode summary is empty")
+            return fallback
+
+    except Exception as e:
+        # Catch all exceptions to ensure the function never fails completely
+        error_type = type(e).__name__
+        logger.error(f"Error generating episode summary ({error_type}): {str(e)}")
         return fallback
 
 
