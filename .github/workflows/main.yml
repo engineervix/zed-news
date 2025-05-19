@@ -246,6 +246,7 @@ jobs:
         shell: bash
         env:
           OPENAI_API_KEY: "fake_key"
+          GEMINI_API_KEY: "fake_key"
           COHERE_API_KEY: "another_fake_key"
           TOGETHER_API_KEY: "some_key"
           AWS_ACCESS_KEY_ID: "1234567890"
