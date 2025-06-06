@@ -358,7 +358,7 @@ def get_release_notes(c):
 
 @task
 def digest(c):
-    """Generate daily news digest from latest Zambian news sources"""
+    """Generate news digest from latest Zambian news sources"""
     c.run("python app/core/run.py", pty=True)
 
 

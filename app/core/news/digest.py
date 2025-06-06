@@ -21,8 +21,8 @@ def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, s
         logging.warning(f"Could not find article with title '{title}', URL '{url}', and date '{date}'")
 
 
-def create_daily_digest(news: list[dict[str, str]], dest: str, summarizer: Callable):
-    """Create a daily news digest from the news articles using the provided summarization function
+def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callable):
+    """Create a news digest from the news articles using the provided summarization function
     and write it to a file
 
     Args:
@@ -101,11 +101,11 @@ def create_daily_digest(news: list[dict[str, str]], dest: str, summarizer: Calla
             digest_content += f"\n{summary.strip()}\n\n"
 
     # Write the raw content to a file for reference
-    metadata = f"Title: Zed News Daily Digest\nDate: {today_human_readable}\n\n"
+    metadata = f"Title: Zed News Digest\nDate: {today_human_readable}\n\n"
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + digest_content)
 
-    # Generate a cohesive daily digest using OpenAI
+    # Generate a cohesive news digest using OpenAI
     model = "gpt-4.1-nano"
     temperature = 0.7
     max_tokens = 3096
@@ -163,7 +163,7 @@ def create_daily_digest(news: list[dict[str, str]], dest: str, summarizer: Calla
         with open(dest, "w") as f:
             f.write(generated_digest)
 
-        logging.info(f"Daily digest created successfully: {dest}")
+        logging.info(f"News digest created successfully: {dest}")
         return {
             "date": today_iso_fmt,
             "title": f"News Digest - {today_human_readable}",

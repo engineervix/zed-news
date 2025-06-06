@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 def create_digest_description(content: str, date: str) -> str:
     """
-    Using Google's Gemini API, create a brief description for the daily digest.
+    Using Google's Gemini API, create a brief description for the news digest.
 
     Args:
         content: The digest content to summarize
@@ -35,7 +35,7 @@ def create_digest_description(content: str, date: str) -> str:
     Returns:
         str: The generated description or fallback text if generation fails
     """
-    fallback = f"Daily news digest for {date} covering the latest developments in Zambian news."
+    fallback = f"News digest for {date} covering the latest developments in Zambian news."
 
     # Check if API key is available
     if not GEMINI_API_KEY:
