@@ -1,5 +1,5 @@
 """
-Toolchain for fetching news content and processing it into a daily digest.
+Toolchain for fetching news content and processing it into a digest.
 """
 
 import json
@@ -11,7 +11,7 @@ from colorama import init
 from dotenv import load_dotenv
 
 from app.core.db.config import close_database, initialize_database
-from app.core.news.digest import create_daily_digest
+from app.core.news.digest import create_news_digest
 from app.core.news.fetch import get_latest_news, save_news_to_db, save_news_to_file
 from app.core.podcast.eleventify import render_jinja_template
 from app.core.summarization.backends import together as together_backend
@@ -52,9 +52,9 @@ def main():
     # Save news to the database
     save_news_to_db(news)
 
-    # Create daily digest
-    logging.info("Creating daily news digest...")
-    digest_data = create_daily_digest(news, digest_content, together_backend.summarize)
+    # Create news digest
+    logging.info("Creating news digest...")
+    digest_data = create_news_digest(news, digest_content, together_backend.summarize)
 
     end_time = time.time()
     processing_time = int(end_time - start_time)
@@ -72,7 +72,7 @@ def main():
     with open(digest_metadata, "w") as f:
         json.dump(digest_data, f, indent=2, ensure_ascii=False)
 
-    logging.info(f"Daily digest processing completed in {processing_time} seconds")
+    logging.info(f"News digest processing completed in {processing_time} seconds")
     logging.info(f"Digest metadata saved to: {digest_metadata}")
 
     # Move files to today's directory for organization first
@@ -97,7 +97,7 @@ def main():
     # Render the Jinja template for website generation (after files are moved)
     render_jinja_template()
 
-    logging.info("Daily digest generation completed successfully!")
+    logging.info("News digest generation completed successfully!")
 
     # Close the database connection
     close_database()
