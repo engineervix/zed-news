@@ -1,139 +1,106 @@
+import json
 import os
 import shutil
 import tempfile
 import unittest
-from datetime import timedelta
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from peewee import SqliteDatabase
-
-from app.core.db.models import Article, Episode, Mp3
-from app.core.utilities import lingo, podcast_host, today, today_human_readable, today_iso_fmt
-
-MODELS = [Article, Episode, Mp3]
-test_db = SqliteDatabase(":memory:")
+from app.core.news.eleventify import cleanup_old_templates, get_digest_metadata, render_jinja_template
+from app.core.utilities import today_human_readable, today_iso_fmt
 
 
 class TestEleventify(unittest.TestCase):
     def setUp(self):
-        # Patch genai.Client before importing render_jinja_template
-        self.genai_patch = patch("app.core.podcast.eleventify.genai.Client")
-        self.genai_patch.start()
-        from app.core.podcast.eleventify import render_jinja_template
-
-        self.render_jinja_template = render_jinja_template
-
         self.temp_dir = tempfile.mkdtemp()
-        self.dist_file = os.path.join(self.temp_dir, f"{today_iso_fmt}.njk")
-        self.transcript = os.path.join(self.temp_dir, f"{today_iso_fmt}_transcript.txt")
+        self.patcher_data_dir = patch("app.core.utilities.DATA_DIR", self.temp_dir)
+        self.patcher_dist_file = patch("app.core.news.eleventify.dist_file", f"{self.temp_dir}/{today_iso_fmt}.njk")
 
-        self.patch_dist_file = patch("app.core.podcast.eleventify.dist_file", self.dist_file)
-        self.patch_transcript = patch("app.core.podcast.eleventify.transcript", self.transcript)
+        self.mock_data_dir = self.patcher_data_dir.start()
+        self.mock_dist_file = self.patcher_dist_file.start()
 
-        self.patch_dist_file.start()
-        self.patch_transcript.start()
-
-        # Bind model classes to test db. Since we have a complete list of
-        # all models, we do not need to recursively bind dependencies.
-        test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
-
-        test_db.connect()
-        test_db.create_tables(MODELS)
-
-        self.mp3 = Mp3.create(
-            url=f"https://example.com/{today_iso_fmt}_podcast_dist.mp3", filesize=10485760, duration=630
-        )
-
-        self.episode = Episode.create(
-            number=1,
-            live=True,
-            title=today_human_readable,
-            description="Episode 001",
-            presenter=podcast_host,
-            locale=lingo.replace("-", "_"),
-            mp3=self.mp3,
-            time_to_produce=120,
-            word_count=5000,
-        )
-
-        articles = [
-            {
-                "title": f"Test Article {idx}",
-                "source": f"Test Source {idx}",
-                "url": f"https://example.com/{idx}",
-                "content": f"This is a test article {idx}",
-                "date": today,
-                "episode": self.episode,
-            }
-            for idx in range(5)
-        ]
-        articles.append(
-            {
-                "title": "Test Article 5",
-                "source": "Test Source 5",
-                "url": "https://example.com/5",
-                "content": "This is a test article 5",
-                "date": today - timedelta(days=1),
-            }
-        )
-        self.articles = [Article(**article) for article in articles]
-        for article in self.articles:
-            article.save()
+        self.digest_metadata_file = os.path.join(self.mock_data_dir, f"{today_iso_fmt}/{today_iso_fmt}_digest.json")
+        os.makedirs(os.path.dirname(self.digest_metadata_file), exist_ok=True)
 
     def tearDown(self):
+        self.patcher_data_dir.stop()
+        self.patcher_dist_file.stop()
         shutil.rmtree(self.temp_dir)
-        # Not strictly necessary since SQLite in-memory databases only live
-        # for the duration of the connection, and in the next step we close
-        # the connection...but a good practice all the same.
-        test_db.drop_tables(MODELS)
 
-        # Close connection to db.
-        test_db.close()
+    @patch("app.core.news.eleventify.create_digest_description")
+    @patch("app.core.news.eleventify.get_digest_metadata")
+    @patch("app.core.news.eleventify.logging")
+    def test_render_jinja_template(self, mock_logging, mock_get_digest_metadata, mock_create_digest_description):
+        mock_get_digest_metadata.return_value = {
+            "content": "This is the main digest content.",
+            "sources": ["Source A", "Source B"],
+            "articles": [
+                {"source": "Source A", "url": "http://example.com/a", "title": "Article A", "summary": "Summary A"},
+                {"source": "Source B", "url": "http://example.com/b", "title": "Article B", "summary": "Summary B"},
+            ],
+            "total_articles": 2,
+            "generated_at": "2024-01-01T12:00:00Z",
+        }
+        mock_create_digest_description.return_value = "A fantastic news digest for you."
 
-        # If we wanted, we could re-bind the models to their original
-        # database here. But for tests this is probably not necessary.
+        render_jinja_template()
 
-        self.patch_dist_file.stop()
-        self.patch_transcript.stop()
-        self.genai_patch.stop()
-
-    @patch("app.core.podcast.eleventify.get_content")
-    @patch("app.core.podcast.eleventify.create_episode_summary")
-    @patch("app.core.podcast.eleventify.logging")
-    def test_render_jinja_template(self, mock_logging, mock_episode_summary, mock_get_content):
-        mock_episode_summary.return_value = (
-            "In today's news, we cover various topics, including the Lorem Ipsum incident, "
-            "where a prankster replaced all traffic signs with memes, a study suggesting that "
-            "talking to houseplants improves Wi-Fi signal strength, and an interview with a "
-            "local squirrel who claims to have invented a new dance craze sweeping the forest floor."
-        )
-        mock_get_content.return_value = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        self.render_jinja_template(production_time=120, word_count=5000)
-
-        mock_logging.info.assert_called_once_with("Rendering Jinja template ...")
-        self.assertTrue(os.path.exists(self.dist_file))
-        file_size = os.path.getsize(self.dist_file)
-        self.assertNotEqual(file_size, 0, f"The file {self.dist_file} is empty.")
-        with open(self.dist_file, "r") as f:
+        dist_file_path = f"{self.temp_dir}/{today_iso_fmt}.njk"
+        self.assertTrue(os.path.exists(dist_file_path))
+        with open(dist_file_path, "r") as f:
             content = f.read()
 
-        for i in range(5):
-            self.assertIn(f"Test Article {i}", content)
-            self.assertIn(f"Test Source {i}", content)
-            self.assertIn(f"https://example.com/{i}", content)
+        self.assertIn(f"title: {today_human_readable}", content)
+        self.assertIn("description: A fantastic news digest for you.", content)
+        self.assertIn("This is the main digest content.", content)
+        self.assertIn("total_articles: 2", content)
+        self.assertIn("num_sources: 2", content)
+        self.assertIn("Article A", content)
+        self.assertIn("Summary B", content)
+        mock_logging.info.assert_any_call("Rendering Jinja template for daily digest...")
+        mock_logging.info.assert_any_call(f"Daily digest template rendered successfully: {dist_file_path}")
 
-        for i in [5, 6]:
-            self.assertNotIn(f"Test Article {i}", content)
-            self.assertNotIn(f"Test Source {i}", content)
-            self.assertNotIn(f"https://example.com/{i}", content)
+    def test_get_digest_metadata(self):
+        mock_data = {"key": "value"}
+        with open(self.digest_metadata_file, "w") as f:
+            json.dump(mock_data, f)
 
-        self.assertIn("including the Lorem Ipsum incident", content)
-        self.assertIn('episode: "001"', content)
-        self.assertIn(podcast_host, content)
-        self.assertIn(lingo, content)
-        self.assertIn(f"{today_iso_fmt}_podcast_dist.mp3", content)
-        self.assertIn("production_time: 2 minutes", content)
-        self.assertIn("count: 5,000", content)
-        self.assertIn("size: 10.00 MB", content)
-        self.assertIn("enclosure_length: 10485760", content)
-        self.assertIn("itunes_duration: 10:30", content)
+        with patch("app.core.news.eleventify.digest_metadata_file", self.digest_metadata_file):
+            data = get_digest_metadata()
+            self.assertEqual(data, mock_data)
+
+    def test_get_digest_metadata_file_not_found(self):
+        with patch("app.core.news.eleventify.logging") as mock_logging:
+            with patch("app.core.news.eleventify.digest_metadata_file", "non_existent_file.json"):
+                data = get_digest_metadata()
+                self.assertEqual(data, {})
+                mock_logging.error.assert_called_with("Digest metadata file not found: non_existent_file.json")
+
+    @patch("app.core.news.eleventify.gemini_client")
+    def test_create_digest_description_success(self, mock_gemini_client):
+        mock_response = MagicMock()
+        mock_response.text = "This is a generated description."
+        mock_gemini_client.models.generate_content.return_value = mock_response
+
+        with patch.dict(os.environ, {"GEMINI_API_KEY": "test_key"}):
+            description = render_jinja_template.__globals__["create_digest_description"]("content", "date")
+            self.assertIn("This is a generated description.", description)
+
+    def test_cleanup_old_templates(self):
+        news_dir = os.path.join(self.temp_dir, "app/web/_pages/news")
+        os.makedirs(news_dir, exist_ok=True)
+
+        # Create some dummy files
+        with open(os.path.join(news_dir, "2023-01-01.njk"), "w") as f:
+            f.write("old")
+        with open(os.path.join(news_dir, f"{today_iso_fmt}.njk"), "w") as f:
+            f.write("new")
+
+        with patch("app.core.news.eleventify.news_dir", news_dir):
+            cleanup_old_templates(days_to_keep=30)
+
+        self.assertFalse(os.path.exists(os.path.join(news_dir, "2023-01-01.njk")))
+        self.assertTrue(os.path.exists(os.path.join(news_dir, f"{today_iso_fmt}.njk")))
+
+
+if __name__ == "__main__":
+    unittest.main()
