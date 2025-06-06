@@ -1,0 +1,135 @@
+{% extends "base.njk" %}
+
+{% block header %}
+<header class="py-3">
+    <div class="container px-5">
+        <div class="row gx-5 align-items-center justify-content-center">
+            <div class="col-lg-10">
+                <div class="my-5 text-center">
+                    <h1 class="display-6 fw-bolder mb-3">{{ title }}</h1>
+                    <p class="lead mb-4">{{ description }}</p>
+                    <div class="d-flex justify-content-center align-items-center gap-4 text-muted">
+                        <div>
+                            <i class="fa-solid fa-calendar-days me-2"></i>
+                            <time datetime="{{ date | date('YYYY-MM-DD') }}">{{ date | date('dddd, MMMM Do, YYYY') }}</time>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-clock me-2"></i>
+                            {{ processing_time }}
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-newspaper me-2"></i>
+                            {{ references.count }} articles from {{ references.sources }} sources
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section py-5">
+    <div class="container px-5">
+        <div class="row gx-5 justify-content-center">
+            <div class="col-lg-10">
+                {# Main digest content #}
+                <div class="card mb-5">
+                    <div class="card-body p-5">
+                        <div class="small text-uppercase fw-bold text-primary mb-3">
+                            <i class="fa-solid fa-file-text me-2"></i>
+                            Daily News Digest
+                        </div>
+                        <div class="digest-content">
+                            {{ digest_content | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe | replace('<p>', '<p class="mb-4">') }}
+                        </div>
+                    </div>
+                </div>
+
+                {# Sources summary #}
+                <div class="card mb-5">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fa-solid fa-list-ul me-2"></i>
+                            News Sources Summary
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="display-6 fw-bold text-primary">{{ references.count }}</div>
+                                    <div class="text-muted">Total Articles</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="display-6 fw-bold text-success">{{ references.sources }}</div>
+                                    <div class="text-muted">News Sources</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="display-6 fw-bold text-info">{{ processing_time.split(',')[0] }}</div>
+                                    <div class="text-muted">Processing Time</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="h6 fw-bold mb-3">Sources:</h4>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            {% for source in source_list %}
+                            <span class="badge bg-secondary">{{ source }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {# Article details #}
+                {% if articles.length > 0 %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fa-solid fa-newspaper me-2"></i>
+                            Article Details
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        {% for article in articles %}
+                        {% if article.summary %}
+                        <div class="p-4 {% if not loop.last %}border-bottom{% endif %}">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="h6 mb-1">
+                                    <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                                        {{ article.title | replace('"', '') }}
+                                        <i class="fa-solid fa-external-link-alt fa-sm ms-1"></i>
+                                    </a>
+                                </h5>
+                                <span class="badge bg-light text-dark">{{ article.source }}</span>
+                            </div>
+                            {% if article.summary %}
+                            <p class="text-muted mb-0">{{ article.summary }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {# Navigation #}
+                <div class="mt-5 d-flex justify-content-between">
+                    <a href="/news/" class="btn btn-outline-primary">
+                        <i class="fa-solid fa-arrow-left me-2"></i>
+                        All News Digests
+                    </a>
+                    <div class="text-muted small">
+                        Generated on {{ generated_at | date('MMMM Do, YYYY [at] h:mm A [UTC]') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -6,26 +6,30 @@
     <div class="row gx-5 align-items-center justify-content-center">
         <div class="col-lg-8 col-xl-7 col-xxl-6">
         <div class="my-5 text-start">
-            <h1 class="display-5 fw-bolder mb-2">Zed News Podcast</h1>
+            <h1 class="display-5 fw-bolder mb-2">Zed News</h1>
             <p class="lead fw-normal mb-4">
-            Discover the Zed News Podcast – your weekday source for the
-            latest happenings in Zambia (and beyond). Stay informed and
-            up-to-date with AI-powered updates from various Zambian sources.
-            Our podcast runs on autopilot, leveraging technology to curate
-            content & summarize each news item, providing you with concise
-            and easily digestible updates. Tune in every weekday and stay
-            ahead of the news.
+            Your daily source for AI-curated news digests covering the latest happenings in Zambia and beyond.
+            Stay informed with comprehensive summaries that consolidate multiple news sources into easily
+            digestible insights. Our automated system curates, analyzes, and summarizes news from various
+            Zambian sources, providing you with concise and informative daily updates.
             </p>
             <div class="d-flex flex-column align-items-start flex-md-row justify-content-md-between gap-3">
-                <button type="button" id="home-play-btn" class="btn btn-outline-danger">
-                    <i class="fa-solid fa-circle-play me-2"></i>
-                    Listen
-                </button>
-                <div class="podcast-listen-btn-container"></div>
-                <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#other-ways-to-listen">
-                    <i class="fa-solid fa-headphones me-2"></i>
-                    Other ways to listen
-                </button>
+                {% if collections.news.length > 0 %}
+                    {%- set latestDigest = collections.news | first -%}
+                    <a href="{{ latestDigest.url }}" class="btn btn-primary">
+                        <i class="fa-solid fa-newspaper me-2"></i>
+                        Read Latest Digest
+                    </a>
+                    <a href="/news/" class="btn btn-outline-dark">
+                        <i class="fa-solid fa-list me-2"></i>
+                        Browse All Digests
+                    </a>
+                {% else %}
+                    <a href="/episodes/" class="btn btn-outline-primary">
+                        <i class="fa-solid fa-headphones me-2"></i>
+                        Browse Episodes Archive
+                    </a>
+                {% endif %}
             </div>
         </div>
         </div>
@@ -33,7 +37,7 @@
         <img
             class="img-fluid rounded-3 my-5"
             src="/img/podcast-illustration.svg"
-            alt="Zed News Podcast"
+            alt="Zed News"
         />
         </div>
     </div>
@@ -42,33 +46,52 @@
 {% endblock %}
 
 {% block content %}
-<section class="section bg-success bg-gradient py-5">
+{% if collections.news.length > 0 %}
+<section class="section bg-primary bg-gradient py-5">
     <div class="container px-4 px-lg-5">
         <div class="row gx-5 justify-content-center">
         <div class="col-lg-10">
             <div class="card mb-5 mb-xl-0">
-            <div id="audio-player" class="card-body p-5">
+            <div class="card-body p-5">
                 <div class="small text-uppercase fw-bold">
                 <i class="fa-solid fa-star text-warning"></i>
-                Latest Episode
+                Latest News Digest
                 </div>
                 <div class="mb-3">
-                    {%- set latestEpisode = collections.episode | reverse | first -%}
-                    {%- set episodeTitle = latestEpisode.data.title -%}
-                    {%- set episodeTitleParts = episodeTitle.split(", ") -%}
-                    {%- set episodeDayOfWeek = episodeTitleParts[0] -%}
-                    <span class="display-4 fw-bold">{{ episodeDayOfWeek }}</span>
-                    <span class="text-muted">{{ episodeTitleParts[1] }}, {{ episodeTitleParts[2] }}</span>
+                    {%- set latestDigest = collections.news | first -%}
+                    {%- set digestTitle = latestDigest.data.title -%}
+                    {%- set digestDate = latestDigest.date -%}
+                    <span class="display-5 fw-bold">{{ digestDate | date('dddd') }}</span>
+                    <span class="text-muted">{{ digestDate | date('MMMM Do, YYYY') }}</span>
                 </div>
-                <audio class="podcast-player" controls>
-                    <source src="{{ latestEpisode.data.mp3.url }}" type="audio/mp3" />
-                    <code>audio</code> tag is not supported in this browser.
-                </audio>
-                <div class="mt-3">
-                    <a href="{{ latestEpisode.url }}">
-                        <i class="fa-solid fa-note-sticky text-primary me-2"></i>
-                        Episode notes
+                <p class="mb-3">{{ latestDigest.data.description }}</p>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% for source in latestDigest.data.source_list %}
+                    <span class="badge bg-light text-dark">{{ source }}</span>
+                    {% endfor %}
+                </div>
+                <div class="row text-center mb-3">
+                    <div class="col-md-4">
+                        <div class="h5 fw-bold text-primary">{{ latestDigest.data.references.count }}</div>
+                        <div class="small text-muted">Articles</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="h5 fw-bold text-success">{{ latestDigest.data.references.sources }}</div>
+                        <div class="small text-muted">Sources</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="h5 fw-bold text-info">{{ latestDigest.data.processing_time.split(',')[0] }}</div>
+                        <div class="small text-muted">Processing Time</div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ latestDigest.url }}" class="btn btn-primary">
+                        <i class="fa-solid fa-newspaper me-2"></i>
+                        Read Full Digest
                     </a>
+                    <small class="text-muted">
+                        Generated {{ latestDigest.data.generated_at | date('MMM DD, YYYY [at] h:mm A') }}
+                    </small>
                 </div>
             </div>
             </div>
@@ -76,14 +99,82 @@
         </div>
     </div>
 </section>
+{% else %}
+<section class="section bg-warning bg-gradient py-5">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-5 justify-content-center">
+        <div class="col-lg-10">
+            <div class="card mb-5 mb-xl-0">
+            <div class="card-body p-5 text-center">
+                <div class="display-1 text-muted mb-3">
+                    <i class="fa-solid fa-newspaper"></i>
+                </div>
+                <h3 class="h4 mb-3">Daily News Digests Coming Soon</h3>
+                <p class="mb-4">We're transitioning from podcast episodes to daily text-based news digests. The first digest will appear here once generated.</p>
+                <a href="/episodes/" class="btn btn-outline-primary">
+                    <i class="fa-solid fa-headphones me-2"></i>
+                    Browse Episode Archive (500 Episodes)
+                </a>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% if collections.news.length > 1 %}
 <section class="section py-5">
     <div class="container px-5">
         <div class="row gx-5">
         <div class="col">
-            <h2 class="fw-bolder fs-5 mb-4">Recent Episodes</h2>
+            <h2 class="fw-bolder fs-5 mb-4">Recent News Digests</h2>
+            {%- for digest in collections.news.slice(1, 5) -%}
+            <div class="d-flex mb-4 border-bottom">
+                <div class="flex-shrink-0">
+                    <div class="p-3 bg-primary text-white rounded">
+                        <i class="fa-solid fa-newspaper fa-2x"></i>
+                    </div>
+                </div>
+                <div class="flex-grow-1 ms-3"
+                     data-aos="fade-up"
+                     data-aos-delay="50"
+                     data-aos-duration="1800"
+                     data-aos-easing="ease-out-back">
+                    <div class="small text-muted">{{ digest.date | date('dddd, MMMM Do, YYYY') }}</div>
+                    <a class="text-decoration-none h6" href="{{ digest.url }}">
+                        {{ digest.data.title | replace('"', '') }}
+                    </a>
+                    <p class="text-muted small mb-2">{{ digest.data.description | truncate(120) }}</p>
+                    <div class="d-flex gap-2">
+                        {% for source in digest.data.source_list.slice(0, 3) %}
+                        <span class="badge bg-light text-dark">{{ source }}</span>
+                        {% endfor %}
+                        {% if digest.data.source_list.length > 3 %}
+                        <span class="badge bg-secondary">+{{ digest.data.source_list.length - 3 }} more</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {%- endfor -%}
+            <div class="text-end mb-5 mb-xl-0">
+            <a class="text-decoration-none" href="/news/">
+                View all news digests
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+{% else %}
+<section class="section py-5">
+    <div class="container px-5">
+        <div class="row gx-5">
+        <div class="col">
+            <h2 class="fw-bolder fs-5 mb-4">Recent Episodes <span class="badge bg-secondary">Archive</span></h2>
+            <p class="text-muted mb-4">Browse our complete archive of 500 podcast episodes, produced from June 2023 to the present.</p>
             {%- set episodes = collections.episode | reverse -%}
-            {%- for episode in episodes.slice(1, 5) -%}
-            {# Episode #}
+            {%- for episode in episodes.slice(0, 4) -%}
             <div class="d-flex mb-4 border-bottom">
                 <div class="flex-shrink-0">
                     <img src="/img/zed-news-podcast-icon.svg" alt="Episode {{ episode.data.episode }}" />
@@ -114,6 +205,7 @@
         </div>
     </div>
 </section>
+{% endif %}
 <section class="py-5 section__support" style="background-image: url('/img/support.jpg')" >
     <div class="overlay"></div>
     <div class="text-center my-5">

@@ -1,0 +1,123 @@
+{% extends "base.njk" %}
+
+{% block header %}
+<header class="py-3">
+    <div class="container px-5">
+        <div class="row gx-5 align-items-center justify-content-center">
+            <div class="col-lg-8">
+                <div class="my-5 text-center">
+                    <h1 class="display-5 fw-bolder mb-2">Daily News Digests</h1>
+                    <p class="lead fw-normal mb-4">
+                        Stay informed with AI-curated daily summaries of the latest happenings in Zambia and beyond.
+                        Each digest consolidates multiple news sources into easily digestible insights.
+                    </p>
+                    <div class="d-flex justify-content-center align-items-center gap-4 text-muted">
+                        <div>
+                            <i class="fa-solid fa-newspaper me-2"></i>
+                            {{ collections.news.length }} Total Digests
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-clock me-2"></i>
+                            Updated Daily
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section py-5">
+    <div class="container px-5">
+        <div class="row gx-5 justify-content-center">
+            <div class="col-lg-10">
+                {% if news.length > 0 %}
+                    {% for digest in news %}
+                    <div class="card mb-4">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <time class="badge bg-primary me-3" datetime="{{ digest.date | date('YYYY-MM-DD') }}">
+                                            {{ digest.date | date('MMM DD, YYYY') }}
+                                        </time>
+                                        <div class="text-muted small">
+                                            <i class="fa-solid fa-newspaper me-1"></i>
+                                            {{ digest.data.references.count }} articles from {{ digest.data.references.sources }} sources
+                                        </div>
+                                    </div>
+                                    <h3 class="h5 mb-2">
+                                        <a href="{{ digest.url }}" class="text-decoration-none">
+                                            {{ digest.data.title | replace('"', '') }}
+                                        </a>
+                                    </h3>
+                                    <p class="text-muted mb-2">{{ digest.data.description }}</p>
+                                    <div class="d-flex flex-wrap gap-1 mb-2">
+                                        {% for source in digest.data.source_list %}
+                                        <span class="badge bg-light text-dark small">{{ source }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <div class="d-flex flex-column align-items-md-end">
+                                        <div class="text-muted small mb-2">
+                                            <i class="fa-solid fa-clock me-1"></i>
+                                            {{ digest.data.processing_time }}
+                                        </div>
+                                        <a href="{{ digest.url }}" class="btn btn-outline-primary btn-sm">
+                                            Read Digest
+                                            <i class="fa-solid fa-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% if pagination.pages.length > 1 %}
+                    <nav aria-label="News digest pagination" class="mt-5">
+                        <ul class="pagination justify-content-center">
+                            {% if pagination.previousPageLink %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ pagination.previousPageLink }}">
+                                    <i class="fa-solid fa-arrow-left me-1"></i>
+                                    Previous
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for pageNum in range(0, pagination.pages.length) %}
+                            <li class="page-item {% if pagination.pageNumber == pageNum %}active{% endif %}">
+                                <a class="page-link" href="{{ pagination.pages[pageNum] }}">{{ pageNum + 1 }}</a>
+                            </li>
+                            {% endfor %}
+
+                            {% if pagination.nextPageLink %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ pagination.nextPageLink }}">
+                                    Next
+                                    <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="display-1 text-muted mb-3">
+                            <i class="fa-solid fa-newspaper"></i>
+                        </div>
+                        <h3 class="h4 mb-3">No News Digests Yet</h3>
+                        <p class="text-muted mb-4">Daily news digests will appear here as they are generated.</p>
+                        <a href="/" class="btn btn-primary">Return Home</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
