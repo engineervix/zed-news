@@ -27,7 +27,6 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libssl-dev libffi-dev python3-dev python3-venv tzdata locales \
     curl \
     git \
-    ffmpeg \
     libpq-dev \
     postgresql-client \
     && apt-get autoremove \
