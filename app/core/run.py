@@ -76,10 +76,7 @@ def main():
     logging.info(f"Daily digest processing completed in {processing_time} seconds")
     logging.info(f"Digest metadata saved to: {digest_metadata}")
 
-    # Render the Jinja template for website generation
-    render_jinja_template(processing_time)
-
-    # Move files to today's directory for organization
+    # Move files to today's directory for organization first
     # NOTE: Run a cron job to delete these files after a month
     subprocess.run(
         f"mkdir -p {DATA_DIR}/{today_iso_fmt}",
@@ -97,6 +94,9 @@ def main():
         f"mv -v {digest_metadata} {DATA_DIR}/{today_iso_fmt}/",
         shell=True,
     )
+
+    # Render the Jinja template for website generation (after files are moved)
+    render_jinja_template(processing_time)
 
     logging.info("Daily digest generation completed successfully!")
 

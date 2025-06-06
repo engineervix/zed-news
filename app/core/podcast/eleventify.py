@@ -5,7 +5,6 @@ from datetime import datetime, timedelta, timezone
 
 import pytz
 from babel import Locale
-from google import genai
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from app.core.db.models import Article
@@ -16,11 +15,11 @@ env = Environment(
     autoescape=select_autoescape(["html"]),
 )
 base_template = env.get_template("digest.njk.jinja")
-dist_file = f"src/news/{today_iso_fmt}.njk"
+dist_file = f"app/web/_pages/news/{today_iso_fmt}.njk"
 
 # Google
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-gemini_client = genai.Client(api_key=GEMINI_API_KEY, http_options={"api_version": "v1alpha"})
+gemini_client = None  # Initialize lazily when needed
 
 digest_metadata_file = f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}_digest.json"
 
@@ -40,7 +39,19 @@ def create_digest_description(content: str, date: str) -> str:
     """
     fallback = f"Daily news digest for {date} covering the latest developments in Zambian news."
 
+    # Check if API key is available
+    if not GEMINI_API_KEY:
+        logger.warning("GEMINI_API_KEY not set, using fallback description")
+        return fallback
+
     try:
+        # Import and initialize client lazily
+        from google import genai
+
+        global gemini_client
+        if gemini_client is None:
+            gemini_client = genai.Client(api_key=GEMINI_API_KEY, http_options={"api_version": "v1alpha"})
+
         prompt = f"""Given the daily news digest below, write a very brief description (1-2 sentences) that captures the main themes and most significant stories of the day. Focus on what readers will find most valuable.
 
 Digest Content:
@@ -154,7 +165,7 @@ def render_jinja_template(processing_time: int):
 
 def cleanup_old_templates(days_to_keep: int = 30):
     """Remove old digest template files to prevent accumulation"""
-    news_dir = "src/news"
+    news_dir = "app/web/_pages/news"
     if not os.path.exists(news_dir):
         return
 
