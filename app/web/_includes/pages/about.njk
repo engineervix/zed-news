@@ -17,14 +17,13 @@
             it useful too.
           </p>
           <div class="d-flex flex-column align-items-start flex-md-row justify-content-md-between gap-3" >
-            <a class="btn btn-outline-danger px-4" href="/#audio-player">
-                <i class="fa-solid fa-circle-play me-2"></i>
-                Listen
+            <a class="btn btn-outline-primary px-4" href="/news/">
+                <i class="fa-solid fa-newspaper me-2"></i>
+                Browse News Digests
             </a>
-            <div class="podcast-listen-btn-container"></div>
             <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#listen-and-subscribe">
                 <i class="fa-solid fa-headphones me-2"></i>
-                Listen & Subscribe
+                Listen to Podcast Archive
             </button>
           </div>
         </div>
@@ -33,7 +32,7 @@
         <img
           class="img-fluid rounded-3 my-5"
           src="/img/questions-illustration.svg"
-          alt="Zed News Podcast"
+          alt="Zed News"
         />
       </div>
     </div>
@@ -47,9 +46,13 @@
     <div class="row gx-5">
       <div class="col">
         <div class="text-white">
-          <h2 class="fw-bolder text-white mb-3">How does this work❔</h2>
+          <h2 class="fw-bolder text-white mb-3">From Podcast to Daily Digests 📰</h2>
           <p class="lead text-white">
-            Every Monday to Friday in the afternoon, a
+            After producing <strong>500 podcast episodes</strong> from June 2023 onwards, we've evolved into something even better: <strong>daily text-based news digests</strong>. This transition allows for faster consumption, better searchability, and more efficient news consumption while maintaining the same AI-powered curation and summarization that made the podcast valuable.
+          </p>
+          <h3 class="fw-bolder text-white mb-3 mt-4">How does this work❔</h3>
+          <p class="lead text-white">
+            Every weekday, a
             <a
               href="https://en.wikipedia.org/wiki/Cron"
               class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
@@ -65,74 +68,25 @@
               rel="noopener noreferrer"
               >"in the cloud"</a
             >
-            to fetch the latest news from a number of sources (which are
-            mentioned in each podcast episode).
+            to fetch the latest news from multiple Zambian sources.
           </p>
           <p class="lead text-white">
-            Each news item is then summarized using a <a href="https://www.deepset.ai/blog/what-is-a-language-model" class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" target="_blank" rel="noopener noreferrer">language model</a>, and a <a href="https://www.python.org/" class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" target="_blank" rel="noopener noreferrer">Python</a> script compiles everything into some
-            kind of transcript for the podcast episode.
+            Each news item is then summarized using a <a href="https://www.deepset.ai/blog/what-is-a-language-model" class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" target="_blank" rel="noopener noreferrer">language model</a>, and a <a href="https://www.python.org/" class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" target="_blank" rel="noopener noreferrer">Python</a> script compiles everything into a comprehensive daily digest that's organized by themes and importance.
           </p>
           <p class="lead text-white">
-            The transcript is then converted into an audio file using
-            <a
-              href="https://aws.amazon.com/polly/"
-              class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
-              target="_blank"
-              rel="noopener noreferrer"
-              >text-to-speech technology</a
-            >.
+            The digest is automatically published to this website, providing you with a clean, scannable summary of the day's most important Zambian news. Links to original sources are organized by publication for easy reference.
           </p>
           <p class="lead text-white">
-            Next, some <em>basic</em> <a href="https://online.berklee.edu/takenote/mixing-music-what-is-sound-audio-mixing/" class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" target="_blank" rel="noopener noreferrer">sound mixing</a> is done, which includes addition of an opening and
-            closing jingle. Podcast metadata is then added to the audio
-            file. At this point, the episode is ready to be published.
-          </p>
-          <p class="lead text-white">
-            All of the above processes are handled automatically, without
-            any human intervention. I think the animation below
-            pretty sums it up. It's kinda like a
+            All of this happens automatically, without any human intervention - just like our podcast did. It's still a kind of
             <a
               href="https://en.wikipedia.org/wiki/Rube_Goldberg_machine"
               class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
               target="_blank"
               rel="noopener noreferrer"
               >Rube Goldberg machine</a
-            >
-            😄!
+            >, but optimized for the modern way we consume news! 😄
           </p>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-<section class="section pt-5">
-  <div class="container px-4 px-lg-5">
-    <div class="row gx-5">
-      <div class="col">
-        <div
-          style="
-            width: 100%;
-            height: 0;
-            padding-bottom: 75%;
-            position: relative;
-          "
-        >
-          <iframe
-            src="https://giphy.com/embed/xUA7b7pPIVE1p4j3Og"
-            width="100%"
-            height="100%"
-            style="position: absolute"
-            frameborder="0"
-            class="giphy-embed"
-            allowfullscreen
-          ></iframe>
-        </div>
-        <p>
-          <a
-            href="https://giphy.com/gifs/birthday-hand-animated-gif-xUA7b7pPIVE1p4j3Og"
-            >via GIPHY</a
-          >
-        </p>
       </div>
     </div>
   </div>
@@ -142,91 +96,67 @@
     <div class="row gx-5">
       <div class="col">
         <div>
-          <h2 class="fw-bolder mb-3">And now, some fun facts❗</h2>
+          <h2 class="fw-bolder mb-3">Key Facts & Features ✨</h2>
           <ul class="fa-ul">
             <li>
               <span class="fa-li">
                 <i class="text-success fa-solid fa-caret-right"></i>
               </span>
-              Only news items published on the same day are included in
-              each episode.
+              Only news items published on the same day are included in each daily digest, ensuring fresh and relevant content.
             </li>
             <li>
               <span class="fa-li">
                 <i class="text-success fa-solid fa-caret-right"></i>
               </span>
-              No personal opinions are expressed in the podcast. The news items are
-              presented as they are, without any commentary (Although the LLM may add a reaction, or two!).
+              No personal opinions are expressed in the digests. News items are presented objectively, without commentary (though the AI may add helpful context!).
             </li>
             <li>
               <span class="fa-li">
                 <i class="text-success fa-solid fa-caret-right"></i>
               </span>
-               Summaries generated using <a href="https://www.wired.co.uk/article/how-chatgpt-works-large-language-model">LLMs</a> may lack full context, nuance, and may inadvertently introduce biases or inaccuracies due to the limitations of the model and the potential for misinterpretation of input. That's why the links to the articles are there for you to go and check for yourself if you need to!
+              <strong>Historical Achievement:</strong> We successfully produced <strong>500 automated podcast episodes</strong> from June 2023 onwards, proving the viability of AI-powered news curation. This complete archive remains available for listening.
             </li>
             <li>
               <span class="fa-li">
                 <i class="text-success fa-solid fa-caret-right"></i>
               </span>
-              The text to speech technology is not perfect. Sometimes, the
-              pronunciation of locale-specific words (that is, Zambian words,
-              names, places, etc.) is not correct. After some experimenting,
-              I found that, of all the English voices available, the one
-              with better pronunciation is
-              <a
-                href="https://docs.aws.amazon.com/polly/latest/dg/voicelist.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Ayanda from South Africa</a
-              >. I think there's work that needs to be done towards having
-              a Zambian English
-              <a
-                href="https://www.science.co.il/language/Locale-codes.php"
-                target="_blank"
-                rel="noopener noreferrer"
-                >locale</a
-              >, just as we have South African English, Australian
-              English, etc. Perhaps you and I can do something about this?
-              🤔
+               Summaries generated using <a href="https://www.wired.co.uk/article/how-chatgpt-works-large-language-model">LLMs</a> may lack full context, nuance, and may inadvertently introduce biases or inaccuracies due to model limitations. That's why direct links to original articles are provided for fact-checking!
             </li>
             <li>
               <span class="fa-li">
                 <i class="text-success fa-solid fa-caret-right"></i>
               </span>
-              Because the news items are presented as summaries, the
-              podcast episodes are usually short, between 2 and 10 minutes
-              long, depending on the number of news items on that day.
+              <strong>Faster consumption:</strong> Text-based digests can be scanned and read much faster than listening to audio, making it easier to stay informed in our busy world.
             </li>
             <li>
               <span class="fa-li">
                 <i class="text-success fa-solid fa-caret-right"></i>
               </span>
-              Links to the original news articles are included in the show
-              notes, so you can read the full articles if you want to know
-              more.
+              <strong>Searchable content:</strong> Unlike audio, text digests are searchable, making it easy to find specific topics or stories from previous days.
             </li>
             <li>
               <span class="fa-li">
                 <i class="text-success fa-solid fa-caret-right"></i>
               </span>
-              This whole thing is an experiment in automation and
-              artificial intelligence. The best way to learn a craft is by
-              building things, and that's what I'm doing here. I'm
-              learning as I go, and I'm having a lot of fun doing it. I
-              hope you enjoy listening to the podcast as much as I enjoy
-              tinkering with the technology behind it.
+              Links to original news articles are organized by source in collapsible sections, making it easy to explore stories that interest you most.
             </li>
             <li>
               <span class="fa-li">
                 <i class="text-success fa-solid fa-caret-right"></i>
               </span>
-              The idea for this project was actually inspired by
+              This continues to be an experiment in automation and artificial intelligence. The best way to learn is by building and evolving, and that's exactly what we're doing here. We hope you find these daily digests as valuable as our podcast archive.
+            </li>
+            <li>
+              <span class="fa-li">
+                <i class="text-success fa-solid fa-caret-right"></i>
+              </span>
+              The original idea was inspired by
               <a
                 href="https://camrobjones.com/hackercast/"
                 target="_blank"
                 rel="noopener noreferrer"
                 >Hackercast</a
-              >, an AI-generated podcast summary of
+              >, which creates AI-generated podcast summaries of
               <a
                 href="https://news.ycombinator.com/"
                 target="_blank"
@@ -261,11 +191,25 @@
     <div class="modal-dialog">
         <div class="modal-content">
         <div class="modal-header">
-            <p class="modal-title fs-5" id="listenAndSubscribeLabel">Take your pick …</p>
+            <p class="modal-title fs-5" id="listenAndSubscribeLabel">Listen to 500 Episode Archive</p>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+            <div class="text-center mb-3">
+                <p class="text-muted">
+                    <strong>Archive Complete:</strong> Browse our complete collection of 500 podcast episodes, produced from June 2023 onwards. While we've transitioned to daily text digests, these episodes remain available for listening.
+                </p>
+            </div>
             <div class="d-grid gap-2 col-6 mx-auto">
+                <a
+                    class="btn btn-outline-primary px-4"
+                    href="/episodes/"
+                >
+                    <i class="fa-solid fa-list me-2"></i>
+                    Browse All Episodes
+                </a>
+                <hr/>
+                <small class="text-muted text-center mb-2">Or listen on your favorite platform:</small>
                 <a
                     class="btn btn-outline-dark px-4"
                     href="https://podcasts.apple.com/us/podcast/zed-news-podcast/id1690709989"

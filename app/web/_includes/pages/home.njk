@@ -66,7 +66,7 @@
                 </div>
                 <p class="mb-3">{{ latestDigest.data.description }}</p>
                 <div class="d-flex flex-wrap gap-2 mb-3">
-                    {% for source in latestDigest.data.source_list %}
+                    {% for source in latestDigest.data.references.source_list %}
                     <span class="badge bg-light text-dark">{{ source }}</span>
                     {% endfor %}
                 </div>
@@ -141,12 +141,12 @@
                         {{ digest.data.title | replace('"', '') }}
                     </a>
                     <p class="text-muted small mb-2">{{ digest.data.description | truncate(120) }}</p>
-                    <div class="d-flex gap-2">
-                        {% for source in digest.data.source_list.slice(0, 3) %}
+                    <div class="d-flex gap-2 mb-3">
+                        {% for source in digest.data.references.source_list.slice(0, 3) %}
                         <span class="badge bg-light text-dark">{{ source }}</span>
                         {% endfor %}
-                        {% if digest.data.source_list.length > 3 %}
-                        <span class="badge bg-secondary">+{{ digest.data.source_list.length - 3 }} more</span>
+                        {% if digest.data.references.source_list.length > 3 %}
+                        <span class="badge bg-secondary">+{{ digest.data.references.source_list.length - 3 }} more</span>
                         {% endif %}
                     </div>
                 </div>
@@ -155,45 +155,6 @@
             <div class="text-end mb-5 mb-xl-0">
             <a class="text-decoration-none" href="/news/">
                 View all news digests
-                <i class="fa-solid fa-arrow-right"></i>
-            </a>
-            </div>
-        </div>
-        </div>
-    </div>
-</section>
-{% else %}
-<section class="section py-5">
-    <div class="container px-5">
-        <div class="row gx-5">
-        <div class="col">
-            <h2 class="fw-bolder fs-5 mb-4">Recent Episodes <span class="badge bg-secondary">Archive</span></h2>
-            <p class="text-muted mb-4">Browse our complete archive of 500 podcast episodes, produced from June 2023 to the present.</p>
-            {%- set episodes = collections.episode | reverse -%}
-            {%- for episode in episodes.slice(0, 4) -%}
-            <div class="d-flex mb-4 border-bottom">
-                <div class="flex-shrink-0">
-                    <img src="/img/zed-news-podcast-icon.svg" alt="Episode {{ episode.data.episode }}" />
-                </div>
-                <div class="flex-grow-1 ms-3"
-                     data-aos="fade-up"
-                     data-aos-delay="50"
-                     data-aos-duration="1800"
-                     data-aos-easing="ease-out-back">
-                    <div class="small text-muted">{{ episode.data.title }}</div>
-                    <a class="episode-link" href="{{ episode.url }}"
-                    >Episode {{ episode.data.episode }}
-                    </a>
-                    <audio class="podcast-player" controls>
-                    <source src="{{ episode.data.mp3.url }}" type="audio/mp3" />
-                    <code>audio</code> tag is not supported in this browser.
-                    </audio>
-                </div>
-            </div>
-            {%- endfor -%}
-            <div class="text-end mb-5 mb-xl-0">
-            <a class="text-decoration-none" href="/episodes/">
-                View all episodes
                 <i class="fa-solid fa-arrow-right"></i>
             </a>
             </div>
