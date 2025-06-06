@@ -1,6 +1,6 @@
 # zed-news
 
-> Automated news podcast consisting of AI-powered updates from various Zambian 🇿🇲 sources.
+> Automated news digests from various Zambian 🇿🇲 sources.
 
 [![CI/CD](https://github.com/engineervix/zed-news/actions/workflows/main.yml/badge.svg)](https://github.com/engineervix/zed-news/actions/workflows/main.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/engineervix/f4b1128b188c4e29722bc879e4ab6574/raw/covbadge.json)](https://github.com/engineervix/zed-news/actions?query=workflow%3A%22CI%2FCD%22)
@@ -19,130 +19,102 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [Introduction](#introduction)
-- [Why this project?](#why-this-project)
+- [Project Evolution: From Podcast to News Digest](#project-evolution-from-podcast-to-news-digest)
 - [Development](#development)
   - [Core](#core)
   - [Web](#web)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [TODO](#todo)
-  - [Docs](#docs)
   - [Dev](#dev)
   - [Frontend (Web)](#frontend-web)
-  - [Backend (Core)](#backend-core)
   - [Features for future releases](#features-for-future-releases)
 - [Credits](#credits)
   - [Music](#music)
-  - [Icon](#icon)
+  - [Icons](#icons)
   - [News Sources](#news-sources)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Introduction
 
-This is a tool that gathers news from various Zambian 🇿🇲 sources, summarizes the news items and presents the news as a podcast.
+This tool gathers news from various Zambian 🇿🇲 sources, processes them, and presents them as a text-based news digest.
 
-It consists primarily of two parts / components:
+The project has two main components:
 
-- **core** -- this is primarily python code, where the following tasks are handled:
+- **core** -- A Python application that handles:
 
-  - gather the news using [requests](https://pypi.org/project/requests/), [feedparser](https://pypi.org/project/feedparser/) and [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
-  - summarise the news using LLMs,
-  - create the podcast transcript,
-  - convert text to speech using [AWS Polly](https://aws.amazon.com/polly/),
-  - process the audio using [ffmpeg](https://ffmpeg.org/), and
-  - generate content for the website.
+  - Gathering news from RSS feeds using [requests](https://pypi.org/project/requests/), [feedparser](https://pypi.org/project/feedparser/), and [beautifulsoup4](https://pypi.org/project/beautifulsoup4/).
+  - Processing the news articles using Large Language Models (LLMs).
+  - Generating structured data for the static website.
 
-  The illustration below summarises this:
+- **web** -- An [11ty](httpss://www.11ty.dev/) static site that presents the news digests.
 
-  ![How it works](https://res.cloudinary.com/engineervix/image/upload/v1697574721/slidev/zed-news-talk/toolchain.png)
+## Project Evolution: From Podcast to News Digest
 
-- **web** -- this is an [11ty](https://www.11ty.dev/) project, consisting of logic to build a static site for the podcast, including an RSS feed.
+After 500 episodes, I decided to transition the Zed News project from generating audio podcast episodes to producing text-based news digests. The core value of providing consolidated Zambian news is still preserved.
 
-## Why this project?
-
-- I'm generally terrible at keeping up with current affairs
-- I wanted to learn how to work with AI tools while solving a real problem
-- I was inspired by [Hackercast](https://camrobjones.com/hackercast/)
+The original podcast episodes have been archived, and the project now focuses on delivering fast, scannable news content.
 
 ## Development
 
-- clone / fork the project
-- `cd` into the project directory
+- Clone or fork the project.
+- `cd` into the project directory.
 
 ### Core
 
 > **Note**
 >
-> You need to have `docker` and `docker-compose` on your machine
+> You need to have `docker` and `docker-compose` on your machine.
 
-On your machine:
-
-- you need to have [poetry](https://python-poetry.org/) installed
-- create a python [virtual environment](https://realpython.com/python-virtual-environments-a-primer/)
-- upgrade pip to latest version
-
-  ```bash
-  pip install --upgrade pip
-  ```
-
-- install dependencies
-
+- Install [Poetry](https://python-poetry.org/).
+- Create a Python [virtual environment](https://realpython.com/python-virtual-environments-a-primer/).
+- Install dependencies:
   ```bash
   poetry install
   ```
-
-- update environment variables.
+- Set up environment variables:
 
   ```bash
-  # copy .env.example to .env
+  # Copy the example .env file
   cp -v .env.example .env
 
-  # Now you can update the relevant values in the .env file
+  # Update the values in your new .env file
   ```
 
-- build images and spin up docker containers
-
+- Build and run the Docker containers:
   ```bash
   inv up --build
   ```
-
-- access the `app` container
-
+- Access the `app` container's shell:
   ```bash
   inv exec app bash
   ```
 
-In the container:
+Inside the container, you can run the following commands:
 
-- you can run tests
-
+- Run tests:
   ```bash
   inv test
   ```
-
-- you can run the program
-
+- Generate a new digest:
   ```bash
-  inv toolchain
+  inv digest
   ```
 
-See available [invoke](https://www.pyinvoke.org/) tasks with `invoke -l`
+See available [invoke](https://www.pyinvoke.org/) tasks with `invoke -l`.
 
-The project uses [pgweb](https://github.com/sosedoff/pgweb) to help visualize database changes. You can access this in your browser at <http://127.0.0.1:8081>
+The project uses [pgweb](https://github.com/sosedoff/pgweb) to visualize database changes. Access it at <http://127.0.0.1:8081>.
 
 ### Web
 
-This project uses Node [v18](https://nodejs.org/en/blog/release/v18.0.0). I recommend using [fnm](https://github.com/Schniz/fnm) or [volta](https://volta.sh/) to simplify managing Node.js versions on your machine.
+This project uses Node.js [v18](https://nodejs.org/en/blog/release/v18.0.0). We recommend using [fnm](https://github.com/Schniz/fnm) or [volta](https://volta.sh/) to manage Node.js versions.
 
-- install frontend dependencies
-
+- Install frontend dependencies:
   ```bash
   npm install
   ```
-
-- start the dev server, accessible at <http://127.0.0.1:8080/>
-
+- Start the local development server (accessible at <http://127.0.0.1:8080/>):
   ```bash
   npm start
   ```
@@ -151,30 +123,21 @@ See other available scripts in `package.json`.
 
 ## Deployment
 
-The final outputs of this project are:
-
-- **mp3 files**, hosted on [AWS S3](https://aws.amazon.com/s3/) (or similar platforms like [Backblaze](https://www.backblaze.com/)).
-- **a static site**, which can be hosted anywhere. I use [Cloudflare Pages](https://pages.cloudflare.com/), but you have various options such as [GitGub Pages](https://pages.github.com/), [Netlify](https://www.netlify.com/), [Vercel](https://vercel.com/), [Render](https://render.com/), etc. You can even choose to host it on your own server.
+The project's final output is a **static site**, which can be hosted on any platform that supports static files, such as [Cloudflare Pages](https://pages.cloudflare.com/), [Netlify](https://www.netlify.com/), [Vercel](https://vercel.com/), or [GitHub Pages](https://pages.github.com/).
 
 > **Warning**
 >
-> Ensure that environment variables are updated accordingly for both **core** and **web**.
+> Ensure that environment variables are updated accordingly for both the **core** application and the **web** build process.
 
-For a smooth, unattended setup, please follow these steps:
+For an automated, hands-off setup, follow these steps:
 
-1. Set up a [\*nix](https://en.wikipedia.org/wiki/Unix-like) machine (it can be your laptop, a VPS, etc.) with a Python virtual environment for the project, and make sure `docker` and `docker-compose` are installed.
-
-2. Configure a cron job on the machine to run the `cron.sh` script located in the repository root. This script will handle the automated generation and deployment process.
-
-3. Ensure that the machine has `git` properly configured. This is necessary for the `cron.sh` script to push the generated content to the repository, triggering the build and deployment.
-
-By following these steps, you can automate the deployment process and keep your project up to date without manual intervention.
+1.  Set up a [nix-based](https://en.wikipedia.org/wiki/Unix-like) machine (e.g., a VPS or your laptop) with a Python virtual environment, `docker`, and `docker-compose`.
+2.  Configure a cron job to run the `cron.sh` script located in the project root. This script automates the generation and deployment process.
+3.  Ensure `git` is configured correctly on the machine, as the `cron.sh` script pushes the generated content to the repository, which in turn triggers the website's build and deployment pipeline.
 
 > **Note**
 >
-> The `cron.sh` script uses [apprise](https://github.com/caronc/apprise) to notify the owner when a new episode is ready. You'll need to check the apprise docs on how to configure ntfy.sh or whatever apprise backend you choose.
->
-> Feel free to adapt the deployment setup to your specific requirements and preferred hosting platforms.
+> The `cron.sh` script uses [Apprise](https://github.com/caronc/apprise) to send notifications when a new digest is ready. You will need to configure the notification service (e.g., ntfy.sh) in your `.env` file.
 
 ## Contributing
 
@@ -209,40 +172,22 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 
 ### Dev
 
-- [x] Switch to [Poetry](https://python-poetry.org/)
-- [x] Replace [flake8](https://pypi.org/project/flake8/), [pycodestyle](https://pypi.org/project/pydocstyle/) and [isort](https://pypi.org/project/isort/) with [ruff](https://github.com/charliermarsh/ruff)
 - [ ] Improve test coverage
 
 ### Frontend (Web)
 
-- [x] Create a **More ways to listen** button with a popup/modal so that people can choose multiple services
-- [ ] Create a dynamic `og:image` with episode number & date
-- [ ] Keep things DRY. For example, the **More ways to listen** modal on the _home_ and _about_ pages, the header and footer icons.
-- [ ] Toggle Dark/Light mode
-- [ ] Improve the mobile UI. For example, the audio player controls
-- [ ] Improve a11y. For instance, learn more about [using the aria-current attribute](https://tink.uk/using-the-aria-current-attribute/)
-- [ ] Implement **search** on the web app
-
-### Backend (Core)
-
-- [x] Add a separate module for summarization backends so we can choose which one to work with
-- [ ] Add more robust error handling on `requests` and `feedparser` jobs as well as all other operations, such as connecting to AWS Polly, etc.
-- [ ] Add task to perform substitution so that, for instance, K400 is written as 400 Kwacha. The AWS Polly voices fail to read Zambian money correctly.
+- [ ] Create a dynamic `og:image` for each digest.
+- [ ] Keep things DRY. For example, the header and footer icons.
+- [ ] Improve the mobile UI.
+- [ ] Improve accessibility (a11y).
+- [ ] Implement search functionality for the news digests.
 
 ### Features for future releases
 
-- [x] Cleanup the news by consolidating similar articles from different sources. In other words, let's make this [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
-- [x] Connect with social media platforms and automagically tweet, post to facebook when a new episode is out.
-- [x] Keep the background music running throughout the show
-- [x] Different background music for each day of the week
-- [ ] Mention the weather in Lusaka, Livingstone, Kabwe, etc. Perhaps the weather forecast for the following day?
-- [ ] Mention exchange rates
-- [ ] Find a way to make a closing statement based on the news. Something like, "Don't forget to register yor sim card before the ZICTA deadline ..."
-- [ ] Possibly allow for passing of an argument variable for the voice, or dynamically choose a voice from a list, just like the random intros and outros.
-- [ ] Find a way of training the voice to learn how to pronounce Zambian words.
-- [ ] Find a way to summarize for free, without relying on OpenAI's API. Perhaps train your own model, learn how to leverage tools like [NLTK](https://www.nltk.org/), [spaCy](https://spacy.io/), etc.
-- [ ] Incorporate a newsletter version where the news is sent to your mailbox in a nice, clean format. People can subscribe / unsubscribe.
-- [ ] Add [Diamond TV](https://diamondtvzambia.com) as a news source. Might be a good idea to replace Muvi TV with Diamond TV because the latter seems to have infrequent updates. Also, we don't want too many news items -- it kills the whole point of this project -- to get the latest updates delivered in a _concise_ manner.
+- [ ] Add weather reports/forecasts
+- [ ] Add exchange rates feature.
+- [ ] Consider more sustainable AI integrations
+- [ ] Add [Diamond TV](https://diamondtvzambia.com) as a news source.
 
 ## Credits
 
@@ -254,9 +199,10 @@ See `pre-commit-config.yaml` for more details. In addition, please note the foll
 - <https://pixabay.com/music/beats-stellar-echoes-202315/>
 - <https://pixabay.com/music/afrobeat-it-afrobeat-149308/>
 
-### Icon
+### Icons
 
-- logo adapted from <https://www.pngrepo.com/svg/227923/news-reporter-woman>
+- <https://www.pngrepo.com/svg/227923/news-reporter-woman>
+- <https://www.svgrepo.com/svg/205960/news-paper>
 
 ### News Sources
 
