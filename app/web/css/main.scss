@@ -187,6 +187,7 @@ header {
   border: 1px solid var(--bs-border-color);
 
   &:hover {
+    -ms-transform: translateY(-2px);
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     border-color: var(--bs-primary);
@@ -203,6 +204,41 @@ header {
 
   [data-bs-theme="dark"] &:hover {
     box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+  }
+}
+
+// Digest content styling for improved readability
+.digest-content {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--bs-body-color);
+
+  p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Better spacing for content sections
+  > p:first-child {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--bs-emphasis-color);
+  }
+
+  // Style any bold text (likely section headers)
+  strong,
+  b {
+    color: var(--bs-emphasis-color);
+    font-weight: 600;
+  }
+
+  // Improve readability on smaller screens
+  @include media-breakpoint-down(md) {
+    font-size: 1rem;
   }
 }
 
