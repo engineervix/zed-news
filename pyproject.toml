@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "zed-news"
 version = "0.10.0"
-description = "news podcast on auto-pilot"
+description = "Automated news digests from various Zambian 🇿🇲 sources, powered by AI."
 authors = ["Victor Miti <https://github.com/engineervix>"]
 readme = "README.md"
 packages = [{include = "app"}]
