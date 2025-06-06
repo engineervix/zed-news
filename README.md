@@ -95,8 +95,8 @@ On your machine:
 - update environment variables.
 
   ```bash
-  # copy .env.sample to .env
-  cp -v .env.sample .env
+  # copy .env.example to .env
+  cp -v .env.example .env
 
   # Now you can update the relevant values in the .env file
   ```
