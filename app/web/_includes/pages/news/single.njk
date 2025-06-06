@@ -14,10 +14,6 @@
                             <time datetime="{{ date | date('YYYY-MM-DD') }}">{{ date | date('dddd, MMMM Do, YYYY') }}</time>
                         </div>
                         <div>
-                            <i class="fa-solid fa-clock me-2"></i>
-                            {{ processing_time }}
-                        </div>
-                        <div>
                             <i class="fa-solid fa-newspaper me-2"></i>
                             {{ references.count }} articles from {{ references.sources }} sources
                         </div>
@@ -57,63 +53,67 @@
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-6">
                                 <div class="text-center">
                                     <div class="display-6 fw-bold text-primary">{{ references.count }}</div>
                                     <div class="text-muted">Total Articles</div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-6">
                                 <div class="text-center">
                                     <div class="display-6 fw-bold text-success">{{ references.sources }}</div>
                                     <div class="text-muted">News Sources</div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="text-center">
-                                    <div class="display-6 fw-bold text-info">{{ processing_time.split(',')[0] }}</div>
-                                    <div class="text-muted">Processing Time</div>
                                 </div>
                             </div>
                         </div>
 
                         <h4 class="h6 fw-bold mb-3">Sources:</h4>
                         <div class="d-flex flex-wrap gap-2 mb-3">
-                            {% for source in source_list %}
+                            {% for source in references.source_list %}
                             <span class="badge bg-secondary">{{ source }}</span>
                             {% endfor %}
                         </div>
                     </div>
                 </div>
 
-                {# Article details #}
+                {# Article sources accordion #}
                 {% if articles.length > 0 %}
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title mb-0">
                             <i class="fa-solid fa-newspaper me-2"></i>
-                            Article Details
+                            Article Sources
                         </h3>
                     </div>
-                    <div class="card-body p-0">
-                        {% for article in articles %}
-                        {% if article.summary %}
-                        <div class="p-4 {% if not loop.last %}border-bottom{% endif %}">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="h6 mb-1">
-                                    <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
-                                        {{ article.title | replace('"', '') }}
-                                        <i class="fa-solid fa-external-link-alt fa-sm ms-1"></i>
-                                    </a>
-                                </h5>
-                                <span class="badge bg-light text-dark">{{ article.source }}</span>
+                                        <div class="card-body">
+                        <div class="accordion" id="articlesAccordion">
+                            {%- for source, sourceArticles in site.articlesBySource(articles) -%}
+                            <div class="accordion-item">
+                                <h4 class="accordion-header" id="heading{{ loop.index }}">
+                                    <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ loop.index }}">
+                                        <strong>{{ source }}</strong>
+                                        <span class="badge bg-secondary ms-2">{{ sourceArticles.length }} article{% if sourceArticles.length > 1 %}s{% endif %}</span>
+                                    </button>
+                                </h4>
+                                <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#articlesAccordion">
+                                    <div class="accordion-body">
+                                        <ul class="fa-ul">
+                                            {%- for article in sourceArticles -%}
+                                            <li>
+                                                <span class="fa-li">
+                                                    <i class="text-success fa-solid fa-caret-right"></i>
+                                                </span>
+                                                <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer">
+                                                    {{ article.title | replace('"', '') }}
+                                                </a>
+                                            </li>
+                                            {%- endfor -%}
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-                            {% if article.summary %}
-                            <p class="text-muted mb-0">{{ article.summary }}</p>
-                            {% endif %}
+                            {%- endfor -%}
                         </div>
-                        {% endif %}
-                        {% endfor %}
                     </div>
                 </div>
                 {% endif %}

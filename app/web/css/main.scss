@@ -303,3 +303,13 @@ header {
     display: flex;
   }
 }
+
+// Custom news digest colors
+.bg-news-green {
+  --bs-bg-opacity: 1;
+  background-color: rgba(34, 139, 34, var(--bs-bg-opacity)) !important;
+}
+
+.bg-news-green.bg-gradient {
+  background-image: var(--bs-gradient) !important;
+}

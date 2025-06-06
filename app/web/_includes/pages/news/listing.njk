@@ -63,8 +63,8 @@
                                 <div class="col-md-4 text-md-end">
                                     <div class="d-flex flex-column align-items-md-end">
                                         <div class="text-muted small mb-2">
-                                            <i class="fa-solid fa-clock me-1"></i>
-                                            {{ digest.data.processing_time }}
+                                            <i class="fa-solid fa-calendar me-1"></i>
+                                            {{ digest.date | date('dddd') }}
                                         </div>
                                         <a href="{{ digest.url }}" class="btn btn-outline-primary btn-sm">
                                             Read Digest
