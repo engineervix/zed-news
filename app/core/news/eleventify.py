@@ -9,7 +9,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from app.core.utilities import DATA_DIR, today_human_readable, today_iso_fmt
 
 env = Environment(
-    loader=PackageLoader("app", "core/podcast/template"),
+    loader=PackageLoader("app", "core/news/template"),
     autoescape=select_autoescape(["html"]),
 )
 base_template = env.get_template("digest.njk.jinja")

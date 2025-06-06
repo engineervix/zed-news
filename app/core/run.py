@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 
 from app.core.db.config import close_database, initialize_database
 from app.core.news.digest import create_news_digest
+from app.core.news.eleventify import render_jinja_template
 from app.core.news.fetch import get_latest_news, save_news_to_db, save_news_to_file
-from app.core.podcast.eleventify import render_jinja_template
 from app.core.summarization.backends import together as together_backend
 from app.core.utilities import DATA_DIR, configure_logging, today_iso_fmt
 
