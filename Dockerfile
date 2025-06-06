@@ -1,10 +1,14 @@
 FROM ubuntu:24.04
 
-# Add user that will be used in the container
-RUN groupadd zednews && \
-    useradd --create-home --shell /bin/bash -g zednews zednews
-
-RUN mkdir -p /home/zednews/app && chown zednews:zednews /home/zednews/app
+# Remove shipped sudoer user (Required for Ubuntu 24.04 base)
+# Create non-root user & required dirs
+RUN touch /var/mail/ubuntu \
+    && chown ubuntu /var/mail/ubuntu \
+    && userdel -r ubuntu \
+    && groupadd zednews \
+    && useradd --create-home --shell /bin/bash -g zednews zednews \
+    && mkdir -p /home/zednews/app \
+    && chown zednews:zednews /home/zednews/app
 
 # set work directory
 WORKDIR /home/zednews/app
@@ -26,7 +30,8 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     ffmpeg \
     libpq-dev \
     postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get autoremove \
+    && apt-get clean
 
 # Set timezone to Africa/Lusaka
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
