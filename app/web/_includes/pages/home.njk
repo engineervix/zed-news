@@ -64,30 +64,47 @@
                     <span class="display-5 fw-bold">{{ digestDate | date('dddd') }}</span>
                     <span class="text-muted">{{ digestDate | date('MMMM Do, YYYY') }}</span>
                 </div>
-                <p class="mb-3">{{ latestDigest.data.description }}</p>
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    {% for source in latestDigest.data.references.source_list %}
-                    <span class="badge bg-light text-dark">{{ source }}</span>
-                    {% endfor %}
-                </div>
-                <div class="row text-center mb-3">
-                    <div class="col-md-6">
-                        <div class="h5 fw-bold text-primary">{{ latestDigest.data.references.count }}</div>
-                        <div class="small text-muted">Articles</div>
+                                <p class="mb-4">{{ latestDigest.data.description }}</p>
+
+                <!-- Enhanced stats section -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center p-3 bg-primary bg-opacity-10 rounded">
+                            <div class="me-3">
+                                <i class="fa-solid fa-newspaper text-primary fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="h4 fw-bold text-primary mb-0">{{ latestDigest.data.references.count }}</div>
+                                <div class="small text-muted">Articles Reviewed</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="h5 fw-bold text-success">{{ latestDigest.data.references.sources }}</div>
-                        <div class="small text-muted">Sources</div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center p-3 bg-success bg-opacity-10 rounded">
+                            <div class="me-3">
+                                <i class="fa-solid fa-rss text-success fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="h4 fw-bold text-success mb-0">{{ latestDigest.data.references.sources }}</div>
+                                <div class="small text-muted">News Sources</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <a href="{{ latestDigest.url }}" class="btn btn-primary">
+
+                <!-- Enhanced CTA and timestamp section -->
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+                    <a href="{{ latestDigest.url }}" class="btn btn-primary btn-lg">
                         <i class="fa-solid fa-newspaper me-2"></i>
                         Read Full Digest
                     </a>
-                    <small class="text-muted">
-                        Generated {{ latestDigest.data.generated_at | date('MMM DD, YYYY [at] h:mm A') }}
-                    </small>
+                    <div class="d-flex align-items-center text-muted">
+                        <i class="fa-solid fa-clock me-2"></i>
+                        <small>
+                            <span class="fw-medium">Generated</span><br class="d-sm-none">
+                            {{ latestDigest.data.generated_at | date('MMM DD [at] h:mm A') }}
+                        </small>
+                    </div>
                 </div>
             </div>
             </div>
@@ -140,15 +157,7 @@
                     <a class="text-decoration-none h6" href="{{ digest.url }}">
                         {{ digest.data.title | replace('"', '') }}
                     </a>
-                    <p class="text-muted small mb-2">{{ digest.data.description | truncate(120) }}</p>
-                    <div class="d-flex gap-2 mb-3">
-                        {% for source in digest.data.references.source_list.slice(0, 3) %}
-                        <span class="badge bg-light text-dark">{{ source }}</span>
-                        {% endfor %}
-                        {% if digest.data.references.source_list.length > 3 %}
-                        <span class="badge bg-secondary">+{{ digest.data.references.source_list.length - 3 }} more</span>
-                        {% endif %}
-                    </div>
+                    <p class="text-muted small mb-3">{{ digest.data.description | truncate(120) }}</p>
                 </div>
             </div>
             {%- endfor -%}
