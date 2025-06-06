@@ -62,7 +62,6 @@ def main():
     # Add processing metadata to digest data
     digest_data.update(
         {
-            "processing_time": processing_time,
             "generated_at": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
             "raw_news_file": raw_news,
             "digest_file": digest_content,
@@ -96,7 +95,7 @@ def main():
     )
 
     # Render the Jinja template for website generation (after files are moved)
-    render_jinja_template(processing_time)
+    render_jinja_template()
 
     logging.info("Daily digest generation completed successfully!")
 

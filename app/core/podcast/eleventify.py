@@ -4,11 +4,9 @@ import os
 from datetime import datetime, timedelta, timezone
 
 import pytz
-from babel import Locale
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from app.core.db.models import Article
-from app.core.utilities import DATA_DIR, format_duration, lingo, today, today_human_readable, today_iso_fmt
+from app.core.utilities import DATA_DIR, today_human_readable, today_iso_fmt
 
 env = Environment(
     loader=PackageLoader("app", "core/podcast/template"),
@@ -103,7 +101,7 @@ def get_digest_metadata() -> dict:
         return {}
 
 
-def render_jinja_template(processing_time: int):
+def render_jinja_template():
     """Render the Jinja template for a daily digest"""
     logging.info("Rendering Jinja template for daily digest...")
 
@@ -114,17 +112,14 @@ def render_jinja_template(processing_time: int):
         logging.error("No digest metadata available, cannot render template")
         return
 
-    # Get articles for today
-    articles = Article.select().where(Article.date == today)
-
     # Create digest description
     digest_description = create_digest_description(digest_data.get("content", ""), today_human_readable)
 
-    # Prepare sources list
+    # Prepare sources list and articles from digest data (no database query needed)
     sources = digest_data.get("sources", [])
+    digest_articles = digest_data.get("articles", [])
 
     # Setup timezone
-    lc = Locale.parse(lingo.replace("-", "_"))
     utc_dt = datetime.now(timezone.utc) + timedelta(minutes=5)
     LSK = pytz.timezone("Africa/Lusaka")
 
@@ -140,20 +135,17 @@ def render_jinja_template(processing_time: int):
                     "description": digest_description,
                     "date": utc_dt.astimezone(LSK).isoformat(),
                     "digest_content": digest_data.get("content", ""),
-                    "locale_id": lingo,
-                    "locale_name": lc.display_name,
-                    "processing_time": format_duration(processing_time),
-                    "total_articles": digest_data.get("total_articles", len(articles)),
+                    "total_articles": digest_data.get("total_articles", len(digest_articles)),
                     "num_sources": len(sources),
                     "sources": sources,
                     "articles": [
                         {
-                            "source": article.source,
-                            "url": article.url,
-                            "title": f'"{article.title}"',
-                            "summary": article.summary,
+                            "source": article["source"],
+                            "url": article["url"],
+                            "title": article["title"],
+                            "summary": article.get("summary", ""),
                         }
-                        for article in articles
+                        for article in digest_articles
                     ],
                     "generated_at": digest_data.get("generated_at", ""),
                 }
