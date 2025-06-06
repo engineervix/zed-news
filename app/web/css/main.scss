@@ -181,6 +181,31 @@ header {
   }
 }
 
+// News digest cards
+.news-digest-card {
+  transition: all 0.3s ease;
+  border: 1px solid var(--bs-border-color);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: var(--bs-primary);
+
+    .card-title {
+      color: var(--bs-primary);
+    }
+  }
+
+  .card-title {
+    color: var(--bs-body-color);
+    transition: color 0.3s ease;
+  }
+
+  [data-bs-theme="dark"] &:hover {
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+  }
+}
+
 /* stylelint-disable selector-class-pattern */
 .section__support {
   background: no-repeat center center;
