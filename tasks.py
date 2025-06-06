@@ -30,13 +30,15 @@ def get_docker_compose_command():
 def db_snapshot(c, filename_prefix):
     """Create a Database snapshot using DSLR"""
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    c.run(
-        "dslr snapshot {filename_prefix}_{timestamp}".format(
-            filename_prefix=filename_prefix,
-            timestamp=timestamp,
+    (
+        c.run(
+            "dslr snapshot {filename_prefix}_{timestamp}".format(
+                filename_prefix=filename_prefix,
+                timestamp=timestamp,
+            ),
+            pty=True,
         ),
-        pty=True,
-    ),
+    )
 
 
 @task(help={"build": "Build images before starting containers."})
@@ -355,8 +357,8 @@ def get_release_notes(c):
 
 
 @task
-def toolchain(c):
-    """The toolchain for creating the podcast"""
+def digest(c):
+    """Generate daily news digest from latest Zambian news sources"""
     c.run("python app/core/run.py", pty=True)
 
 

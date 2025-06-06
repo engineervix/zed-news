@@ -30,10 +30,6 @@ DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_BUCKET_NAME = os.getenv("AWS_BUCKET_NAME")
-AWS_REGION_NAME = os.getenv("AWS_REGION_NAME")
 
 
 class ColourFormatter(logging.Formatter):
@@ -102,34 +98,6 @@ def format_duration(seconds: int):
     return duration_string
 
 
-def words_per_minute(duration: int, word_count: int):
-    if duration == 0:
-        return "0 words per minute"  # Avoid division by zero
-    duration_minutes = duration / 60
-    rate = word_count / duration_minutes
-    rate_int = int(round(rate))  # Convert rate to nearest integer
-    return f"{rate_int} words per minute"
-
-
-def convert_seconds_to_mmss(duration: int):
-    minutes, seconds = divmod(duration, 60)
-    return "{:02d}:{:02d}".format(minutes, seconds)
-
-
-def format_filesize(filesize: int):
-    """Format the file size in bytes to a human readable string"""
-    units = ["B", "KB", "MB", "GB", "TB"]
-
-    # Iterate through units until the file size is smaller than 1024
-    for unit in units:
-        if filesize < 1024:
-            return f"{filesize:.2f} {unit}"
-        filesize /= 1024
-
-    # If the file size is larger than the largest unit (TB), return in that unit
-    return f"{filesize:.2f} {units[-1]}"
-
-
 def is_valid_date(datestring: str) -> bool:
     try:
         if datestring != datetime.datetime.strptime(datestring, "%Y-%m-%d").strftime("%Y-%m-%d"):
@@ -155,14 +123,10 @@ def count_words(filename: FilePath) -> int:
     return word_count
 
 
-# https://docs.aws.amazon.com/polly/latest/dg/ph-table-english-za.html
-podcast_host = "Ayanda"
 lingo = "en-ZA"
-engine = "neural"
 
 timezone = pytz.timezone("Africa/Lusaka")
 today = datetime.datetime.now(timezone).date()
 
 today_iso_fmt = today.isoformat()
 today_human_readable = custom_strftime("%A, %B {S}, %Y", today)
-podcast_start_date = datetime.date(2023, 6, 1)

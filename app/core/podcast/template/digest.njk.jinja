@@ -1,0 +1,25 @@
+---
+title: "News Digest - {{ title }}"
+description: {{ description | tojson }}
+tags: news
+date: {{ date }}
+digest_content: {{ digest_content | tojson }}
+locale:
+id: {{ locale_id }}
+name: {{ locale_name }}
+processing_time: {{ processing_time }}
+references:
+count: {{ total_articles }}
+sources: {{ num_sources }}
+source_list: {{ sources | tojson }}
+articles:
+{%- for article in articles %}
+- source: {{ article.source }}
+url: {{ article.url }}
+title: {{ article.title | tojson }}
+summary: {{ article.summary | tojson if article.summary else "" }}
+{%- endfor %}
+generated_at: {{ generated_at }}
+---
+
+{{ digest_content }}
