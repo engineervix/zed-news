@@ -10,6 +10,8 @@ from app.core.db.models import Article
 from app.core.summarization.backends.together import brief_summary
 from app.core.utilities import DATA_DIR, today, today_human_readable, today_iso_fmt
 
+logger = logging.getLogger(__name__)
+
 
 def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, summary: str):
     """Find an article by title, URL & date, and update it with the given summary"""
@@ -18,7 +20,7 @@ def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, s
         article.summary = summary
         article.save()
     else:
-        logging.warning(f"Could not find article with title '{title}', URL '{url}', and date '{date}'")
+        logger.warning(f"Could not find article with title '{title}', URL '{url}', and date '{date}'")
 
 
 def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callable):
@@ -151,7 +153,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    logging.info(completion)
+    logger.info(completion)
 
     generated_digest = completion.choices[0].message.content
 
@@ -163,7 +165,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
         with open(dest, "w") as f:
             f.write(generated_digest)
 
-        logging.info(f"News digest created successfully: {dest}")
+        logger.info(f"News digest created successfully: {dest}")
         return {
             "date": today_iso_fmt,
             "title": f"News Digest - {today_human_readable}",
@@ -173,5 +175,5 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
             "sources": list({article["source"] for article in article_summaries}),
         }
     else:
-        logging.error("Generated digest is empty")
+        logger.error("Generated digest is empty")
         sys.exit(1)

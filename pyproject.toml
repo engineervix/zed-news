@@ -108,6 +108,7 @@ show_missing = true
 version_provider = "poetry"
 version_files = [
     "app/__init__.py",
+    "app/core/social/post.py",
     "cron.sh",
 ]
 tag_format = "v$major.$minor.$patch"
