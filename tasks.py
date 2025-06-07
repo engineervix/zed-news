@@ -4,7 +4,7 @@ import shutil
 import subprocess
 
 import tomli
-from colorama import Fore, init
+from colorama import Fore
 from invoke import task
 
 
@@ -30,13 +30,15 @@ def get_docker_compose_command():
 def db_snapshot(c, filename_prefix):
     """Create a Database snapshot using DSLR"""
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    c.run(
-        "dslr snapshot {filename_prefix}_{timestamp}".format(
-            filename_prefix=filename_prefix,
-            timestamp=timestamp,
+    (
+        c.run(
+            "dslr snapshot {filename_prefix}_{timestamp}".format(
+                filename_prefix=filename_prefix,
+                timestamp=timestamp,
+            ),
+            pty=True,
         ),
-        pty=True,
-    ),
+    )
 
 
 @task(help={"build": "Build images before starting containers."})
@@ -311,8 +313,6 @@ def bump(c, branch, first=False, major=False):
     First we check that there are no unstaged files before running
     """
 
-    init()
-
     unstaged_str = "not staged for commit"
     uncommitted_str = "to be committed"
     check = c.run("git status", pty=True)
@@ -355,14 +355,14 @@ def get_release_notes(c):
 
 
 @task
-def toolchain(c):
-    """The toolchain for creating the podcast"""
+def digest(c):
+    """Generate news digest from latest Zambian news sources"""
     c.run("python app/core/run.py", pty=True)
 
 
 @task
 def test(c):
-    """Run tests"""
+    """run tests"""
     c.run("coverage run -m unittest discover app/tests", pty=True)
     c.run("coverage json", pty=True)
     c.run("coverage report -m", pty=True)
@@ -371,4 +371,4 @@ def test(c):
 @task
 def facebook_post(c):
     """Post to Facebook"""
-    c.run("python -m app.core.social.post share facebook", pty=True)
+    c.run("python -m app.core.social.post", pty=True)

@@ -1,0 +1,108 @@
+{% extends "base.njk" %}
+
+{% block header %}
+<header class="py-3">
+    <div class="container px-5">
+        <div class="row gx-5 align-items-center justify-content-center">
+            <div class="col-lg-8">
+                <div class="my-5 text-center">
+                    <h1 class="display-5 fw-bolder mb-2">News Digests</h1>
+                    <p class="lead fw-normal mb-4">
+                        Stay informed with AI-curated summaries of the latest happenings in Zambia and beyond.
+                        Each digest consolidates multiple news sources into easily digestible insights, delivered Monday through Friday.
+                    </p>
+                    <div class="d-flex justify-content-center align-items-center gap-4 text-muted">
+                        <div>
+                            <i class="fa-solid fa-newspaper me-2"></i>
+                            {{ collections.news.length }} Total Digests
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-clock me-2"></i>
+                            Mon - Fri
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section py-5">
+    <div class="container px-5">
+        <div class="row gx-5 justify-content-center">
+            <div class="col-lg-10">
+                {% if news.length > 0 %}
+                    {% for digest in news %}
+                    <a href="{{ digest.url }}" class="text-decoration-none">
+                        <div class="card mb-4 news-digest-card">
+                            <div class="card-body p-4">
+                                <div class="mb-2">
+                                    <div class="text-muted small">
+                                        <i class="fa-solid fa-newspaper me-1"></i>
+                                        {{ digest.data.references.count }} articles from {{ digest.data.references.sources }} sources
+                                    </div>
+                                </div>
+                                <h3 class="h5 mb-2 card-title">
+                                    {{ digest.data.title | replace('"', '') }}
+                                </h3>
+                                <p class="text-muted mb-2">{{ digest.data.description }}</p>
+                                <div class="d-flex flex-wrap gap-1 mb-0">
+                                    {% for source in digest.data.references.source_list %}
+                                    <span class="badge bg-light text-dark small">{{ source }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+
+                    {# Only show pagination if there is more than one page to click through #}
+                    {% if pagination.pages | length > 1 %}
+                    <div class="mb-5 mb-xl-0">
+                        <nav aria-label="News Digest Navigation">
+                            <ul class="pagination justify-content-center">
+                                {% if pagination.href.previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ site.base_url }}{{ pagination.href.previous }}" aria-label="Newer digests">
+                                        <span aria-hidden="true">« Newer</span>
+                                        <span class="sr-only">Newer</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {# {% for page_num in range(0, pagination.pages | length) %}
+                                <li class="page-item {% if page_num  == pagination.pageNumber %} active{% endif %}">
+                                    <a href="{{ site.base_url }}{{ pagination.hrefs[page_num] }}" class="page-link">
+                                        {{ page_num + 1 }}
+                                        {% if page_num == pagination.pageNumber %}<span class="sr-only">(current)</span>{% endif %}
+                                    </a>
+                                </li>
+                                {% endfor %} #}
+                                {% if pagination.href.next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ site.base_url }}{{ pagination.href.next }}" aria-label="Older digests">
+                                        <span aria-hidden="true">Older »</span>
+                                        <span class="sr-only">Older</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="display-1 text-muted mb-3">
+                            <i class="fa-solid fa-newspaper"></i>
+                        </div>
+                        <h3 class="h4 mb-3">No News Digests Yet</h3>
+                        <p class="text-muted mb-4">News digests will appear here as they are generated Monday through Friday.</p>
+                        <a href="/" class="btn btn-primary">Return Home</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

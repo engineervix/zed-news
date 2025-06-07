@@ -44,7 +44,7 @@ git pull || { echo "Failed to pull changes from Git."; send_healthcheck_failure;
 
 # 4. Run script inside docker container
 inv up --build || { echo "Failed to build Docker container."; send_healthcheck_failure; exit 1; }
-docker compose run --rm app invoke toolchain || {
+docker compose run --rm app invoke digest || {
     echo "Failed to run script inside Docker container."
     send_healthcheck_failure
     exit 1
@@ -53,8 +53,8 @@ inv down || { echo "Failed to stop Docker container."; send_healthcheck_failure;
 
 # 5. commit changes
 today_iso=$(date --iso)
-git add app/web/_pages/episodes || { echo "Failed to stage changes for commit."; send_healthcheck_failure; exit 1; }
-git commit --no-verify -m "chore: ✨ new episode 🎙️ » ${today_iso}" || { echo "Failed to commit changes."; send_healthcheck_failure; exit 1; }
+git add app/web/_pages/news || { echo "Failed to stage changes for commit."; send_healthcheck_failure; exit 1; }
+git commit --no-verify -m "chore: 📰 news digest » ${today_iso}" || { echo "Failed to commit changes."; send_healthcheck_failure; exit 1; }
 
 # 6. push changes to remote
 git push origin main || { echo "Failed to push changes to remote repository."; send_healthcheck_failure; exit 1; }
@@ -67,6 +67,6 @@ sleep 300
 
 # Notify Admin via Apprise + ntfy.sh
 today_human_readable=$(date +"%a %d %b %Y")
-apprise -vv -t "🎙️ New Episode » ${today_human_readable}" \
-  -b "📻 Listen now at ${BASE_URL}/episode/${today_iso}/" \
+apprise -vv -t "📰 News Digest » ${today_human_readable}" \
+  -b "📖 Read today's news at ${BASE_URL}/news/${today_iso}/" \
   "${APPRISE_NTFY_URL}"

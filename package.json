@@ -1,7 +1,7 @@
 {
   "name": "zed-news",
   "version": "0.10.0",
-  "description": "news podcast on auto-pilot",
+  "description": "Automated news digests from various Zambian 🇿🇲 sources, powered by AI.",
   "author": "Victor Miti <https://github.com/engineervix>",
   "license": "BSD-3-Clause",
   "private": true,

@@ -329,44 +329,6 @@ jinxed = {version = ">=1.1.0", markers = "platform_system == \"Windows\""}
 wcwidth = ">=0.1.4"
 
 [[package]]
-name = "boto3"
-version = "1.38.28"
-description = "The AWS SDK for Python"
-optional = false
-python-versions = ">=3.9"
-files = [
-    {file = "boto3-1.38.28-py3-none-any.whl", hash = "sha256:1bbf770339d294c91dd396ac90588753d89b9fdd63496edc9bc6f710f24ed25a"},
-    {file = "boto3-1.38.28.tar.gz", hash = "sha256:69395075d54be4552719ccadad9f65a3dee5bb3751701e8851d65d71974a791d"},
-]
-
-[package.dependencies]
-botocore = ">=1.38.28,<1.39.0"
-jmespath = ">=0.7.1,<2.0.0"
-s3transfer = ">=0.13.0,<0.14.0"
-
-[package.extras]
-crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
-
-[[package]]
-name = "botocore"
-version = "1.38.28"
-description = "Low-level, data-driven core of boto 3."
-optional = false
-python-versions = ">=3.9"
-files = [
-    {file = "botocore-1.38.28-py3-none-any.whl", hash = "sha256:515e1a535a27f17e1381aec1fb48eaa2c2308258c4db0bfd09e4f1cd1f239c44"},
-    {file = "botocore-1.38.28.tar.gz", hash = "sha256:63d5977a10a375c3fc11c8e15e1ae5a4daaf450af135d55c170cc537648edf25"},
-]
-
-[package.dependencies]
-jmespath = ">=0.7.1,<2.0.0"
-python-dateutil = ">=2.1,<3.0.0"
-urllib3 = {version = ">=1.25.4,<2.2.0 || >2.2.0,<3", markers = "python_version >= \"3.10\""}
-
-[package.extras]
-crt = ["awscrt (==0.23.8)"]
-
-[[package]]
 name = "bpython"
 version = "0.24"
 description = ""
@@ -839,20 +801,6 @@ files = [
 ]
 
 [[package]]
-name = "deprecation"
-version = "2.1.0"
-description = "A library to handle automated deprecations"
-optional = false
-python-versions = "*"
-files = [
-    {file = "deprecation-2.1.0-py2.py3-none-any.whl", hash = "sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a"},
-    {file = "deprecation-2.1.0.tar.gz", hash = "sha256:72b3bde64e5d778694b0cf68178aed03d15e15477116add3fb773e581f9518ff"},
-]
-
-[package.dependencies]
-packaging = "*"
-
-[[package]]
 name = "distlib"
 version = "0.3.9"
 description = "Distribution utilities"
@@ -918,27 +866,6 @@ files = [
 
 [package.extras]
 tests = ["pytest"]
-
-[[package]]
-name = "eyed3"
-version = "0.9.8"
-description = "Python audio data toolkit (ID3 and MP3)"
-optional = false
-python-versions = "<4.0,>=3.9"
-files = [
-    {file = "eyed3-0.9.8-py3-none-any.whl", hash = "sha256:a49fe53dd0ec0fb1dfa92399c4b1d652e02c4555c90556d0aaa328dd192a3af7"},
-    {file = "eyed3-0.9.8.tar.gz", hash = "sha256:a296ef47d8d5a5b5d7b518c113e650c7db6e47633b31a9ca81453cd48faf9803"},
-]
-
-[package.dependencies]
-deprecation = ">=2.1.0"
-filetype = ">=1.2.0"
-
-[package.extras]
-art-plugin = ["Pillow (>=11.2.1)", "pylast (>=5.5.0)", "requests (>=2.32.3)"]
-dev = ["Paver (>=1.3.4)", "Sphinx (>=7.4.7)", "cogapp (>=3.4.1)", "nicfit-py[cookiecutter] (>=0.8.7)", "regarding (>=0.2.0)", "sphinx-issues (>=5.0.1)", "sphinx-rtd-theme (>=3.0.2)", "twine (>=6.1.0)"]
-test = ["check-manifest (>=0.50)", "coverage (>=7.8.0)", "factory-boy (>=3.3.3)", "flake8 (>=7.2.0)", "pytest (>=8.3.5)", "pytest-cov (>=6.1.1)", "tox (>=4.25.0)"]
-yaml-plugin = ["PyYAML (>=6.0.2)"]
 
 [[package]]
 name = "facebook-sdk"
@@ -1045,17 +972,6 @@ files = [
 docs = ["furo (>=2024.8.6)", "sphinx (>=8.1.3)", "sphinx-autodoc-typehints (>=3)"]
 testing = ["covdefaults (>=2.3)", "coverage (>=7.6.10)", "diff-cover (>=9.2.1)", "pytest (>=8.3.4)", "pytest-asyncio (>=0.25.2)", "pytest-cov (>=6)", "pytest-mock (>=3.14)", "pytest-timeout (>=2.3.1)", "virtualenv (>=20.28.1)"]
 typing = ["typing-extensions (>=4.12.2)"]
-
-[[package]]
-name = "filetype"
-version = "1.2.0"
-description = "Infer file type and MIME type of any file/buffer. No external dependencies."
-optional = false
-python-versions = "*"
-files = [
-    {file = "filetype-1.2.0-py2.py3-none-any.whl", hash = "sha256:7ce71b6880181241cf7ac8697a2f1eb6a8bd9b429f7ad6d27b8db9ba5f1c2d25"},
-    {file = "filetype-1.2.0.tar.gz", hash = "sha256:66b56cd6474bf41d8c54660347d37afcc3f7d1970648de365c102ef77548aadb"},
-]
 
 [[package]]
 name = "frozenlist"
@@ -1527,17 +1443,6 @@ files = [
 ]
 
 [[package]]
-name = "jmespath"
-version = "1.0.1"
-description = "JSON Matching Expressions"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "jmespath-1.0.1-py3-none-any.whl", hash = "sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980"},
-    {file = "jmespath-1.0.1.tar.gz", hash = "sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe"},
-]
-
-[[package]]
 name = "jsonpatch"
 version = "1.33"
 description = "Apply JSON-Patches (RFC 6902)"
@@ -1923,17 +1828,6 @@ files = [
     {file = "multidict-6.4.3-cp39-cp39-win_amd64.whl", hash = "sha256:b1b389ae17296dd739015d5ddb222ee99fd66adeae910de21ac950e00979d897"},
     {file = "multidict-6.4.3-py3-none-any.whl", hash = "sha256:59fe01ee8e2a1e8ceb3f6dbb216b09c8d9f4ef1c22c4fc825d045a147fa2ebc9"},
     {file = "multidict-6.4.3.tar.gz", hash = "sha256:3ada0b058c9f213c5f95ba301f922d402ac234f1111a7d8fd70f1b99f3c281ec"},
-]
-
-[[package]]
-name = "mutagen"
-version = "1.47.0"
-description = "read and write audio tags for many formats"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "mutagen-1.47.0-py3-none-any.whl", hash = "sha256:edd96f50c5907a9539d8e5bba7245f62c9f520aef333d13392a79a4f70aca719"},
-    {file = "mutagen-1.47.0.tar.gz", hash = "sha256:719fadef0a978c31b4cf3c956261b3c58b6948b32023078a2117b1de09f0fc99"},
 ]
 
 [[package]]
@@ -3076,23 +2970,6 @@ files = [
 ]
 
 [[package]]
-name = "s3transfer"
-version = "0.13.0"
-description = "An Amazon S3 Transfer Manager"
-optional = false
-python-versions = ">=3.9"
-files = [
-    {file = "s3transfer-0.13.0-py3-none-any.whl", hash = "sha256:0148ef34d6dd964d0d8cf4311b2b21c474693e57c2e069ec708ce043d2b527be"},
-    {file = "s3transfer-0.13.0.tar.gz", hash = "sha256:f5e6db74eb7776a37208001113ea7aa97695368242b364d73e91c981ac522177"},
-]
-
-[package.dependencies]
-botocore = ">=1.37.4,<2.0a.0"
-
-[package.extras]
-crt = ["botocore[crt] (>=1.37.4,<2.0a.0)"]
-
-[[package]]
 name = "sgmllib3k"
 version = "1.0.0"
 description = "Py3k port of sgmllib."
@@ -3885,4 +3762,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~=3.12"
-content-hash = "aafd9dcae31f7aea4d215047892b7c3ed83218059e05f58af13528eb7ea3c109"
+content-hash = "afb1539586832ec349639ae52f59bf704aacaff880d04b7ce411b19a903678bf"

@@ -21,6 +21,6 @@ def summarize(content: str, title: str) -> str:
         length="auto",
         format="paragraph",
         extractiveness="auto",
-        additional_command="in a manner suitable for reading as part of a podcast",
+        additional_command="in a news-digest format",
     )
     return response.summary
