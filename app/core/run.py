@@ -17,10 +17,6 @@ from app.core.news.fetch import get_latest_news, save_news_to_db, save_news_to_f
 from app.core.summarization.backends import together as together_backend
 from app.core.utilities import DATA_DIR, configure_logging, today_iso_fmt
 
-raw_news = f"{DATA_DIR}/{today_iso_fmt}_news.json"
-digest_content = f"{DATA_DIR}/{today_iso_fmt}_digest-content.txt"
-digest_metadata = f"{DATA_DIR}/{today_iso_fmt}_digest.json"
-
 
 def _read_json_file(file):
     with open(file) as f:
@@ -28,6 +24,10 @@ def _read_json_file(file):
 
 
 def main():
+    raw_news = f"{DATA_DIR}/{today_iso_fmt}_news.json"
+    digest_content = f"{DATA_DIR}/{today_iso_fmt}_digest-content.txt"
+    digest_metadata = f"{DATA_DIR}/{today_iso_fmt}_digest.json"
+
     start_time = time.time()
 
     # Configure logging
