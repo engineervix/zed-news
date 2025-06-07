@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
-from app.core.news.eleventify import cleanup_old_templates, get_digest_metadata, render_jinja_template
+from app.core.news.eleventify import create_digest_description, get_digest_metadata, render_jinja_template
 from app.core.utilities import today_human_readable, today_iso_fmt
 
 
@@ -28,8 +28,8 @@ class TestEleventify(unittest.TestCase):
 
     @patch("app.core.news.eleventify.create_digest_description")
     @patch("app.core.news.eleventify.get_digest_metadata")
-    @patch("app.core.news.eleventify.logging")
-    def test_render_jinja_template(self, mock_logging, mock_get_digest_metadata, mock_create_digest_description):
+    @patch("app.core.news.eleventify.logger")
+    def test_render_jinja_template(self, mock_logger, mock_get_digest_metadata, mock_create_digest_description):
         mock_get_digest_metadata.return_value = {
             "content": "This is the main digest content.",
             "sources": ["Source A", "Source B"],
@@ -49,15 +49,15 @@ class TestEleventify(unittest.TestCase):
         with open(dist_file_path, "r") as f:
             content = f.read()
 
-        self.assertIn(f"title: {today_human_readable}", content)
-        self.assertIn("description: A fantastic news digest for you.", content)
+        self.assertIn(f'title: "News Digest - {today_human_readable}"', content)
+        self.assertIn('description: "A fantastic news digest for you."', content)
         self.assertIn("This is the main digest content.", content)
-        self.assertIn("total_articles: 2", content)
-        self.assertIn("num_sources: 2", content)
+        self.assertIn("count: 2", content)
+        self.assertIn("sources: 2", content)
         self.assertIn("Article A", content)
         self.assertIn("Summary B", content)
-        mock_logging.info.assert_any_call("Rendering Jinja template for daily digest...")
-        mock_logging.info.assert_any_call(f"Daily digest template rendered successfully: {dist_file_path}")
+        mock_logger.info.assert_any_call("Rendering Jinja template for daily digest...")
+        mock_logger.info.assert_any_call(f"Daily digest template rendered successfully: {dist_file_path}")
 
     def test_get_digest_metadata(self):
         mock_data = {"key": "value"}
@@ -69,11 +69,11 @@ class TestEleventify(unittest.TestCase):
             self.assertEqual(data, mock_data)
 
     def test_get_digest_metadata_file_not_found(self):
-        with patch("app.core.news.eleventify.logging") as mock_logging:
+        with patch("app.core.news.eleventify.logger") as mock_logger:
             with patch("app.core.news.eleventify.digest_metadata_file", "non_existent_file.json"):
                 data = get_digest_metadata()
                 self.assertEqual(data, {})
-                mock_logging.error.assert_called_with("Digest metadata file not found: non_existent_file.json")
+                mock_logger.error.assert_called_with("Digest metadata file not found: non_existent_file.json")
 
     @patch("app.core.news.eleventify.gemini_client")
     def test_create_digest_description_success(self, mock_gemini_client):
@@ -82,24 +82,8 @@ class TestEleventify(unittest.TestCase):
         mock_gemini_client.models.generate_content.return_value = mock_response
 
         with patch.dict(os.environ, {"GEMINI_API_KEY": "test_key"}):
-            description = render_jinja_template.__globals__["create_digest_description"]("content", "date")
+            description = create_digest_description("content", "date")
             self.assertIn("This is a generated description.", description)
-
-    def test_cleanup_old_templates(self):
-        news_dir = os.path.join(self.temp_dir, "app/web/_pages/news")
-        os.makedirs(news_dir, exist_ok=True)
-
-        # Create some dummy files
-        with open(os.path.join(news_dir, "2023-01-01.njk"), "w") as f:
-            f.write("old")
-        with open(os.path.join(news_dir, f"{today_iso_fmt}.njk"), "w") as f:
-            f.write("new")
-
-        with patch("app.core.news.eleventify.news_dir", news_dir):
-            cleanup_old_templates(days_to_keep=30)
-
-        self.assertFalse(os.path.exists(os.path.join(news_dir, "2023-01-01.njk")))
-        self.assertTrue(os.path.exists(os.path.join(news_dir, f"{today_iso_fmt}.njk")))
 
 
 if __name__ == "__main__":

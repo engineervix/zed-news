@@ -4,7 +4,7 @@ import shutil
 import subprocess
 
 import tomli
-from colorama import Fore, init
+from colorama import Fore
 from invoke import task
 
 
@@ -313,8 +313,6 @@ def bump(c, branch, first=False, major=False):
     First we check that there are no unstaged files before running
     """
 
-    init()
-
     unstaged_str = "not staged for commit"
     uncommitted_str = "to be committed"
     check = c.run("git status", pty=True)
@@ -364,7 +362,7 @@ def digest(c):
 
 @task
 def test(c):
-    """Run tests"""
+    """run tests"""
     c.run("coverage run -m unittest discover app/tests", pty=True)
     c.run("coverage json", pty=True)
     c.run("coverage report -m", pty=True)
@@ -373,4 +371,4 @@ def test(c):
 @task
 def facebook_post(c):
     """Post to Facebook"""
-    c.run("python -m app.core.social.post share facebook", pty=True)
+    c.run("python -m app.core.social.post", pty=True)

@@ -103,13 +103,13 @@ def get_digest_metadata() -> dict:
 
 def render_jinja_template():
     """Render the Jinja template for a daily digest"""
-    logging.info("Rendering Jinja template for daily digest...")
+    logger.info("Rendering Jinja template for daily digest...")
 
     # Load digest metadata
     digest_data = get_digest_metadata()
 
     if not digest_data:
-        logging.error("No digest metadata available, cannot render template")
+        logger.error("No digest metadata available, cannot render template")
         return
 
     # Create digest description
@@ -152,25 +152,4 @@ def render_jinja_template():
             ),
         )
 
-    logging.info(f"Daily digest template rendered successfully: {dist_file}")
-
-
-def cleanup_old_templates(days_to_keep: int = 30):
-    """Remove old digest template files to prevent accumulation"""
-    news_dir = "app/web/_pages/news"
-    if not os.path.exists(news_dir):
-        return
-
-    cutoff_date = datetime.now() - timedelta(days=days_to_keep)
-
-    for filename in os.listdir(news_dir):
-        if filename.endswith(".njk") and len(filename) == 14:  # YYYY-MM-DD.njk format
-            try:
-                file_date = datetime.strptime(filename[:10], "%Y-%m-%d")
-                if file_date < cutoff_date:
-                    file_path = os.path.join(news_dir, filename)
-                    os.remove(file_path)
-                    logging.info(f"Removed old digest template: {filename}")
-            except ValueError:
-                # Skip files that don't match expected date format
-                continue
+    logger.info(f"Daily digest template rendered successfully: {dist_file}")
