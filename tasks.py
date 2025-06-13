@@ -2,8 +2,8 @@ import datetime
 import os
 import shutil
 import subprocess
+import tomllib
 
-import tomli
 from colorama import Fore
 from invoke import task
 
@@ -194,8 +194,8 @@ def execute_bump_hack(c, branch, is_first_release=False, major=False):
             c.run("unset GIT_COMMITTER_DATE", pty=True)
             c.run(f"git checkout {branch}", pty=True)
             with open("pyproject.toml", "rb") as f:
-                toml_dict = tomli.load(f)
-            project = toml_dict["project"]["name"]
+                toml_dict = tomllib.load(f)
+            project = toml_dict["tool"]["poetry"]["name"]
             release_type = "major" if major else "minor"
             c.run(
                 f"cz bump --files-only --increment {release_type.upper()}",
@@ -234,7 +234,7 @@ def execute_bump_hack(c, branch, is_first_release=False, major=False):
             print(f"{Fore.GREEN}Now handing over to standard-version ...{Fore.RESET}")
             # first, stage the bumped files
             with open("pyproject.toml", "rb") as f:
-                toml_dict = tomli.load(f)
+                toml_dict = tomllib.load(f)
             version_files = toml_dict["tool"]["commitizen"]["version_files"]
             files_to_add = " ".join(version_files)
             c.run(
