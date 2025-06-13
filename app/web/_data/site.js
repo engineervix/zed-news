@@ -22,8 +22,20 @@ module.exports = {
   }).format(new Date()),
   articlesBySource: function (articles) {
     const articlesBySource = {};
+    const seenArticles = new Set();
+
     articles.forEach((article) => {
+      // Create a unique key for deduplication (title + url)
+      const articleKey = `${article.title}|${article.url}`;
+
+      // Skip if we've already seen this article
+      if (seenArticles.has(articleKey)) {
+        return;
+      }
+
+      seenArticles.add(articleKey);
       const source = article.source;
+
       if (!articlesBySource[source]) {
         articlesBySource[source] = [];
       }

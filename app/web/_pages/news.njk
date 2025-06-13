@@ -1,0 +1,11 @@
+---
+eleventyImport:
+    collections: ["news"]
+title: News
+permalink: /news/{% if pagination.pageNumber > 0 %}page-{{ pagination.pageNumber + 1 }}/{% endif %}
+layout: pages/news/listing.njk
+pagination:
+    data: collections.news
+    size: 10
+    alias: news
+---

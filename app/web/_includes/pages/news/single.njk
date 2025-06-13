@@ -1,0 +1,179 @@
+{% extends "base.njk" %}
+
+{% block header %}
+<header class="py-3">
+    <div class="container px-5">
+        <div class="row gx-5 align-items-center justify-content-center">
+            <div class="col-lg-10">
+                <div class="my-5 text-center">
+                    <h1 class="display-6 fw-bolder mb-3">{{ title }}</h1>
+                    <p class="lead mb-4">{{ description }}</p>
+                    <div class="d-flex justify-content-center align-items-center gap-4 text-muted mb-4">
+                        <div>
+                            <i class="fa-solid fa-calendar-days me-2"></i>
+                            <time datetime="{{ date | date('YYYY-MM-DD') }}">{{ date | date('dddd, MMMM Do, YYYY') }}</time>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-newspaper me-2"></i>
+                            {{ references.count }} articles from {{ references.sources }} sources
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-outline-primary px-4" data-bs-toggle="modal" data-bs-target="#share">
+                            <i class="fa-solid fa-share-nodes me-2"></i>
+                            Share this digest
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section py-5">
+    <div class="container px-5">
+        <div class="row gx-5 justify-content-center">
+            <div class="col-lg-10">
+                {# Main digest content #}
+                <div class="card mb-5">
+                    <div class="card-body p-5">
+                        <div class="digest-content">
+                            {{ digest_content | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe | replace('<p>', '<p class="mb-4">') }}
+                        </div>
+                    </div>
+                </div>
+
+                {# Article sources accordion #}
+                {% if articles.length > 0 %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fa-solid fa-newspaper me-2"></i>
+                            Article Sources
+                        </h3>
+                    </div>
+                                        <div class="card-body">
+                        <div class="accordion" id="articlesAccordion">
+                            {%- for source, sourceArticles in site.articlesBySource(articles) -%}
+                            <div class="accordion-item">
+                                <h4 class="accordion-header" id="heading{{ loop.index }}">
+                                    <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ loop.index }}">
+                                        <strong>{{ source }}</strong>
+                                        <span class="badge bg-secondary ms-2">{{ sourceArticles.length }} article{% if sourceArticles.length > 1 %}s{% endif %}</span>
+                                    </button>
+                                </h4>
+                                <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#articlesAccordion">
+                                    <div class="accordion-body">
+                                        <ul class="fa-ul">
+                                            {%- for article in sourceArticles -%}
+                                            <li>
+                                                <span class="fa-li">
+                                                    <i class="text-success fa-solid fa-caret-right"></i>
+                                                </span>
+                                                <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer">
+                                                    {{ article.title | replace('"', '') }}
+                                                </a>
+                                            </li>
+                                            {%- endfor -%}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {%- endfor -%}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {# Navigation #}
+                <div class="mt-5 d-flex justify-content-between">
+                    <a href="/news/" class="btn btn-outline-primary">
+                        <i class="fa-solid fa-arrow-left me-2"></i>
+                        All News Digests
+                    </a>
+                    <div class="text-muted small">
+                        Generated on {{ generated_at | date('MMMM Do, YYYY [at] h:mm A [UTC]') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Share Modal #}
+<div class="modal fade" id="share" tabindex="-1" aria-labelledby="shareLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareLabel">Share this news digest</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">Share today's Zambian news digest with your network</p>
+                <div class="d-grid gap-2 col-8 mx-auto">
+                    <button
+                        class="btn btn-social-tw px-4"
+                        data-sharer="twitter"
+                        data-title="Check out today's Zambian news digest from Zed News!"
+                        data-hashtags="Zambia, ZedNews, news, digest"
+                        data-url="{{ site.base_url }}{{ page.url }}"
+                    >
+                        <i class="fa-brands fa-twitter me-2"></i>
+                        Share on Twitter
+                    </button>
+                    <button
+                        class="btn btn-social-fb px-4"
+                        data-sharer="facebook"
+                        data-hashtag="Zambia"
+                        data-url="{{ site.base_url }}{{ page.url }}"
+                    >
+                        <i class="fa-brands fa-facebook me-2"></i>
+                        Share on Facebook
+                    </button>
+                    <button
+                        class="btn btn-social-whatsapp px-4"
+                        data-sharer="whatsapp"
+                        data-title="Check out today's Zambian news digest from Zed News!"
+                        data-url="{{ site.base_url }}{{ page.url }}"
+                    >
+                        <i class="fa-brands fa-whatsapp me-2"></i>
+                        Share on WhatsApp
+                    </button>
+                    <button
+                        class="btn btn-social-telegram px-4"
+                        data-sharer="telegram"
+                        data-title="Check out today's Zambian news digest from Zed News!"
+                        data-url="{{ site.base_url }}{{ page.url }}"
+                    >
+                        <i class="fa-brands fa-telegram me-2"></i>
+                        Share on Telegram
+                    </button>
+                    <button
+                        class="btn btn-social-email px-4"
+                        data-sharer="email"
+                        data-title="Zed News - Daily News Digest"
+                        data-url="{{ site.base_url }}{{ page.url }}"
+                        data-subject="Today's Zambian News Digest from Zed News"
+                        data-to=""
+                    >
+                        <i class="fa-solid fa-envelope-open-text me-2"></i>
+                        Share via Email
+                    </button>
+                    <button
+                        class="btn btn-outline-secondary px-4"
+                        onclick="navigator.clipboard.writeText('{{ site.base_url }}{{ page.url }}'); this.innerHTML='<i class=\'fa-solid fa-check me-2\'></i>Copied!'; setTimeout(() => this.innerHTML='<i class=\'fa-solid fa-copy me-2\'></i>Copy Link', 2000)"
+                    >
+                        <i class="fa-solid fa-copy me-2"></i>
+                        Copy Link
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,175 +1,131 @@
+import json
 import os
 import shutil
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, mock_open, patch
 
-import requests
-from peewee import SqliteDatabase
-
-from app.core.db.models import Article, Episode, Mp3
-from app.core.social.post import (
-    create_facebook_post,
-    get_content,
-    get_episode_number,
-    get_random_image,
-    get_random_video,
-    podcast_is_live,
-    post_to_facebook,
-    upload_video_to_facebook,
-)
-from app.core.utilities import (
-    lingo,
-    podcast_host,
-    today_human_readable,
-    today_iso_fmt,
-)
-
-MODELS = [Article, Episode, Mp3]
-test_db = SqliteDatabase(":memory:")
+from app.core.social import post
+from app.core.utilities import today_iso_fmt
 
 
 class TestSocialPost(unittest.TestCase):
     def setUp(self):
-        # Create temporary directory for test files
         self.temp_dir = tempfile.mkdtemp()
+        post.DATA_DIR = self.temp_dir
+        post.IMAGES_DIR = os.path.join(self.temp_dir, "promotional")
+        os.makedirs(post.IMAGES_DIR, exist_ok=True)
 
-        # Create some temporary test files
-        self.video_file = os.path.join(self.temp_dir, "test_video.mp4")
-        self.image_file = os.path.join(self.temp_dir, "test_image.png")
-        self.logo_file = os.path.join(self.temp_dir, "logo.png")
-
-        # Create empty test files
-        open(self.video_file, "w").close()
-        open(self.image_file, "w").close()
-        open(self.logo_file, "w").close()
-
-        # Set up test database
-        test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
-        test_db.connect()
-        test_db.create_tables(MODELS)
-
-        # Create test data in database
-        self.mp3 = Mp3.create(
-            url=f"https://example.com/{today_iso_fmt}_podcast_dist.mp3", filesize=10485760, duration=630
-        )
-
-        self.episode = Episode.create(
-            number=1,
-            live=True,
-            title=today_human_readable,
-            description="Episode 001",
-            presenter=podcast_host,
-            locale=lingo.replace("-", "_"),
-            mp3=self.mp3,
-            time_to_produce=120,
-            word_count=5000,
-        )
-
-        # Create test content file
-        self.content_file = os.path.join(self.temp_dir, f"{today_iso_fmt}_podcast-content.txt")
-        with open(self.content_file, "w") as f:
-            f.write("Test podcast content")
-
-        # Create headlines file
-        self.headlines_file = os.path.join(self.temp_dir, f"{today_iso_fmt}_news_headlines.txt")
-        with open(self.headlines_file, "w") as f:
-            f.write("Title: Zed News Podcast episode 1\nTest headlines")
+        self.digest_dir = os.path.join(self.temp_dir, today_iso_fmt)
+        os.makedirs(self.digest_dir, exist_ok=True)
+        post.digest_file_path = os.path.join(self.digest_dir, f"{today_iso_fmt}_digest.json")
 
     def tearDown(self):
-        # Remove temporary directory and files
         shutil.rmtree(self.temp_dir)
 
-        # Clean up database
-        test_db.drop_tables(MODELS)
-        test_db.close()
+    def test_get_digest_content_success(self):
+        mock_data = {"content": "This is the digest content."}
+        with open(post.digest_file_path, "w") as f:
+            json.dump(mock_data, f)
 
-    @patch("app.core.social.post.requests.head")
-    def test_podcast_is_live(self, mock_head):
-        # Test when podcast is live
-        mock_head.return_value.status_code = 200
-        self.assertTrue(podcast_is_live("https://example.com/episode/1"))
+        # The function reads the raw file, not just the JSON content key
+        with patch("builtins.open", mock_open(read_data=json.dumps(mock_data))) as mock_file:
+            content = post.get_digest_content()
+            self.assertEqual(content, json.dumps(mock_data))
+            mock_file.assert_called_with(post.digest_file_path, "r")
 
-        # Test when podcast is not live
-        mock_head.return_value.status_code = 404
-        self.assertFalse(podcast_is_live("https://example.com/episode/2"))
-
-        # Test when request fails
-        mock_head.side_effect = requests.exceptions.RequestException
-        self.assertFalse(podcast_is_live("https://example.com/episode/3"))
-
-    def test_get_content(self):
-        with patch("app.core.social.post.transcript", self.content_file):
-            content = get_content()
-            self.assertEqual(content, "Test podcast content")
-
-    def test_get_episode_number(self):
-        with patch("app.core.social.post.news_headlines", self.headlines_file):
-            number = get_episode_number(self.headlines_file)
-            self.assertEqual(number, "1")
-
-    def test_get_random_video(self):
-        # Test with existing video
-        with patch("os.listdir") as mock_listdir, patch("os.path.isfile") as mock_isfile:
-            mock_listdir.return_value = ["test1.mp4", "test2.mp4"]
-            mock_isfile.return_value = True
-            video = get_random_video(self.temp_dir)
-            self.assertIsNotNone(video)
-            self.assertTrue(video.endswith(".mp4"))
-
-        # Test with no videos
-        with patch("os.listdir") as mock_listdir:
-            mock_listdir.return_value = ["test.txt", "test.jpg"]
-            video = get_random_video(self.temp_dir)
-            self.assertIsNone(video)
-
-    def test_get_random_image(self):
-        # Test with existing images
-        with patch("os.listdir") as mock_listdir, patch("os.path.isfile") as mock_isfile:
-            mock_listdir.return_value = ["test1.jpg", "test2.png"]
-            mock_isfile.return_value = True
-            image = get_random_image(self.temp_dir)
-            self.assertIsNotNone(image)
-            self.assertTrue(image.endswith((".jpg", ".png")))
-
-        # Test with no images
-        with patch("os.listdir") as mock_listdir:
-            mock_listdir.return_value = ["test.txt", "test.mp4"]
-            image = get_random_image(self.temp_dir)
-            self.assertIsNone(image)
+    @patch("app.core.social.post.logger")
+    def test_get_digest_content_not_found(self, mock_logger):
+        content = post.get_digest_content()
+        self.assertEqual(content, "")
+        mock_logger.error.assert_called_with(f"Digest file not found at {post.digest_file_path}")
 
     @patch("app.core.social.post.client")
-    def test_create_facebook_post(self, mock_client):
+    def test_create_facebook_post_text_success(self, mock_together_client):
         mock_completion = MagicMock()
-        mock_completion.choices[0].message.content = "Test Facebook post content"
-        mock_client.chat.completions.create.return_value = mock_completion
+        mock_completion.choices[0].message.content = "Generated Facebook Post"
+        mock_together_client.chat.completions.create.return_value = mock_completion
 
-        result = create_facebook_post("Test content", "https://example.com")
-        self.assertEqual(result, "Test Facebook post content")
+        text = post.create_facebook_post_text("Some digest content.")
+        self.assertEqual(text, "Generated Facebook Post")
+        mock_together_client.chat.completions.create.assert_called_once()
 
-    @patch("app.core.social.post.facebook.GraphAPI")
-    def test_post_to_facebook(self, mock_graph_api):
-        mock_graph = MagicMock()
-        mock_graph_api.return_value = mock_graph
+    @patch("app.core.social.post.client")
+    @patch("app.core.social.post.logger")
+    def test_create_facebook_post_text_failure(self, mock_logger, mock_together_client):
+        mock_together_client.chat.completions.create.side_effect = Exception("API Error")
+        text = post.create_facebook_post_text("Some digest content.")
+        self.assertEqual(text, "")
+        mock_logger.error.assert_called_with("Failed to generate Facebook post text: API Error")
 
-        post_to_facebook("Test content", "https://example.com")
+    @patch("app.core.social.post.datetime")
+    def test_get_daily_image_success(self, mock_datetime):
+        # Mock today to be Monday
+        mock_datetime.now.return_value.strftime.return_value = "Monday"
 
-        mock_graph.put_object.assert_called_once()
-        args = mock_graph.put_object.call_args[1]
-        self.assertEqual(args["message"], "Test content")
-        self.assertEqual(args["link"], "https://example.com")
+        # Create dummy image files
+        with open(os.path.join(post.IMAGES_DIR, "monday.jpg"), "w") as f:
+            f.write("dummy image data")
 
-    @patch("app.core.social.post.requests.post")
-    def test_upload_video_to_facebook(self, mock_post):
-        # Test successful upload
-        mock_post.return_value.json.return_value = {"id": "123456"}
-        result = upload_video_to_facebook(self.video_file, title="Test Video", description="Test Description")
-        self.assertEqual(result, "https://www.facebook.com/watch/?v=123456")
+        image_path = post.get_daily_image(post.IMAGES_DIR)
+        self.assertEqual(image_path, os.path.join(post.IMAGES_DIR, "monday.jpg"))
 
-        # Test failed upload
-        mock_post.return_value.json.return_value = {"error": "Upload failed"}
-        result = upload_video_to_facebook(self.video_file, title="Test Video", description="Test Description")
-        self.assertEqual(result, "")
+    @patch("app.core.social.post.datetime")
+    def test_get_daily_image_fallback_to_random(self, mock_datetime):
+        # Mock today to be Sunday, for which there is no image
+        mock_datetime.now.return_value.strftime.return_value = "Sunday"
+
+        # Create a random image to fallback to
+        with open(os.path.join(post.IMAGES_DIR, "random.jpg"), "w") as f:
+            f.write("dummy image data")
+
+        image_path = post.get_daily_image(post.IMAGES_DIR)
+        self.assertEqual(image_path, os.path.join(post.IMAGES_DIR, "random.jpg"))
+
+    def test_get_daily_image_no_images(self):
+        image_path = post.get_daily_image(post.IMAGES_DIR)
+        self.assertEqual(image_path, "")
+
+    @patch("app.core.social.post.logger")
+    def test_get_daily_image_dir_not_found(self, mock_logger):
+        shutil.rmtree(post.IMAGES_DIR)
+        image_path = post.get_daily_image(post.IMAGES_DIR)
+        self.assertEqual(image_path, "")
+        mock_logger.error.assert_called_with(f"Image directory not found: {post.IMAGES_DIR}")
+
+    @patch("app.core.social.post.graph")
+    @patch("app.core.social.post.FACEBOOK_PAGE_ID", "test-page-id")
+    @patch("app.core.social.post.requests")
+    @patch("builtins.open", new_callable=mock_open, read_data="data")
+    def test_post_to_facebook_success(self, mock_open, mock_requests, mock_graph):
+        with patch("app.core.social.post.HEALTHCHECKS_PING_URL", "http://fake-url"):
+            post.post_to_facebook("Test text", "test_image.jpg")
+            mock_graph.put_photo.assert_called_once()
+            mock_open.assert_called_once_with("test_image.jpg", "rb")
+
+    @patch("app.core.social.post.logger")
+    @patch("app.core.social.post.requests")
+    @patch("app.core.social.post.FACEBOOK_PAGE_ID", "test-page-id")
+    @patch("app.core.social.post.graph")
+    def test_post_to_facebook_missing_data(self, mock_graph, mock_requests, mock_logger):
+        with patch("app.core.social.post.HEALTHCHECKS_PING_URL", "http://fake-url"):
+            post.post_to_facebook("", "test_image.jpg")
+            mock_logger.error.assert_called_with("Missing necessary data for Facebook post. Aborting.")
+            mock_graph.put_photo.assert_not_called()
+            mock_requests.get.assert_called_once()  # healthcheck fail ping
+
+    @patch("sys.exit")
+    @patch("app.core.social.post.post_to_facebook")
+    @patch("app.core.social.post.get_daily_image", return_value="image.jpg")
+    @patch("app.core.social.post.create_facebook_post_text", return_value="post text")
+    @patch("app.core.social.post.get_digest_content", return_value='{"content":"digest"}')
+    def test_main_runs_full_process(self, mock_get_digest, mock_create_text, mock_get_image, mock_post_fb, mock_exit):
+        post.main()
+        mock_get_digest.assert_called_once()
+        mock_create_text.assert_called_once_with('{"content":"digest"}')
+        mock_get_image.assert_called_once()
+        mock_post_fb.assert_called_once_with("post text", "image.jpg")
+        mock_exit.assert_not_called()
 
 
 if __name__ == "__main__":

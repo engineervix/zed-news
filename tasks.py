@@ -2,8 +2,8 @@ import datetime
 import os
 import shutil
 import subprocess
+import tomllib
 
-import tomli
 from colorama import Fore, init
 from invoke import task
 
@@ -30,13 +30,15 @@ def get_docker_compose_command():
 def db_snapshot(c, filename_prefix):
     """Create a Database snapshot using DSLR"""
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    c.run(
-        "dslr snapshot {filename_prefix}_{timestamp}".format(
-            filename_prefix=filename_prefix,
-            timestamp=timestamp,
+    (
+        c.run(
+            "dslr snapshot {filename_prefix}_{timestamp}".format(
+                filename_prefix=filename_prefix,
+                timestamp=timestamp,
+            ),
+            pty=True,
         ),
-        pty=True,
-    ),
+    )
 
 
 @task(help={"build": "Build images before starting containers."})
@@ -149,117 +151,6 @@ def upgrade(c):
     c.run("aerich upgrade", pty=True)
 
 
-def get_first_commit():
-    try:
-        output = subprocess.check_output(
-            ["git", "log", "--reverse", "--format=%H", "--max-parents=0"], universal_newlines=True
-        )
-        return output.strip()
-    except subprocess.CalledProcessError:
-        return None
-
-
-def execute_bump_hack(c, branch, is_first_release=False, major=False):
-    """A little hack that combines commitizen-tools and standard-version
-
-    commitizen-tools works best with Python projects, but I don't like the
-    generated changelogs. I had no time to look at how to customize them, so I
-    decided to use standard-version (which works best with Node.js projects).
-    Unfortunately, standard-version by default doesn't work with Python projects,
-    and since I didn't have time to write my own updater for python files and toml files,
-    I have to make the two work together!
-
-    This requires standard-version to be installed in your project:
-    ``npm i -D standard-version``
-    If you're setting it up for the first time on another project, you will probably
-    encounter problems generating the entire changelog. See how Łukasz Nojek came up
-    with a hack to deal with this:
-    https://lukasznojek.com/blog/2020/03/how-to-regenerate-changelog-using-standard-version/
-
-    The formula (workflow) for is as follows:
-
-    1. cz bump --files-only
-    2. git add pyproject.toml and other_files specified in pyproject.toml
-    3. standard-version --commit-all --release-as <result from cz if not none>
-    4. git push --follow-tags origin [branch]
-    """
-    if is_first_release:
-        first_commit = get_first_commit()
-        if first_commit:
-            c.run(f"git checkout {first_commit}", pty=True)
-            c.run('GIT_COMMITTER_DATE="$(git show --format=%aD | head -1)"', pty=True)
-            c.run('git tag -a v0.0.0 -m "v0.0.0 - this is where it all starts"', pty=True)
-            c.run("unset GIT_COMMITTER_DATE", pty=True)
-            c.run(f"git checkout {branch}", pty=True)
-            with open("pyproject.toml", "rb") as f:
-                toml_dict = tomli.load(f)
-            project = toml_dict["project"]["name"]
-            release_type = "major" if major else "minor"
-            c.run(
-                f"cz bump --files-only --increment {release_type.upper()}",
-                pty=True,
-            )
-            version_files = toml_dict["tool"]["commitizen"]["version_files"]
-            files_to_add = " ".join(version_files)
-            c.run(
-                f"git add pyproject.toml {files_to_add}",
-                pty=True,
-            )
-            c.run(
-                f'npm run release -- --commit-all --release-as {release_type} --releaseCommitMessageFormat "chore: This is {project} v{{{{currentTag}}}} 🎉"',
-                pty=True,
-            )
-            # push to origin
-            c.run(f"git push --follow-tags origin {branch}", pty=True)
-        else:
-            print("No commit found or Git repository not initialized.")
-    else:
-        print(f"{Fore.MAGENTA}Attempting to bump using commitizen-tools ...{Fore.RESET}")
-        c.run("cz bump --files-only > .bump_result.txt", pty=True)
-        str_of_interest = "increment detected: "
-        result = ""
-        with open(".bump_result.txt", "r") as br:
-            for line in br:
-                if str_of_interest in line:
-                    result = line
-                    break
-        release_type = result.replace(str_of_interest, "").strip("\n").lower()
-        print(f"cz bump result: {release_type}")
-        if release_type == "none":
-            print(f"{Fore.YELLOW}No increment detected, cannot bump{Fore.RESET}")
-        elif release_type in ["major", "minor", "patch"]:
-            print(f"{Fore.GREEN}Looks like the bump command worked!{Fore.RESET}")
-            print(f"{Fore.GREEN}Now handing over to standard-version ...{Fore.RESET}")
-            # first, stage the bumped files
-            with open("pyproject.toml", "rb") as f:
-                toml_dict = tomli.load(f)
-            version_files = toml_dict["tool"]["commitizen"]["version_files"]
-            files_to_add = " ".join(version_files)
-            c.run(
-                f"git add pyproject.toml {files_to_add}",
-                pty=True,
-            )
-            # now we can pass result to standard-release
-            print(f"{Fore.GREEN}let me retrieve the tag we're bumping from ...{Fore.RESET}")
-            get_current_tag = c.run(
-                "git describe --abbrev=0 --tags `git rev-list --tags --skip=0  --max-count=1`",
-                pty=True,
-            )
-            previous_tag = get_current_tag.stdout.rstrip()
-            c.run(
-                f'npm run release -- --commit-all --release-as {release_type} --releaseCommitMessageFormat "bump: ✈️ {previous_tag} → v{{{{currentTag}}}}"',
-                pty=True,
-            )
-            # push to origin
-            c.run(f"git push --follow-tags origin {branch}", pty=True)
-        else:
-            print(f"{Fore.RED}Something went horribly wrong, please investigate & fix it!{Fore.RESET}")
-            print(f"{Fore.RED}Bump failed!{Fore.RESET}")
-
-        # clean up
-        c.run("rm -vf .bump_result.txt", pty=True)
-
-
 @task(help={"fix": "let black and ruff format your files"})
 def lint(c, fix=False):
     """ruff and black"""
@@ -297,15 +188,95 @@ def clean_test(c):
     c.run("rm -fr .pytest_cache", pty=True)
 
 
+def create_release(c, branch, is_first_release=False, push=False):
+    """Create a release by combining `commitizen-tools` and `commit-and-tag-version`
+
+    commitizen-tools works best with Python projects, but I don't like the
+    generated changelogs. I had no time to look at how to customize them, so I
+    decided to use commit-and-tag-version (which works best with Node.js projects).
+    Unfortunately, commit-and-tag-version by default doesn't work with Python projects,
+    and since I didn't have time to write my own updater for python files and toml files,
+    I have to make the two work together!
+
+    This requires commit-and-tag-version to be installed in your project:
+    ``npm i -D commit-and-tag-version``
+
+    The logic is as follows:
+
+    1. cz bump --files-only
+    2. git add pyproject.toml and other_files specified in pyproject.toml
+    3. commit-and-tag-version --commit-all --release-as <result from cz if not none>
+    4. git push --follow-tags origin [branch]
+    """
+    if is_first_release:  # tag a release without bumping the version bumpFiles
+        with open("pyproject.toml", "rb") as f:
+            toml_dict = tomllib.load(f)
+        project = toml_dict["tool"]["poetry"]["name"]
+        print(f"{Fore.YELLOW}Generating your changelog for your first release ...{Fore.RESET}")
+        c.run(
+            f'npm run release -- --first-release --releaseCommitMessageFormat "chore: This is {project} v{{{{currentTag}}}} 🎉"',
+            pty=True,
+        )
+        if push:
+            # push to origin
+            c.run(f"git push --follow-tags origin {branch}", pty=True)
+    else:
+        print(f"{Fore.MAGENTA}Attempting to bump using commitizen-tools ...{Fore.RESET}")
+        c.run("cz bump --files-only > .bump_result.txt", pty=True)
+        str_of_interest = "increment detected: "
+        result = ""
+        with open(".bump_result.txt", "r") as br:
+            for line in br:
+                if str_of_interest in line:
+                    result = line
+                    break
+        release_type = result.replace(str_of_interest, "").strip("\n").lower()
+        print(f"cz bump result: {release_type}")
+        if release_type == "none":
+            print(f"{Fore.YELLOW}No increment detected, cannot bump{Fore.RESET}")
+        elif release_type in ["major", "minor", "patch"]:
+            print(f"{Fore.GREEN}Looks like the bump command worked!{Fore.RESET}")
+            print(f"{Fore.GREEN}Now handing over to commit-and-tag-version ...{Fore.RESET}")
+            # first, stage the bumped files
+            with open("pyproject.toml", "rb") as f:
+                toml_dict = tomllib.load(f)
+            version_files = toml_dict["tool"]["commitizen"]["version_files"]
+            files_to_add = " ".join(version_files)
+            c.run(
+                f"git add pyproject.toml {files_to_add}",
+                pty=True,
+            )
+            # now we can pass result to standard-release
+            print(f"{Fore.GREEN}let me retrieve the tag we're bumping from ...{Fore.RESET}")
+            get_current_tag = c.run(
+                "git describe --abbrev=0 --tags `git rev-list --tags --skip=0  --max-count=1`",
+                pty=True,
+            )
+            previous_tag = get_current_tag.stdout.rstrip()
+
+            c.run(
+                f'npm run release -- --commit-all --release-as {release_type} --releaseCommitMessageFormat "bump: ✈️ {previous_tag} → v{{{{currentTag}}}}"',
+                pty=True,
+            )
+            if push:
+                # push to origin
+                c.run(f"git push --follow-tags origin {branch}", pty=True)
+        else:
+            print(f"{Fore.RED}Something went horribly wrong, please investigate & fix it!{Fore.RESET}")
+            print(f"{Fore.RED}Bump failed!{Fore.RESET}")
+
+        # clean up
+        c.run("rm -vf .bump_result.txt", pty=True)
+
+
 @task(
     help={
         "branch": "The branch against which you wanna bump",
         "first": "Is this the first release?",
-        "major": "Is this a major release?",
     }
 )
-def bump(c, branch, first=False, major=False):
-    """Use Commitizen Tools & standard-version to bump version and generate changelog
+def bump(c, branch, first=False):
+    """Use Commitizen Tools & commit-and-tag-version to bump version and generate changelog
 
     Run this task when you want to prepare a release.
     First we check that there are no unstaged files before running
@@ -317,7 +288,7 @@ def bump(c, branch, first=False, major=False):
     uncommitted_str = "to be committed"
     check = c.run("git status", pty=True)
     if unstaged_str not in check.stdout or uncommitted_str not in check.stdout:
-        execute_bump_hack(c, branch, first, major)
+        create_release(c, branch, first, push=False)
     else:
         print(f"{Fore.RED}Sorry mate, please ensure there are no unstaged files before creating a release{Fore.RESET}")
 
@@ -355,14 +326,14 @@ def get_release_notes(c):
 
 
 @task
-def toolchain(c):
-    """The toolchain for creating the podcast"""
+def digest(c):
+    """Generate news digest from latest Zambian news sources"""
     c.run("python app/core/run.py", pty=True)
 
 
 @task
 def test(c):
-    """Run tests"""
+    """run tests"""
     c.run("coverage run -m unittest discover app/tests", pty=True)
     c.run("coverage json", pty=True)
     c.run("coverage report -m", pty=True)
@@ -371,4 +342,4 @@ def test(c):
 @task
 def facebook_post(c):
     """Post to Facebook"""
-    c.run("python -m app.core.social.post share facebook", pty=True)
+    c.run("python -m app.core.social.post", pty=True)

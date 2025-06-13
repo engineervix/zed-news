@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "zed-news"
 version = "0.10.0"
-description = "news podcast on auto-pilot"
+description = "Automated news digests from various Zambian 🇿🇲 sources, powered by AI."
 authors = ["Victor Miti <https://github.com/engineervix>"]
 readme = "README.md"
 packages = [{include = "app"}]
@@ -16,11 +16,9 @@ python = "~=3.12"
 apprise = "^1.4.0"
 babel = "^2.12.1"
 beautifulsoup4 = "^4.12.2"
-boto3 = "^1.26.147"
 bpython = "^0.24"
 cohere = "^4.8.0"
 colorama = "^0.4.6"
-eyed3 = "^0.9.7"
 facebook-sdk = "^3.1.0"
 fake-useragent = "^1.1.3"
 feedparser = "^6.0.10"
@@ -30,7 +28,6 @@ jinja2 = "^3.1.2"
 langchain = "^0.3.15"
 langchain-community = "^0.3.15"
 langchain-openai = "^0.3.1"
-mutagen = "^1.46.0"
 num2words = "^0.5.12"
 openai = "^1.59.9"
 peewee = "^3.17.0"
@@ -40,15 +37,14 @@ python-dotenv = "^1.0.0"
 pytz = "^2023.3"
 requests = "^2.32.0"
 together = "^1.2.1"
-tomli = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.4.2"
-commitizen = "^3.2.2"
-coverage = {version = "<6", extras = ["toml"]}
+black = "^25.1.0"
+commitizen = "^4.8.3"
+coverage = "^7.9.0"
 dslr = "^0.4.0"
-pre-commit = "^3.3.2"
-ruff = "^0.11.0"
+pre-commit = "^4.2.0"
+ruff = "^0.11.13"
 
 [tool.black]
 line-length = 120
@@ -111,6 +107,7 @@ show_missing = true
 version_provider = "poetry"
 version_files = [
     "app/__init__.py",
+    "app/core/social/post.py",
     "cron.sh",
 ]
 tag_format = "v$major.$minor.$patch"
