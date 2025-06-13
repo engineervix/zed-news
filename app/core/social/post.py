@@ -79,7 +79,7 @@ def create_facebook_post_text(content: str) -> str:
 
     try:
         completion = client.chat.completions.create(
-            model="meta-llama/Llama-3.1-70B-Instruct-Turbo",
+            model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
