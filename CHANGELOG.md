@@ -4,6 +4,95 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.0](https://github.com/engineervix/zed-news/compare/v0.10.0...v1.0.0) (2025-06-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* The project has transitioned from generating
+audio podcast episodes to text-based news digests.
+This represents a fundamental change in the project's
+content format, delivery method and project architecture.
+
+### 🚀 Features
+
+* foundational work for transitioning from audio podcast to news digest ([388801e](https://github.com/engineervix/zed-news/commit/388801e08e456e2a3fccaa451745b3b0714bedd8))
+* news digests ([c854131](https://github.com/engineervix/zed-news/commit/c8541311768bcae11a1a66e3921c1c64d74fa1f4))
+* remove AWS Polly TTS voice processing component ([ca0d94f](https://github.com/engineervix/zed-news/commit/ca0d94f8d98c888646bb66a36a2d4b38999261f9))
+* remove FFmpeg audio mixing and S3 upload functionality ([e97ed38](https://github.com/engineervix/zed-news/commit/e97ed3865853da88c35029e15491c3043cb4b3b6))
+* remove podcast transcript generation component ([75bb81c](https://github.com/engineervix/zed-news/commit/75bb81cc357a39f269676403a663a56083ad6340))
+* transition from podcast episodes to news digests ([ca30261](https://github.com/engineervix/zed-news/commit/ca30261ff1ad4749c7c0d7d3f3f313f3b6ad8cc0))
+
+
+### 🐛 Bug Fixes
+
+* **deps:** update dependency @fortawesome/fontawesome-free to v6.7.2 ([#165](https://github.com/engineervix/zed-news/issues/165)) ([d20d21b](https://github.com/engineervix/zed-news/commit/d20d21bc44a087c2b28af898d6dd1a5ac9b1bc15))
+* **deps:** update dependency boto3 to v1.38.28 ([#157](https://github.com/engineervix/zed-news/issues/157)) ([1d66fb1](https://github.com/engineervix/zed-news/commit/1d66fb126b8d89ae23d6fa75956369622058a6c8))
+* **deps:** update dependency bpython to v0.25 ([#166](https://github.com/engineervix/zed-news/issues/166)) ([f87622a](https://github.com/engineervix/zed-news/commit/f87622a122d90a546fa04e1643c90b6d5b1ec855))
+* **deps:** update dependency langchain-openai to v0.3.19 ([#158](https://github.com/engineervix/zed-news/issues/158)) ([7fc0ecc](https://github.com/engineervix/zed-news/commit/7fc0eccf0f7b5fff6dfa15d9db60d5f4a9fdd143))
+* lazily initialise GEMINI client, nunjucks template generation ([ab4f482](https://github.com/engineervix/zed-news/commit/ab4f48215c2c1e774ac3feeff45148d4933e38ab))
+* prevent duplicates, remove unnecessary information ([bb2b019](https://github.com/engineervix/zed-news/commit/bb2b01986efd1eb572e58c985bd6261df44e78d5))
+* template rendering and styling ([c42c006](https://github.com/engineervix/zed-news/commit/c42c0069c066992726b06dab699007e9ccdd7dbe))
+* **testing:** Correct file path generation in tests ([ab0273a](https://github.com/engineervix/zed-news/commit/ab0273a81437ecb0c9170d19964ce1f4aa17620b))
+* use correct model ([b36fc62](https://github.com/engineervix/zed-news/commit/b36fc6259d49229545b74e9071d3ca0f5a0ef48a))
+
+
+### 📝 Docs
+
+* update README ([46562fe](https://github.com/engineervix/zed-news/commit/46562fee643c066f5ebc72a4a997866cdde05ab3))
+
+
+### 💄 Styling
+
+* improve ui on homepage and remove un-necessary items ([a9375df](https://github.com/engineervix/zed-news/commit/a9375df5a83be0ea26cf5dd4d7fb50fc9b57fe39))
+* make stylelint happy ([a3e2497](https://github.com/engineervix/zed-news/commit/a3e2497dd6bd6225cee58ed94f15aa2ba2878f0d))
+* ui enhancements on news listing template ([1cb7f8a](https://github.com/engineervix/zed-news/commit/1cb7f8a707a21afab7571959731b22d1b09c6746))
+* ui/ux enhancements on single news item, plus share functionality ([6bc8504](https://github.com/engineervix/zed-news/commit/6bc85047201ea03ce56cfa7880c7ad8d300dcbcc))
+* update assets ([2eb9331](https://github.com/engineervix/zed-news/commit/2eb9331852c047a7c727926f598bd9a554dc2cff))
+* update logo ([9ec5c89](https://github.com/engineervix/zed-news/commit/9ec5c89856aaea04cafe55718c1b4d48ef734f02))
+
+
+### ♻️ Code Refactoring
+
+* **.eleventy.js:** news collection and custom date filters ([06d4e43](https://github.com/engineervix/zed-news/commit/06d4e430c01b7b7834119738d416daf5d4f196ff))
+* content changes on home page ([2ffb5d3](https://github.com/engineervix/zed-news/commit/2ffb5d3c55b373c910e866909093a3eb720d861a))
+* remove lots of unused stuff, cleanup and fix tests ([ecbd9a2](https://github.com/engineervix/zed-news/commit/ecbd9a2b7924bdb61a494db2f75a539fd0da730b))
+* rename .env.sample -> .env.example ([a539c6c](https://github.com/engineervix/zed-news/commit/a539c6c511b005b89baa9d4c846ac04e02fa0817))
+* reorganise code and remove things we don't need ([d678b0a](https://github.com/engineervix/zed-news/commit/d678b0a982befa925365a603532e466b9bd659c0))
+* replace tomli with built-in tomllib ([ac6e716](https://github.com/engineervix/zed-news/commit/ac6e716efe4faaeb20df558026048ef942d616d7))
+* update content on about page, and fix apple button ([8080000](https://github.com/engineervix/zed-news/commit/80800004e4b8f4afe71a4b516c759c21268f51dc))
+* update copy on homepage ([23f7853](https://github.com/engineervix/zed-news/commit/23f785315bb5fb84d6207804d46ba27fd62a3911))
+* update cron script ([4bdeed6](https://github.com/engineervix/zed-news/commit/4bdeed6f8e5e2e5ae55b1ba7d6b504b0c4694654))
+* update info, fix order of news items plus some small ui fixes ([3687fb4](https://github.com/engineervix/zed-news/commit/3687fb4e634ab3aec89b87f9db07106b8e6e57aa))
+* use commit-and-tag-version instead of standard-version ([321e842](https://github.com/engineervix/zed-news/commit/321e842cb02f422a0b4a2b2e67cc5f425fd44c03))
+* we don't need ffmpeg ([8af534a](https://github.com/engineervix/zed-news/commit/8af534a99d0a8cb58ddf8272ec4871a078f47c5d))
+* zed news podcast -> zed news, and use updated illustration ([63343a7](https://github.com/engineervix/zed-news/commit/63343a78475809ab88479892921ba8f97f57d6a4))
+
+
+### ✅ Tests
+
+* update tests and remove ones we no longer need ([258dad1](https://github.com/engineervix/zed-news/commit/258dad19c3327c7ee93ddb47df0e21a83a8dc83f))
+
+
+### ⚙️ Build System
+
+* add missing GEMINI_API_KEY ([afd0441](https://github.com/engineervix/zed-news/commit/afd04418e55ffc4c131b2f2f12b630a95bed04fe))
+* **deps:** update babel monorepo ([#153](https://github.com/engineervix/zed-news/issues/153)) ([11471dd](https://github.com/engineervix/zed-news/commit/11471dd8dcc47e155742daad830f15eca4a69429))
+* **deps:** update dependency babel-loader to v9.2.1 ([#154](https://github.com/engineervix/zed-news/issues/154)) ([4dc8fa6](https://github.com/engineervix/zed-news/commit/4dc8fa6237b62e14e8a3dfa0b360b071ac8ee1df))
+* **deps:** update dependency commitizen to v4.3.1 ([#130](https://github.com/engineervix/zed-news/issues/130)) ([d31f16a](https://github.com/engineervix/zed-news/commit/d31f16aef1e0a781a24f87fe9c0359430c3aed87))
+* **deps:** update dependency core-js to v3.42.0 ([#155](https://github.com/engineervix/zed-news/issues/155)) ([fd240a4](https://github.com/engineervix/zed-news/commit/fd240a4d81499a560a09258cb9f1393de1d0d73c))
+* **deps:** update dependency eslint to v8.57.1 ([#132](https://github.com/engineervix/zed-news/issues/132)) ([32559c5](https://github.com/engineervix/zed-news/commit/32559c5f98df8be1384e19ccb2be89c5cfb344dc))
+* **deps:** update dependency mini-css-extract-plugin to v2.9.2 ([#117](https://github.com/engineervix/zed-news/issues/117)) ([5e47e2e](https://github.com/engineervix/zed-news/commit/5e47e2e35160845a9106f934c572977180346539))
+* **dev-deps:** bump several dev dependencies to latest versions ([fae82ad](https://github.com/engineervix/zed-news/commit/fae82ad272d5b361b87d84f5e06fda02d864734d))
+* just say postgres 15, not 15.xx ([0c91099](https://github.com/engineervix/zed-news/commit/0c910998fffcee7c8c4c9308910fcf8a200a258c))
+* remove boto3, id3 and mutagen ([8f73c98](https://github.com/engineervix/zed-news/commit/8f73c98bad4c538eab48ba0e2d70ae6a8db3f3b7))
+* things changed in ubuntu 24.04 ([0f1b5c1](https://github.com/engineervix/zed-news/commit/0f1b5c1c70ef6e5366c9f515a8742ecae0a2c44c))
+
+
+### 👷 CI/CD
+
+* update config ([724edcb](https://github.com/engineervix/zed-news/commit/724edcb0011be93f0fb34fcaf91a049b7f979432))
+
 ## [v0.10.0](https://github.com/engineervix/zed-news/compare/v0.9.0...v0.10.0) (2025-05-19)
 
 

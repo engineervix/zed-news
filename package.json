@@ -1,6 +1,6 @@
 {
   "name": "zed-news",
-  "version": "0.10.0",
+  "version": "1.0.0",
   "description": "Automated news digests from various Zambian 🇿🇲 sources, powered by AI.",
   "author": "Victor Miti <https://github.com/engineervix>",
   "license": "BSD-3-Clause",

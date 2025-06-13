@@ -5,7 +5,7 @@
 post to social media
 """
 
-__version__ = "0.10.0"
+__version__ = "1.0.0"
 
 import logging
 import os
