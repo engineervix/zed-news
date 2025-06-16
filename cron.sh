@@ -44,19 +44,19 @@ source .env
 
 # Set healthchecks URL based on task
 if [[ "$TASK" == "digest" ]]; then
-    HEALTHCHECKS_PING_URL="${HEALTHCHECKS_PING_URL}"
+    PING_URL="${HEALTHCHECKS_PING_URL}"
 elif [[ "$TASK" == "facebook-post" ]]; then
-    HEALTHCHECKS_PING_URL="${HEALTHCHECKS_FACEBOOK_PING_URL}"
+    PING_URL="${HEALTHCHECKS_FACEBOOK_PING_URL}"
 fi
 
 # Function to send success signal to healthchecks.io
 function send_healthcheck_success() {
-  curl -fsS --retry 3 "${HEALTHCHECKS_PING_URL}" > /dev/null
+  curl -fsS --retry 3 "${PING_URL}" > /dev/null
 }
 
 # Function to send failure signal to healthchecks.io
 function send_healthcheck_failure() {
-  curl -fsS --retry 3 "${HEALTHCHECKS_PING_URL}/fail" > /dev/null
+  curl -fsS --retry 3 "${PING_URL}/fail" > /dev/null
 }
 
 # 2. Activate virtual environment
