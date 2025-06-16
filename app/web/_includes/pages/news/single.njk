@@ -40,7 +40,7 @@
                 <div class="card mb-5">
                     <div class="card-body p-5">
                         <div class="digest-content">
-                            {{ digest_content | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe | replace('<p>', '<p class="mb-4">') }}
+                            {{ content | safe }}
                         </div>
                     </div>
                 </div>
