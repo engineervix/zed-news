@@ -68,6 +68,20 @@ module.exports = (eleventyConfig) => {
   // TODO: Add Search Filter
   // eleventyConfig.addFilter("search", searchFilter);
 
+  // Handle newlines in content
+  eleventyConfig.addFilter("nl2p", function (content) {
+    if (!content) return "";
+
+    // Split content by double newlines (paragraph breaks)
+    const paragraphs = content.trim().split(/\n\s*\n/);
+
+    // Wrap each paragraph in <p> tags and join
+    return paragraphs
+      .filter((p) => p.trim().length > 0) // Remove empty paragraphs
+      .map((p) => `<p>${p.trim()}</p>`)
+      .join("\n\n");
+  });
+
   // Add Shortcodes
   // Get the current year - super useful for copyright dates.
   eleventyConfig.addShortcode("year", () => `${new Date().getFullYear()}`);
