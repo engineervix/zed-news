@@ -23,6 +23,7 @@ from app.core.utilities import (
     ASSETS_DIR,  # noqa: F401
     DATA_DIR,
     configure_logging,
+    timezone,
     today_human_readable,
     today_iso_fmt,
 )
@@ -65,11 +66,12 @@ def get_digest_content() -> str:
 
 def create_facebook_post_text(content: str) -> str:
     """Create a Facebook post using Together AI's Inference API."""
+    now = datetime.now(timezone).strftime("%I:%M%p")
     system_prompt = (
-        "You are a social media marketing expert for Zed News, a news digest service for Zambia. "
+        f"The time is {now}. You are a social media marketing expert for Zed News, a news digest service for Zambia. "
         "Your task is to create a short, engaging Facebook post based on today's news digest. "
         "The post should:\n"
-        "- Start with a greeting, like 'Good morning, Zambia!'\n"
+        "- Start with a warm, friendly greeting\n"
         "- Highlight 2-3 of the most interesting or impactful stories.\n"
         "- Use bullet points and relevant emojis to make it scannable.\n"
         "- Maintain a professional yet friendly tone.\n"
