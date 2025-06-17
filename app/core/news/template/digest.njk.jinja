@@ -14,7 +14,6 @@ articles:
     - source: {{ article.source }}
       url: {{ article.url }}
       title: {{ article.title | tojson }}
-      summary: {{ article.summary | tojson if article.summary else "" }}
     {%- endfor %}
 generated_at: {{ generated_at }}
 ---

@@ -143,7 +143,6 @@ def render_jinja_template():
                             "source": article["source"],
                             "url": article["url"],
                             "title": article["title"],
-                            "summary": article.get("summary", ""),
                         }
                         for article in digest_articles
                     ],
