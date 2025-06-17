@@ -99,7 +99,7 @@ if [[ "$TASK" == "digest" ]]; then
 elif [[ "$TASK" == "facebook-post" ]]; then
     echo "Running Facebook post task natively..."
     # Run facebook post task natively (no Docker)
-    inv facebook_post || {
+    inv facebook-post || {
         echo "Failed to run Facebook post task."
         send_healthcheck_failure
         exit 1
