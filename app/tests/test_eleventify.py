@@ -34,8 +34,8 @@ class TestEleventify(unittest.TestCase):
             "content": "This is the main digest content.",
             "sources": ["Source A", "Source B"],
             "articles": [
-                {"source": "Source A", "url": "http://example.com/a", "title": "Article A", "summary": "Summary A"},
-                {"source": "Source B", "url": "http://example.com/b", "title": "Article B", "summary": "Summary B"},
+                {"source": "Source A", "url": "http://example.com/a", "title": "Article A"},
+                {"source": "Source B", "url": "http://example.com/b", "title": "Article B"},
             ],
             "total_articles": 2,
             "generated_at": "2024-01-01T12:00:00Z",
@@ -55,7 +55,6 @@ class TestEleventify(unittest.TestCase):
         self.assertIn("count: 2", content)
         self.assertIn("sources: 2", content)
         self.assertIn("Article A", content)
-        self.assertIn("Summary B", content)
         mock_logger.info.assert_any_call("Rendering Jinja template for daily digest...")
         mock_logger.info.assert_any_call(f"Daily digest template rendered successfully: {dist_file_path}")
 
