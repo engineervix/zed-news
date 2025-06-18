@@ -4,17 +4,18 @@
  */
 
 // You can override colours here
-// $primary: #203682;
-// $secondary: #f2cb4d;
-// $warning: #f8b563;
-// $danger: #de4a49;
-$success: #188200;
+$primary: #28a745;
+$secondary: #6c757d;
+$warning: #ffc107;
+$danger: #dc3545;
+$success: #20c997;
 
-// $info: #324d5e;
+$info: #17a2b8;
 
 // If you wanna override fonts ...
 // $font-family-sans-serif: "Merriweather Sans", sans-serif !default;
-// $font-family-serif: "Merriweather", serif !default;
+$font-family-serif: "Iowan Old Style", "Palatino Linotype", "URW Palladio L",
+  P052, serif;
 // $font-family-monospace: "Menlo", "Monaco", "Consolas", "Liberation Mono",
 //   "Courier New", monospace !default;
 // $font-family-base: $font-family-sans-serif !default;
@@ -208,13 +209,13 @@ header {
 
 // Digest content styling for improved readability
 .digest-content {
-  font-size: 1.1rem;
+  font-family: $font-family-serif;
+  font-size: 1.25rem;
   line-height: 1.7;
   color: var(--bs-body-color);
 
   p {
     margin-bottom: 1.5rem;
-    text-align: justify;
 
     &:last-child {
       margin-bottom: 0;
@@ -223,21 +224,15 @@ header {
 
   // Better spacing for content sections
   > p:first-child {
-    font-size: 1.125rem;
+    font-size: 1.375rem;
     font-weight: 500;
     color: var(--bs-emphasis-color);
   }
 
-  // Style any bold text (likely section headers)
   strong,
   b {
     color: var(--bs-emphasis-color);
     font-weight: 600;
-  }
-
-  // Improve readability on smaller screens
-  @include media-breakpoint-down(md) {
-    font-size: 1rem;
   }
 }
 
@@ -367,10 +362,23 @@ header {
 // Custom news digest colors
 .bg-news-green {
   --bs-bg-opacity: 1;
-
   background-color: rgb(34 139 34 / var(--bs-bg-opacity)) !important;
 }
 
 .bg-news-green.bg-gradient {
-  background-image: var(--bs-gradient) !important;
+  background: linear-gradient(
+    to bottom,
+    #{$primary} 0%,
+    #{mix($primary, #ffffff, 60%)} 50%,
+    #{mix($primary, #f8f9fa, 40%)} 100%
+  ) !important;
+
+  [data-bs-theme="dark"] & {
+    background: linear-gradient(
+      to bottom,
+      #{mix($primary, #000000, 80%)} 0%,
+      #{mix($primary, #212529, 60%)} 50%,
+      #{mix($primary, #343a40, 40%)} 100%
+    ) !important;
+  }
 }
