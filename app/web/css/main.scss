@@ -1,3 +1,5 @@
+@use "sass:color";
+
 /* Bootstrap
  * https: //getbootstrap.com/docs/5.2/customize/sass/
  * -------------------------------------------------
@@ -9,13 +11,13 @@ $secondary: #6c757d;
 $warning: #ffc107;
 $danger: #dc3545;
 $success: #20c997;
-
 $info: #17a2b8;
 
 // If you wanna override fonts ...
 // $font-family-sans-serif: "Merriweather Sans", sans-serif !default;
 $font-family-serif: "Iowan Old Style", "Palatino Linotype", "URW Palladio L",
-  P052, serif;
+  p052, serif;
+
 // $font-family-monospace: "Menlo", "Monaco", "Consolas", "Liberation Mono",
 //   "Courier New", monospace !default;
 // $font-family-base: $font-family-sans-serif !default;
@@ -362,6 +364,7 @@ header {
 // Custom news digest colors
 .bg-news-green {
   --bs-bg-opacity: 1;
+
   background-color: rgb(34 139 34 / var(--bs-bg-opacity)) !important;
 }
 
@@ -369,16 +372,16 @@ header {
   background: linear-gradient(
     to bottom,
     #{$primary} 0%,
-    #{mix($primary, #ffffff, 60%)} 50%,
-    #{mix($primary, #f8f9fa, 40%)} 100%
+    #{color.mix($primary, #fff, 60%)} 50%,
+    #{color.mix($primary, #f8f9fa, 40%)} 100%
   ) !important;
 
   [data-bs-theme="dark"] & {
     background: linear-gradient(
       to bottom,
-      #{mix($primary, #000000, 80%)} 0%,
-      #{mix($primary, #212529, 60%)} 50%,
-      #{mix($primary, #343a40, 40%)} 100%
+      #{color.mix($primary, #000, 80%)} 0%,
+      #{color.mix($primary, #212529, 60%)} 50%,
+      #{color.mix($primary, #343a40, 40%)} 100%
     ) !important;
   }
 }
