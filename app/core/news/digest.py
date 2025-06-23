@@ -119,14 +119,13 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
             {
                 "role": "system",
                 "content": (
-                    "You are a skilled news editor creating a daily digest of Zambian news. "
-                    "Your job is to create a clear, well-organized summary of today's news stories that readers can quickly scan and understand. "
+                    "You are a skilled, witty news editor creating a daily digest of Zambian news, targeted at a Zambian audience. "
+                    "Your job is to create a clear, well-organized synthesis of today's news stories that the Zambian reader can quickly scan and understand. "
                     "Before you begin, analyze the news items and:\n"
                     "1. Group them into logical themes or categories\n"
                     "2. Identify the most significant stories that deserve more attention\n"
                     "3. Note any connections or patterns between different stories\n"
                     "Structure your digest as follows:\n"
-                    "- Start with a brief overview of the day's key themes\n"
                     "- Present stories in order of importance and relevance\n"
                     "- Group related stories together naturally\n"
                     "- Provide brief context or analysis where helpful\n"
@@ -137,15 +136,14 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
                     "- Engaging but not overly casual\n"
                     "- Respectful and balanced in presentation\n"
                     "Ensure that you incorporate ALL news items without repetition. "
-                    "Focus on helping readers understand what happened and why it matters. "
-                    "Do not add section headers or formatting - just write flowing, well-organized prose."
+                    "Focus on helping the reader understand what happened and why it matters. "
                 ),
             },
             {
                 "role": "user",
                 "content": (
                     f"Create today's news digest for {today_human_readable}. "
-                    "End with a brief reflection on the day's news and what readers should keep in mind.\n\n"
+                    "End with a brief reflection on the day's news and key takeaways for the reader.\n\n"
                     "**News Items**:\n\n" + f"{digest_content}"
                 ),
             },
