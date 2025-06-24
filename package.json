@@ -58,6 +58,7 @@
     "eslint-webpack-plugin": "^4.0.1",
     "file-loader": "^6.2.0",
     "he": "^1.2.0",
+    "markdown-it": "^14.1.0",
     "mini-css-extract-plugin": "^2.7.6",
     "mustache": "^4.2.0",
     "node-sass": "^9.0.0",

@@ -1,5 +1,10 @@
 const path = require("path");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
+const md = require("markdown-it")({
+  html: false,
+  breaks: true,
+  linkify: true,
+});
 
 // const searchFilter = require("./app/utils/searchFilter.js");
 
@@ -68,19 +73,10 @@ module.exports = (eleventyConfig) => {
   // TODO: Add Search Filter
   // eleventyConfig.addFilter("search", searchFilter);
 
-  // Handle newlines in content
-  eleventyConfig.addFilter("nl2p", function (content) {
-    if (!content) return "";
-
-    // Split content by double newlines (paragraph breaks)
-    const paragraphs = content.trim().split(/\n\s*\n/);
-
-    // Wrap each paragraph in <p> tags and join
-    return paragraphs
-      .filter((p) => p.trim().length > 0) // Remove empty paragraphs
-      .map((p) => `<p>${p.trim()}</p>`)
-      .join("\n\n");
-  });
+  // Markdown filter
+  eleventyConfig.addNunjucksFilter("markdownify", (markdownString) =>
+    md.render(markdownString)
+  );
 
   // Add Shortcodes
   // Get the current year - super useful for copyright dates.
