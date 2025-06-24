@@ -7,31 +7,32 @@
 # version:      1.0.0
 # license:      BSD-3-Clause
 #
-# Usage: ./cron.sh [digest|facebook-post]
+# Usage: ./cron.sh [digest|facebook-post|fx-update]
 #
 # Logical steps
 # 1. cd to project directory
 # 2. Activate virtual environment
-# 3. Run specified task (digest in docker or facebook-post natively)
-# 4. commit changes (only for digest)
-# 5. push changes to remote (only for digest)
+# 3. Run specified task (digest in docker, facebook-post and fx-update natively)
+# 4. commit changes (for digest and fx-update)
+# 5. push changes to remote (for digest and fx-update)
 # =================================================================================================
 
 set -e  # Exit immediately if any command fails
 
 # Check for required argument
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 [digest|facebook-post]"
+    echo "Usage: $0 [digest|facebook-post|fx-update]"
     echo "  digest        - Generate news digest using Docker"
     echo "  facebook-post - Post to Facebook (runs natively, no Docker)"
+    echo "  fx-update     - Update foreign exchange rates (runs natively, no Docker)"
     exit 1
 fi
 
 TASK="$1"
 
 # Validate task argument
-if [[ "$TASK" != "digest" && "$TASK" != "facebook-post" ]]; then
-    echo "Error: Invalid task '$TASK'. Must be 'digest' or 'facebook-post'"
+if [[ "$TASK" != "digest" && "$TASK" != "facebook-post" && "$TASK" != "fx-update" ]]; then
+    echo "Error: Invalid task '$TASK'. Must be 'digest', 'facebook-post', or 'fx-update'"
     exit 1
 fi
 
@@ -47,6 +48,8 @@ if [[ "$TASK" == "digest" ]]; then
     PING_URL="${HEALTHCHECKS_PING_URL}"
 elif [[ "$TASK" == "facebook-post" ]]; then
     PING_URL="${HEALTHCHECKS_FACEBOOK_PING_URL}"
+elif [[ "$TASK" == "fx-update" ]]; then
+    PING_URL="${HEALTHCHECKS_FX_PING_URL}"
 fi
 
 # Function to send success signal to healthchecks.io
@@ -109,4 +112,26 @@ elif [[ "$TASK" == "facebook-post" ]]; then
     send_healthcheck_success
 
     echo "Facebook post task completed successfully."
+
+elif [[ "$TASK" == "fx-update" ]]; then
+    echo "Running FX rates update task natively..."
+    # Run FX update task natively (no Docker)
+    inv fx-update || {
+        echo "Failed to run FX update task."
+        send_healthcheck_failure
+        exit 1
+    }
+
+    # Commit FX data changes
+    today=$(date  +"%Y-%m-%d %H:%M %Z")
+    git add app/web/_data/fx_current.json app/web/_data/fx_data.json data/fx/ || { echo "Failed to stage FX data changes for commit."; send_healthcheck_failure; exit 1; }
+    git commit --no-verify -m "chore: 💱 fx rates update » ${today}" || { echo "Failed to commit FX data changes."; send_healthcheck_failure; exit 1; }
+
+    # Push changes to remote
+    git push origin main || { echo "Failed to push FX data changes to remote repository."; send_healthcheck_failure; exit 1; }
+
+    # Send success signal to healthchecks.io
+    send_healthcheck_success
+
+    echo "FX rates update task completed successfully."
 fi
