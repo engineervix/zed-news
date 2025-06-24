@@ -360,7 +360,7 @@ function registerFXComponents(Alpine) {
               ),
               borderWidth: 2,
               fill: true,
-              tension: 0.1,
+              cubicInterpolationMode: "monotone",
               pointRadius: window.innerWidth < 768 ? 2 : 2,
               pointHoverRadius: window.innerWidth < 768 ? 8 : 5,
               pointHitRadius: window.innerWidth < 768 ? 15 : 10,
@@ -437,6 +437,7 @@ function registerFXComponents(Alpine) {
           scales: {
             y: {
               beginAtZero: false,
+              reverse: true,
               title: {
                 display: true,
                 text: "Zambian Kwacha (ZMW)",
