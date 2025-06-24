@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 import sys
 from typing import Callable
 
@@ -11,6 +12,40 @@ from app.core.summarization.backends.together import brief_summary
 from app.core.utilities import DATA_DIR, today, today_human_readable, today_iso_fmt
 
 logger = logging.getLogger(__name__)
+
+
+def fix_markdown_headings(text: str) -> str:
+    """Fix markdown headings that might be missing spaces after hash characters
+
+    Args:
+        text: The text content to fix
+
+    Returns:
+        Text with properly formatted markdown headings
+
+    Examples:
+        >>> fix_markdown_headings("##Main Stories\\n###Subsection")
+        "## Main Stories\\n### Subsection"
+    """
+    return re.sub(r"^(#{1,6})([^\s#])", r"\1 \2", text, flags=re.MULTILINE)
+
+
+def remove_title_headings(text: str) -> str:
+    """Remove title-level headings (single # at start of line) from text
+
+    Args:
+        text: The text content to process
+
+    Returns:
+        Text with title-level heading lines removed
+
+    Examples:
+        >>> remove_title_headings("# Title\\n## Section\\nContent")
+        "## Section\\nContent"
+        >>> remove_title_headings("# Title without newline")
+        ""
+    """
+    return re.sub(r"^# .*\n?", "", text, flags=re.MULTILINE)
 
 
 def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, summary: str):
@@ -128,20 +163,18 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
                     "3. Note connections and patterns between stories\n"
                     "4. Determine which stories provide broader context about Zambia's current situation\n\n"
                     "STRUCTURE REQUIREMENTS:\n"
-                    "Format your digest with these exact sections:\n\n"
-                    "**Opening Summary Paragraph:**\n"
-                    "- Begin with a 2-3 sentence overview of the day's major themes\n"
-                    "- Highlight the most significant developments\n\n"
-                    "**Main Stories Section:**\n"
+                    "Format your digest with these exact sections (DO NOT include a title - it will be added separately):\n\n"
+                    "Start with an opening summary paragraph (no heading).\n\n"
+                    "## Main Stories\n"
                     "- Present 5-8 key stories in order of importance\n"
-                    "- Use clear, descriptive headlines for each story\n"
+                    "- Use **bold formatting** for story headlines\n"
                     "- Provide 2-3 sentences of context and analysis per story\n"
                     "- Group related stories together naturally\n"
                     "- Focus on impact and significance, not just facts\n\n"
-                    "**Brief Updates Section:**\n"
+                    "## Brief Updates\n"
                     "- Cover remaining stories in 1-2 sentences each\n"
                     "- Group by theme where possible\n\n"
-                    "**Closing Reflection:**\n"
+                    "## Closing Reflection\n"
                     "- 2-3 sentences summarizing key takeaways\n"
                     "- What should readers remember or watch for?\n\n"
                     "TONE AND STYLE:\n"
@@ -182,8 +215,11 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
     generated_digest = completion.choices[0].message.content
 
     if generated_digest := generated_digest.strip():
-        # Clean up the generated content
-        generated_digest = generated_digest.replace("**", "").replace("# ", "")
+        # Remove title-level headings since title is added separately
+        generated_digest = remove_title_headings(generated_digest)
+
+        # Fix markdown headings that might be missing spaces
+        generated_digest = fix_markdown_headings(generated_digest)
 
         # Write the digest to the destination file
         with open(dest, "w") as f:
