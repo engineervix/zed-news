@@ -153,15 +153,77 @@ function registerFXComponents(Alpine) {
       });
 
       // Handle window resize for responsive chart updates
+      let resizeTimeout;
       this.resizeHandler = () => {
         if (this.chart) {
-          this.chart.resize();
-          // Rerender chart on significant size changes to update tick limits
-          this.renderChart();
+          // Clear any existing timeout
+          clearTimeout(resizeTimeout);
+
+          // Debounce the resize handling
+          resizeTimeout = setTimeout(() => {
+            // Use requestAnimationFrame to ensure DOM is ready after resize
+            requestAnimationFrame(() => {
+              // Check if canvas is still visible and has dimensions
+              const canvas = this.$refs.chartCanvas;
+              if (canvas && canvas.offsetWidth > 0 && canvas.offsetHeight > 0) {
+                this.chart.resize();
+                // Update chart options for new screen size
+                this.updateChartForScreenSize();
+              } else {
+                // If canvas is not properly sized, re-render completely
+                setTimeout(() => {
+                  this.renderChart();
+                }, 100);
+              }
+            });
+          }, 150); // 150ms debounce delay
         }
       };
 
+      // Handle orientation change specifically for mobile devices
+      this.orientationHandler = () => {
+        // Delay to allow the orientation change to complete
+        setTimeout(() => {
+          if (this.chart) {
+            this.renderChart();
+          }
+        }, 300);
+      };
+
       window.addEventListener("resize", this.resizeHandler);
+      window.addEventListener("orientationchange", this.orientationHandler);
+
+      // Add intersection observer to handle when the chart becomes visible
+      this.intersectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const chartCanvas = this.$refs.chartCanvas;
+          if (
+            entry.isIntersecting &&
+            chartCanvas &&
+            entry.target === chartCanvas.parentElement
+          ) {
+            // Chart container is now visible, ensure chart is rendered
+            if (
+              !this.chart &&
+              !this.$store.fxData.loading &&
+              !this.$store.fxData.error
+            ) {
+              this.$nextTick(() => {
+                this.renderChart();
+              });
+            }
+          }
+        });
+      });
+
+      // Start observing the chart container when it's available
+      this.$nextTick(() => {
+        const chartCanvas = this.$refs.chartCanvas;
+        const chartContainer = chartCanvas && chartCanvas.parentElement;
+        if (chartContainer) {
+          this.intersectionObserver.observe(chartContainer);
+        }
+      });
 
       // Observe theme changes on document root and body
       this.themeObserver.observe(document.documentElement, {
@@ -180,14 +242,44 @@ function registerFXComponents(Alpine) {
         this.themeObserver.disconnect();
       }
 
+      // Clean up intersection observer
+      if (this.intersectionObserver) {
+        this.intersectionObserver.disconnect();
+      }
+
       // Clean up resize listener
       if (this.resizeHandler) {
         window.removeEventListener("resize", this.resizeHandler);
       }
 
+      // Clean up orientation change listener
+      if (this.orientationHandler) {
+        window.removeEventListener(
+          "orientationchange",
+          this.orientationHandler
+        );
+      }
+
       if (this.chart) {
         this.chart.destroy();
       }
+    },
+
+    updateChartForScreenSize() {
+      if (!this.chart) return;
+
+      const isMobile = window.innerWidth < 768;
+
+      // Update x-axis tick configuration based on screen size
+      this.chart.options.scales.x.ticks.maxTicksLimit = isMobile ? 6 : 12;
+      this.chart.options.scales.x.ticks.maxRotation = isMobile ? 45 : 30;
+
+      // Update point radius for mobile
+      this.chart.data.datasets[0].pointRadius = isMobile ? 1 : 2;
+      this.chart.data.datasets[0].pointHoverRadius = isMobile ? 4 : 5;
+
+      // Update the chart
+      this.chart.update("none"); // Use 'none' animation mode for immediate update
     },
 
     getFilteredData() {
@@ -220,6 +312,15 @@ function registerFXComponents(Alpine) {
 
       const canvas = this.$refs.chartCanvas;
       if (!canvas) return;
+
+      // Ensure the canvas container has proper dimensions before creating chart
+      if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) {
+        // If canvas is not properly sized, retry after a short delay
+        setTimeout(() => {
+          this.renderChart();
+        }, 100);
+        return;
+      }
 
       // Destroy existing chart
       if (this.chart) {
