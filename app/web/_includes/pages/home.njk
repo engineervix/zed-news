@@ -134,7 +134,7 @@
 </section>
 {% endif %}
 
-<!-- FX Rates Widget -->
+{# FX Rates Widget #}
 <section class="section py-5 bg-body-secondary fx-rates-section">
     <div class="container px-5">
         <div class="row gx-5">
@@ -148,7 +148,7 @@
                 </div>
 
                 <div x-data="fxWidget" class="fx-widget">
-                    <!-- Loading State -->
+                    {# Loading State #}
                     <div x-show="loading" class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
@@ -156,13 +156,13 @@
                         <p class="mt-2 text-muted">Loading current rates...</p>
                     </div>
 
-                    <!-- Error State -->
+                    {# Error State #}
                     <div x-show="error" class="alert alert-warning text-center">
                         <i class="fas fa-exclamation-triangle me-2"></i>
                         <span x-text="error"></span>
                     </div>
 
-                    <!-- Current Rates -->
+                    {# Current Rates #}
                     <div x-show="!loading && !error">
                         <div class="row justify-content-center">
                             <template x-for="([currency, rates]) in Object.entries(currentRates)" :key="currency">
@@ -193,7 +193,7 @@
                         </div>
 
                         <div class="text-center mt-4">
-                            <!-- Date Information -->
+                            {# Date Information #}
                             <template x-if="!loading && !error && fx_current?.current_rates?.date">
                                 <div class="mb-3">
                                     <div class="badge bg-light text-dark fs-6 py-2 px-3">

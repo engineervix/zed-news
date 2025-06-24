@@ -14,7 +14,7 @@
                 <code>audio</code> tag is not supported in this browser.
             </audio>
             </div>
-            <!-- Buttons: Subscribe, Share -->
+            {# Buttons: Subscribe, Share #}
             <div
             class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start"
             >
@@ -50,7 +50,7 @@
                 {% set has_words = words is defined and words %}
                 {% set has_full_cards = has_production and has_words %}
                 <div class="row features-icons text-center pb-3">
-                    <!-- presenter -->
+                    {# presenter #}
                     <div class="col-lg-{% if has_full_cards %}4{% else %}6{% endif %} col-md-6">
                         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
                         <div class="features-icons-icon d-flex">
@@ -64,7 +64,7 @@
                         </p>
                         </div>
                     </div>
-                    <!-- locale -->
+                    {# locale #}
                     <div class="col-lg-{% if has_full_cards %}4{% else %}6{% endif %} col-md-6">
                         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
                         <div class="features-icons-icon d-flex">
@@ -75,7 +75,7 @@
                         </div>
                     </div>
                     {% if production_time %}
-                    <!-- time to produce -->
+                    {# time to produce #}
                     <div class="col-lg-4 col-md-6">
                         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
                             <div class="features-icons-icon d-flex">
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                     {% endif %}
-                    <!-- audio file -->
+                    {# audio file #}
                     <div class="col-lg-{% if has_full_cards %}4{% else %}6{% endif %} col-md-6">
                         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
                         <div class="features-icons-icon d-flex">
@@ -104,7 +104,7 @@
                         </div>
                     </div>
                     {% if words %}
-                    <!-- number of words -->
+                    {# number of words #}
                     <div class="col-lg-4 col-md-6">
                         <div class="features-icons-item mx-auto mb-0 mb-lg-3">
                             <div class="features-icons-icon d-flex">
@@ -117,7 +117,7 @@
                         </div>
                     </div>
                     {% endif %}
-                    <!-- number of articles -->
+                    {# number of articles #}
                     <div class="col-lg-{% if has_full_cards %}4{% else %}6{% endif %} col-md-6">
                         <div class="features-icons-item mx-auto mb-0 mb-lg-3">
                         <div class="features-icons-icon d-flex">
