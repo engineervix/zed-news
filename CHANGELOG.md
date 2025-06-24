@@ -4,6 +4,60 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.0](https://github.com/engineervix/zed-news/compare/v1.0.0...v1.1.0) (2025-06-24)
+
+
+### 🚀 Features
+
+* add cron job for fx updates ([263c40a](https://github.com/engineervix/zed-news/commit/263c40a25f4ee4cebf1e78897af0e75cb2ec5cab))
+* enhance touch interaction for FX charts with larger hit targets and hover feedback ([6d16a66](https://github.com/engineervix/zed-news/commit/6d16a66897b1eb734ea3169364e5fac85c548b83))
+* foreign exchange data ([5ecaff2](https://github.com/engineervix/zed-news/commit/5ecaff274158d4bf74c6943385d201099f74d147))
+* improve mobile responsiveness for FX rate date display ([58f3de8](https://github.com/engineervix/zed-news/commit/58f3de8f446a065f27a5f7a4beec2c656b29f032))
+* render markdown using markdown-it ([4a83060](https://github.com/engineervix/zed-news/commit/4a830606df367fdfdda56f6b96eafbd66f839d55))
+* show foreign exchange updates ([79ba323](https://github.com/engineervix/zed-news/commit/79ba32339c0bffc08d403cd54168d0962301e28a))
+
+
+### 🐛 Bug Fixes
+
+* don't repeat yourself ([70f4dc3](https://github.com/engineervix/zed-news/commit/70f4dc3195d8f362dda4008160ebe9efb1628079))
+* handle newlines ([b26b295](https://github.com/engineervix/zed-news/commit/b26b2958df9641863c12c3d313fee327cd4a2f2e))
+* invocation of social post ([19ea3eb](https://github.com/engineervix/zed-news/commit/19ea3ebfa93ee8ed9aa5f5ae648d7aaf6fd9e7a5))
+* nav layout on single news template ([6cc9793](https://github.com/engineervix/zed-news/commit/6cc97933c682983ffdb194da6ca786473609fca2))
+* resolve chart rendering issues during screen orientation changes ([4bbac90](https://github.com/engineervix/zed-news/commit/4bbac90738e05cc7a426aaa8cf8eae17bb7f3442))
+* SC2269 (info): This variable is assigned to itself, so the assignment does nothing ([b1bcdd7](https://github.com/engineervix/zed-news/commit/b1bcdd7565f990b61c96e88078f3cee521e0a8c1))
+* we don't need toadd summary for each article ([4d6adba](https://github.com/engineervix/zed-news/commit/4d6adba85debfa377994a77e5b7a555120d269f6))
+
+
+### 💄 Styling
+
+* about page UX improvements ([71d4939](https://github.com/engineervix/zed-news/commit/71d4939df9c180ded1abc15129019bf275fac883))
+* make stylelint happy ([9e9dfdf](https://github.com/engineervix/zed-news/commit/9e9dfdf59ef696cad642545dcd739c7531247504))
+
+
+### ♻️ Code Refactoring
+
+* add custom colours, serif font and improve readability ([5b4309c](https://github.com/engineervix/zed-news/commit/5b4309cf4b906d89b6a88520a1f8f15786c08c9e))
+* adjust prompt for structure and consistency ([7382a86](https://github.com/engineervix/zed-news/commit/7382a86e7e67648e794b055b23f6704be405cc24))
+* better styling of news digest, and try to match content & styling ([ce4dfdb](https://github.com/engineervix/zed-news/commit/ce4dfdbc6a3bfb9423ff82bba7e46b3dc379c78e))
+* cleanup generated content for more consistent output ([b615877](https://github.com/engineervix/zed-news/commit/b615877dd379b8e880d25379715a14af1b93e737))
+* fx chart UI/UX enhancements ([19e7642](https://github.com/engineervix/zed-news/commit/19e76427e564dbff33911442d866a4dce06c38eb))
+* get daily rates for past 1 year ([ea45b4d](https://github.com/engineervix/zed-news/commit/ea45b4d4d19a4ed26eb2daae7df48cd214c7f865))
+* only update fx data if not already updated ([95d28cd](https://github.com/engineervix/zed-news/commit/95d28cd1393e5cae0532c76687da9bca86c97ec1))
+* remove rss feed icon ([3418d83](https://github.com/engineervix/zed-news/commit/3418d8300e87c1825d699580fb832f78ef139879))
+* swap order on mobile ([ae00a07](https://github.com/engineervix/zed-news/commit/ae00a0780b4f3c3b3a32e7a7afc6868d8c211590))
+* tweak digest prompt ([e7d1d49](https://github.com/engineervix/zed-news/commit/e7d1d494f1f9ddac3a966c00ea83b4cbe183df60))
+* update cron.sh to handle both digest & social post ([41c851c](https://github.com/engineervix/zed-news/commit/41c851c0cfb43e8e752b8deea3f73237d9a292ed))
+
+
+### ✅ Tests
+
+* add tests for fx feature ([2d717cb](https://github.com/engineervix/zed-news/commit/2d717cb2fb89c3e61ca5ed35533d8b7c02aac2f9))
+
+
+### ⚙️ Build System
+
+* add pandas ([076c982](https://github.com/engineervix/zed-news/commit/076c98263e47673d2fdbba65d0919ab8bb5406b0))
+
 ## [v1.0.0](https://github.com/engineervix/zed-news/compare/v0.10.0...v1.0.0) (2025-06-13)
 
 

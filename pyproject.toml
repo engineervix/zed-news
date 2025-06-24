@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "zed-news"
-version = "1.0.0"
+version = "1.1.0"
 description = "Automated news digests from various Zambian 🇿🇲 sources, powered by AI."
 authors = ["Victor Miti <https://github.com/engineervix>"]
 readme = "README.md"
