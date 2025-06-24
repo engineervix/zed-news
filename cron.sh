@@ -114,6 +114,25 @@ elif [[ "$TASK" == "facebook-post" ]]; then
     echo "Facebook post task completed successfully."
 
 elif [[ "$TASK" == "fx-update" ]]; then
+    # Check if FX data is already up to date for today
+    today_iso=$(date +"%Y-%m-%d")
+    fx_current_file="app/web/_data/fx_current.json"
+
+    if [[ -f "$fx_current_file" ]]; then
+        # Extract the current_rates.date from the JSON file
+        current_fx_date=$(jq -r '.current_rates.date' "$fx_current_file" 2>/dev/null || echo "")
+
+        if [[ "$current_fx_date" == "$today_iso" ]]; then
+            echo "FX rates are already up to date for today ($today_iso). Skipping update."
+            send_healthcheck_success
+            exit 0
+        else
+            echo "FX rates are from $current_fx_date, updating to $today_iso..."
+        fi
+    else
+        echo "FX current file not found, proceeding with update..."
+    fi
+
     echo "Running FX rates update task natively..."
     # Run FX update task natively (no Docker)
     inv fx-update || {
