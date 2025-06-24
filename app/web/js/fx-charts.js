@@ -274,9 +274,10 @@ function registerFXComponents(Alpine) {
       this.chart.options.scales.x.ticks.maxTicksLimit = isMobile ? 6 : 12;
       this.chart.options.scales.x.ticks.maxRotation = isMobile ? 45 : 30;
 
-      // Update point radius for mobile
-      this.chart.data.datasets[0].pointRadius = isMobile ? 1 : 2;
-      this.chart.data.datasets[0].pointHoverRadius = isMobile ? 4 : 5;
+      // Update point radius for mobile - larger touch targets
+      this.chart.data.datasets[0].pointRadius = isMobile ? 2 : 2;
+      this.chart.data.datasets[0].pointHoverRadius = isMobile ? 8 : 5;
+      this.chart.data.datasets[0].pointHitRadius = isMobile ? 15 : 10;
 
       // Update the chart
       this.chart.update("none"); // Use 'none' animation mode for immediate update
@@ -360,8 +361,9 @@ function registerFXComponents(Alpine) {
               borderWidth: 2,
               fill: true,
               tension: 0.1,
-              pointRadius: 2,
-              pointHoverRadius: 5,
+              pointRadius: window.innerWidth < 768 ? 2 : 2,
+              pointHoverRadius: window.innerWidth < 768 ? 8 : 5,
+              pointHitRadius: window.innerWidth < 768 ? 15 : 10,
               pointBackgroundColor: this.getCurrencyColor(
                 this.selectedCurrency
               ),
@@ -376,6 +378,12 @@ function registerFXComponents(Alpine) {
           interaction: {
             intersect: false,
             mode: "index",
+          },
+          // Enhanced touch/hover settings
+          onHover: (event, activeElements) => {
+            // Change cursor on hover/touch
+            event.native.target.style.cursor =
+              activeElements.length > 0 ? "pointer" : "default";
           },
           plugins: {
             title: {
