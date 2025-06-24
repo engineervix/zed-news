@@ -124,7 +124,7 @@ elif [[ "$TASK" == "fx-update" ]]; then
 
     # Commit FX data changes
     today=$(date  +"%Y-%m-%d %H:%M %Z")
-    git add app/web/_data/fx_current.json app/web/_data/fx_data.json data/fx/ || { echo "Failed to stage FX data changes for commit."; send_healthcheck_failure; exit 1; }
+    git add app/web/_data/fx_current.json app/web/_data/fx_data.json || { echo "Failed to stage FX data changes for commit."; send_healthcheck_failure; exit 1; }
     git commit --no-verify -m "chore: 💱 fx rates update » ${today}" || { echo "Failed to commit FX data changes."; send_healthcheck_failure; exit 1; }
 
     # Push changes to remote
