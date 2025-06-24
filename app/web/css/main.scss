@@ -455,7 +455,7 @@ header {
       &:focus {
         background-color: var(--bs-dark-bg-subtle);
         border-color: var(--bs-primary);
-        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+        box-shadow: 0 0 0 0.25rem rgb(var(--bs-primary-rgb) 0.25);
         color: var(--bs-body-color);
       }
     }
@@ -472,7 +472,7 @@ header {
       }
 
       &:focus {
-        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+        box-shadow: 0 0 0 0.25rem rgb(var(--bs-primary-rgb) 0.25);
       }
     }
   }
@@ -481,35 +481,35 @@ header {
 // FX Data Freshness Card
 .fx-data-freshness-card {
   .card-body {
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
 
   .badge {
     border: 1px solid transparent;
-    -webkit-transition: all 0.3s ease;
-    -moz-transition: all 0.3s ease;
-    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    transition: all 0.3s ease;
     transition: all 0.3s ease;
 
     &.bg-primary {
-      border-color: rgba(var(--bs-primary-rgb), 0.2);
+      border-color: rgb(var(--bs-primary-rgb) 0.2);
     }
 
     &.bg-secondary {
-      border-color: rgba(var(--bs-secondary-rgb), 0.2);
+      border-color: rgb(var(--bs-secondary-rgb) 0.2);
     }
 
     &.bg-warning {
-      border-color: rgba(var(--bs-warning-rgb), 0.2);
+      border-color: rgb(var(--bs-warning-rgb) 0.2);
     }
   }
 
   [data-bs-theme="dark"] & {
     background: linear-gradient(
       135deg,
-      rgba(13, 110, 253, 0.08) 0%,
-      rgba(25, 135, 84, 0.08) 100%
+      rgb(13 110 253 / 8%) 0%,
+      rgb(25 135 84 / 8%) 100%
     ) !important;
     border-color: var(--bs-border-color) !important;
 
@@ -523,8 +523,8 @@ header {
 
     .bg-primary {
       &.bg-opacity-10 {
-        background-color: rgba(var(--bs-primary-rgb), 0.15) !important;
-        border-color: rgba(var(--bs-primary-rgb), 0.3) !important;
+        background-color: rgb(var(--bs-primary-rgb) 0.15) !important;
+        border-color: rgb(var(--bs-primary-rgb) 0.3) !important;
       }
     }
 
@@ -534,20 +534,20 @@ header {
 
     .bg-secondary {
       &.bg-opacity-10 {
-        background-color: rgba(var(--bs-secondary-rgb), 0.15) !important;
-        border-color: rgba(var(--bs-secondary-rgb), 0.3) !important;
+        background-color: rgb(var(--bs-secondary-rgb) 0.15) !important;
+        border-color: rgb(var(--bs-secondary-rgb) 0.3) !important;
       }
     }
 
     .bg-warning {
       &.bg-opacity-10 {
-        background-color: rgba(var(--bs-warning-rgb), 0.15) !important;
-        border-color: rgba(var(--bs-warning-rgb), 0.3) !important;
+        background-color: rgb(var(--bs-warning-rgb) 0.15) !important;
+        border-color: rgb(var(--bs-warning-rgb) 0.3) !important;
       }
     }
 
     .rounded-circle {
-      background-color: rgba(var(--bs-primary-rgb), 0.15) !important;
+      background-color: rgb(var(--bs-primary-rgb) 0.15) !important;
     }
   }
 }
