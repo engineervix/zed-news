@@ -16,3 +16,4 @@
 # Remove noise from Github language stats
 # credits: https://proandroiddev.com/removing-noise-from-your-github-language-stats-e96113f8183d
 app/web/_pages/episodes/*.njk linguist-vendored
+app/web/_pages/news/*.njk linguist-vendored
