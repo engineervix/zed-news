@@ -1,0 +1,302 @@
+{% extends "base.njk" %}
+
+{% block header %}
+<header class="py-3">
+  <div class="container px-5">
+    <div class="row gx-5 align-items-center justify-content-center">
+      <div class="col-lg-8 col-xl-7 col-xxl-6">
+        <div class="my-5 text-start">
+          <h1 class="display-5 fw-bolder mb-2">
+            Foreign Exchange Rates
+          </h1>
+          <p class="lead fw-normal mb-4">
+            Current and historical exchange rates for major currencies against the Zambian Kwacha (ZMW).
+            All data is sourced from the Bank of Zambia and updated regularly.
+          </p>
+          <div class="card border-0 shadow-sm bg-gradient fx-data-freshness-card mb-4" style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(25, 135, 84, 0.05) 100%);" x-data="fxWidget">
+            <div class="card-body py-3">
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" style="width: 48px; height: 48px;">
+                    <i class="fas fa-calendar-check text-primary fs-5"></i>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="mb-1">
+                    <h6 class="mb-0 fw-bold text-dark">Current as of</h6>
+                  </div>
+                  <div class="mb-2">
+                    <template x-if="!loading && !error && fx_current && fx_current.current_rates && fx_current.current_rates.date">
+                      <div class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6 fw-semibold">
+                        <i class="fas fa-chart-line me-2"></i>
+                        <span x-text="`Rates as of ${new Date(fx_current.current_rates.date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
+                      </div>
+                    </template>
+                    <template x-if="loading">
+                      <div class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 fs-6">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Loading rate data...
+                      </div>
+                    </template>
+                    <template x-if="error">
+                      <div class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 fs-6">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Date unavailable
+                      </div>
+                    </template>
+                    <template x-if="!loading && !error && (!fx_current || !fx_current.current_rates || !fx_current.current_rates.date)">
+                      <div class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 fs-6">
+                        <i class="fas fa-question-circle me-2"></i>
+                        No date data available
+                      </div>
+                    </template>
+                  </div>
+                  <div>
+                    <small class="text-muted">
+                      <template x-if="!loading && !error && fx_current && fx_current.last_updated">
+                        <span x-text="`Last updated: ${new Date(fx_current.last_updated).toLocaleDateString('en-GB')} at ${new Date(fx_current.last_updated).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })}`"></span>
+                      </template>
+                      <template x-if="loading || error">
+                        <span>Update information unavailable</span>
+                      </template>
+                      <template x-if="!loading && !error && (!fx_current || !fx_current.last_updated)">
+                        <span>No update information available</span>
+                      </template>
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-5 col-xxl-6 d-none d-xl-block text-center">
+        <div class="my-5">
+          <img src="/img/fx.svg" alt="Foreign Exchange" class="img-fluid" style="max-height: 200px; opacity: 0.8;">
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <div class="col-12">
+
+      <!-- Current Rates Summary -->
+      <div class="row mb-5" x-data="fxWidget">
+        <div class="col-12">
+          <h2 class="h4 mb-3">
+            <i class="fas fa-money-bill-wave text-primary me-2"></i>
+            Current Exchange Rates
+          </h2>
+
+          <!-- Loading State -->
+          <div x-show="loading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading current rates...</p>
+          </div>
+
+          <!-- Error State -->
+          <div x-show="error" class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span x-text="error"></span>
+          </div>
+
+          <!-- Current Rates Cards -->
+          <div x-show="!loading && !error" class="row">
+            <template x-for="([currency, rates]) in Object.entries(currentRates)" :key="currency">
+              <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-body text-center">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h5 class="card-title mb-0" x-text="currency"></h5>
+                      <template x-if="trends[currency]">
+                        <span :class="getTrendClass(trends[currency].direction)">
+                          <i :class="getTrendIcon(trends[currency].direction)"></i>
+                        </span>
+                      </template>
+                    </div>
+                    <div class="display-6 fw-bold mb-2" x-text="formatRate(rates && rates.mid ? rates.mid : null)"></div>
+                    <div class="small text-muted">ZMW per 1 <span x-text="currency"></span></div>
+                    <template x-if="trends[currency] && trends[currency].change_percent !== 0">
+                      <div class="mt-2">
+                        <small :class="getTrendClass(trends[currency].direction)">
+                          <span x-text="trends[currency].change_percent > 0 ? '+' : ''"></span><span x-text="trends[currency].change_percent.toFixed(2)"></span>%
+                        </small>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Chart Section -->
+      <div class="row" x-data="fxCharts">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom-0">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <h3 class="card-title mb-0">
+                    <i class="fas fa-chart-area text-primary me-2"></i>
+                    Historical Exchange Rates
+                  </h3>
+                  <p class="text-muted mb-0 mt-1">Interactive chart showing currency trends over time</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                  <button class="btn btn-outline-primary btn-sm" @click="$store.fxData.loadData()" :disabled="$store.fxData.loading">
+                    <i class="fas fa-sync-alt me-1" :class="{ 'fa-spin': $store.fxData.loading }"></i>
+                    Reload Charts
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <!-- Chart Controls -->
+              <div class="row mb-4 fx-controls">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label fw-semibold">Currency</label>
+                  <select class="form-select" x-model="selectedCurrency">
+                    <template x-for="currency in currencies" :key="currency.code">
+                      <option :value="currency.code" x-text="`${currency.code} - ${currency.name}`"></option>
+                    </template>
+                  </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label class="form-label fw-semibold">Time Period</label>
+                  <select class="form-select" x-model="selectedPeriod">
+                    <template x-for="period in periods" :key="period.code">
+                      <option :value="period.code" x-text="period.name"></option>
+                    </template>
+                  </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label class="form-label fw-semibold d-block">Data Options</label>
+                  <template x-if="selectedPeriod === 'ALL'">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" x-model="showNormalizedData" id="showNormalized">
+                      <label class="form-check-label" for="showNormalized">
+                        Include pre-2013 normalized data
+                      </label>
+                    </div>
+                  </template>
+                  <template x-if="selectedPeriod !== 'ALL'">
+                    <p class="small text-muted mb-0">No additional options for this time period</p>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Loading State -->
+              <div x-show="$store.fxData.loading" class="text-center py-5">
+                <div class="spinner-border text-primary mb-3" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="text-muted">Loading historical data...</p>
+              </div>
+
+              <!-- Error State -->
+              <div x-show="$store.fxData.error" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Failed to load historical data: <span x-text="$store.fxData.error"></span>
+              </div>
+
+              <!-- Chart Container -->
+              <div x-show="!$store.fxData.loading && !$store.fxData.error" class="chart-container" style="position: relative; height: 500px;">
+                <canvas x-ref="chartCanvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Information Section -->
+      <div class="row mt-5">
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h4 class="card-title">
+                <i class="fas fa-info-circle text-primary me-2"></i>
+                About This Data
+              </h4>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6 class="fw-semibold">Data Source</h6>
+                  <p class="small text-muted">
+                    All exchange rate data is sourced directly from the Bank of Zambia's official records and updated regularly.
+                  </p>
+
+                  <h6 class="fw-semibold mt-3">Currency Rebasement</h6>
+                  <p class="small text-muted">
+                    The Zambian Kwacha was rebased on January 1, 2013. Pre-2013 data has been normalized (divided by 1,000) for consistency.
+                  </p>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="fw-semibold">Supported Currencies</h6>
+                  <ul class="list-unstyled small text-muted">
+                    <li><i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>USD - United States Dollar</li>
+                    <li><i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem;"></i>GBP - British Pound Sterling</li>
+                    <li><i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>EUR - Euro</li>
+                    <li><i class="fas fa-circle text-danger me-2" style="font-size: 0.5rem;"></i>ZAR - South African Rand</li>
+                  </ul>
+
+                  <h6 class="fw-semibold mt-3">Update Frequency</h6>
+                  <p class="small text-muted">
+                    Exchange rates are updated regularly based on Bank of Zambia publications.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm fx-controls" x-data="{ converterAmount: 100, converterFrom: 'USD' }">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="fas fa-calculator text-primary me-2"></i>
+                Quick Converter
+              </h5>
+              <div class="mb-3">
+                <label class="form-label">Amount</label>
+                <input type="number" class="form-control" placeholder="Enter amount" x-model="converterAmount">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">From Currency</label>
+                <select class="form-select" x-model="converterFrom">
+                  <option value="USD">USD</option>
+                  <option value="GBP">GBP</option>
+                  <option value="EUR">EUR</option>
+                  <option value="ZAR">ZAR</option>
+                </select>
+              </div>
+              <div class="mb-3" x-data="fxWidget">
+                <label class="form-label">To ZMW</label>
+                <div class="form-control bg-body-secondary" x-text="currentRates[converterFrom] ? (converterAmount * currentRates[converterFrom].mid).toFixed(2) + ' ZMW' : 'Loading...'"></div>
+              </div>
+              <p class="small text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Based on current mid-market rates
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+  <script type="module" src="/js/fx.min.js"></script>
+{% endblock %}

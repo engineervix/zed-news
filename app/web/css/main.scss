@@ -385,3 +385,169 @@ header {
     ) !important;
   }
 }
+
+// FX Widget Dark Mode Styling
+.fx-rates-section {
+  [data-bs-theme="dark"] & {
+    background-color: var(--bs-dark-bg-subtle);
+  }
+}
+
+.fx-rate-card {
+  background-color: var(--bs-body-bg);
+  border-color: var(--bs-border-color);
+  color: var(--bs-body-color);
+
+  [data-bs-theme="dark"] & {
+    background-color: var(--bs-dark);
+    border-color: var(--bs-border-color);
+
+    .card-title,
+    .h5 {
+      color: var(--bs-body-color);
+    }
+
+    &:hover {
+      background-color: var(--bs-dark-bg-subtle);
+      transform: translateY(-2px);
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+.fx-widget {
+  [data-bs-theme="dark"] & {
+    .spinner-border {
+      color: var(--bs-primary);
+    }
+
+    .alert {
+      background-color: var(--bs-dark-bg-subtle);
+      border-color: var(--bs-border-color);
+      color: var(--bs-body-color);
+    }
+  }
+}
+
+// FX Charts Page Dark Mode Styling
+.chart-container {
+  [data-bs-theme="dark"] & {
+    background-color: var(--bs-body-bg);
+    border-radius: 0.375rem;
+  }
+
+  canvas {
+    [data-bs-theme="dark"] & {
+      border-radius: 0.375rem;
+    }
+  }
+}
+
+// Form controls in FX page
+.fx-controls {
+  .form-select,
+  .form-control {
+    [data-bs-theme="dark"] & {
+      background-color: var(--bs-dark-bg-subtle);
+      border-color: var(--bs-border-color);
+      color: var(--bs-body-color);
+
+      &:focus {
+        background-color: var(--bs-dark-bg-subtle);
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+        color: var(--bs-body-color);
+      }
+    }
+  }
+
+  .form-check-input {
+    [data-bs-theme="dark"] & {
+      background-color: var(--bs-dark-bg-subtle);
+      border-color: var(--bs-border-color);
+
+      &:checked {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+      }
+    }
+  }
+}
+
+// FX Data Freshness Card
+.fx-data-freshness-card {
+  .card-body {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .badge {
+    border: 1px solid transparent;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+
+    &.bg-primary {
+      border-color: rgba(var(--bs-primary-rgb), 0.2);
+    }
+
+    &.bg-secondary {
+      border-color: rgba(var(--bs-secondary-rgb), 0.2);
+    }
+
+    &.bg-warning {
+      border-color: rgba(var(--bs-warning-rgb), 0.2);
+    }
+  }
+
+  [data-bs-theme="dark"] & {
+    background: linear-gradient(
+      135deg,
+      rgba(13, 110, 253, 0.08) 0%,
+      rgba(25, 135, 84, 0.08) 100%
+    ) !important;
+    border-color: var(--bs-border-color) !important;
+
+    .card-body {
+      color: var(--bs-body-color);
+    }
+
+    h6 {
+      color: var(--bs-body-color) !important;
+    }
+
+    .bg-primary {
+      &.bg-opacity-10 {
+        background-color: rgba(var(--bs-primary-rgb), 0.15) !important;
+        border-color: rgba(var(--bs-primary-rgb), 0.3) !important;
+      }
+    }
+
+    .text-primary {
+      color: var(--bs-primary) !important;
+    }
+
+    .bg-secondary {
+      &.bg-opacity-10 {
+        background-color: rgba(var(--bs-secondary-rgb), 0.15) !important;
+        border-color: rgba(var(--bs-secondary-rgb), 0.3) !important;
+      }
+    }
+
+    .bg-warning {
+      &.bg-opacity-10 {
+        background-color: rgba(var(--bs-warning-rgb), 0.15) !important;
+        border-color: rgba(var(--bs-warning-rgb), 0.3) !important;
+      }
+    }
+
+    .rounded-circle {
+      background-color: rgba(var(--bs-primary-rgb), 0.15) !important;
+    }
+  }
+}
