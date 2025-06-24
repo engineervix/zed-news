@@ -395,12 +395,12 @@ header {
 
 .fx-rate-card {
   background-color: var(--bs-body-bg);
-  border-color: var(--bs-border-color);
+  border: 1px solid var(--bs-border-color);
   color: var(--bs-body-color);
 
   [data-bs-theme="dark"] & {
     background-color: var(--bs-dark);
-    border-color: var(--bs-border-color);
+    border: 1px solid var(--bs-border-color);
 
     .card-title,
     .h5 {

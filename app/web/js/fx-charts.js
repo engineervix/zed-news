@@ -4,6 +4,7 @@
  */
 
 import Chart from "chart.js/auto";
+import "chartjs-adapter-date-fns";
 
 // Register FX components using the global registration system
 function registerFXComponents(Alpine) {
@@ -151,6 +152,17 @@ function registerFXComponents(Alpine) {
         }
       });
 
+      // Handle window resize for responsive chart updates
+      this.resizeHandler = () => {
+        if (this.chart) {
+          this.chart.resize();
+          // Rerender chart on significant size changes to update tick limits
+          this.renderChart();
+        }
+      };
+
+      window.addEventListener("resize", this.resizeHandler);
+
       // Observe theme changes on document root and body
       this.themeObserver.observe(document.documentElement, {
         attributes: true,
@@ -167,6 +179,12 @@ function registerFXComponents(Alpine) {
       if (this.themeObserver) {
         this.themeObserver.disconnect();
       }
+
+      // Clean up resize listener
+      if (this.resizeHandler) {
+        window.removeEventListener("resize", this.resizeHandler);
+      }
+
       if (this.chart) {
         this.chart.destroy();
       }
@@ -211,14 +229,7 @@ function registerFXComponents(Alpine) {
       const filteredData = this.getFilteredData();
 
       // Prepare chart data
-      const labels = filteredData.map((d) => {
-        const date = new Date(d.date);
-        return date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-        });
-      });
-
+      const labels = filteredData.map((d) => d.date);
       const chartData = filteredData.map((d) => d[this.selectedCurrency]);
 
       // Detect dark mode
@@ -268,7 +279,7 @@ function registerFXComponents(Alpine) {
           plugins: {
             title: {
               display: true,
-              text: `${this.selectedCurrency} to Zambian Kwacha Exchange Rate`,
+              text: `Zambian Kwacha per ${this.selectedCurrency}`,
               color: textColor,
               font: {
                 size: 16,
@@ -286,15 +297,30 @@ function registerFXComponents(Alpine) {
               borderWidth: 1,
               cornerRadius: 8,
               callbacks: {
+                title: (context) => {
+                  const dataPoint = filteredData[context[0].dataIndex];
+                  const date = new Date(dataPoint.date);
+                  return date.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  });
+                },
                 label: (context) => {
                   const value = context.parsed.y;
                   const dataPoint = filteredData[context.dataIndex];
                   const normalized = dataPoint.normalized
-                    ? " (normalized)"
+                    ? " (pre-rebase, normalized)"
                     : "";
+                  const dataType =
+                    dataPoint.period_type === "daily"
+                      ? " (daily)"
+                      : dataPoint.period_type === "monthly"
+                      ? " (monthly avg)"
+                      : "";
                   return `${this.selectedCurrency}: ${value.toFixed(
                     3
-                  )} ZMW${normalized}`;
+                  )} ZMW${normalized}${dataType}`;
                 },
               },
             },
@@ -316,6 +342,18 @@ function registerFXComponents(Alpine) {
               },
             },
             x: {
+              type: "time",
+              time: {
+                parser: "yyyy-MM-dd",
+                tooltipFormat: "MMM dd, yyyy",
+                displayFormats: {
+                  day: "MMM dd",
+                  week: "MMM dd",
+                  month: "MMM yyyy",
+                  quarter: "MMM yyyy",
+                  year: "yyyy",
+                },
+              },
               title: {
                 display: true,
                 text: "Date",
@@ -323,6 +361,10 @@ function registerFXComponents(Alpine) {
               },
               ticks: {
                 color: textColor,
+                maxTicksLimit: window.innerWidth < 768 ? 6 : 12,
+                autoSkip: true,
+                maxRotation: window.innerWidth < 768 ? 45 : 30,
+                minRotation: 0,
               },
               grid: {
                 display: false,

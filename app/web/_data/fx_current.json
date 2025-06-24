@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-06-24T13:38:37.668407",
+  "last_updated": "2025-06-24T13:56:11.329452",
   "current_rates": {
     "date": "2025-06-23",
     "rates": {
@@ -27,23 +27,23 @@
   },
   "trends": {
     "USD": {
-      "change": -2.099,
-      "change_percent": 7.79,
-      "direction": "up"
+      "change": 0.104,
+      "change_percent": -0.45,
+      "direction": "down"
     },
     "GBP": {
-      "change": -2.425,
-      "change_percent": 6.73,
+      "change": -0.118,
+      "change_percent": 0.38,
       "direction": "up"
     },
     "EUR": {
-      "change": -1.885,
-      "change_percent": 6.2,
-      "direction": "up"
+      "change": 0.014,
+      "change_percent": -0.05,
+      "direction": "down"
     },
     "ZAR": {
-      "change": -0.097,
-      "change_percent": 6.52,
+      "change": -0.004,
+      "change_percent": 0.31,
       "direction": "up"
     }
   }
