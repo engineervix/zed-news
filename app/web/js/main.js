@@ -6,6 +6,7 @@ import Plyr from "plyr";
 import UAParser from "ua-parser-js";
 import sharer from "sharer.js";
 import { format } from "timeago.js";
+import Alpine from "alpinejs";
 import "aos/dist/aos.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
@@ -207,3 +208,37 @@ function initThemeToggle() {
 }
 
 initThemeToggle();
+
+// Initialize Alpine.js globally and provide a registration system
+window.Alpine = Alpine;
+
+// Create a global registration queue for components that need to register before Alpine starts
+window.alpineRegistrationQueue = window.alpineRegistrationQueue || [];
+
+// Function to register components either immediately or queue them
+window.registerAlpineComponent = function (registrationFn) {
+  if (Alpine._started) {
+    // Alpine is already started, register immediately
+    registrationFn(Alpine);
+  } else {
+    // Alpine hasn't started yet, queue for later
+    window.alpineRegistrationQueue.push(registrationFn);
+  }
+};
+
+// Start Alpine after a brief delay to allow other components to register
+setTimeout(() => {
+  if (!Alpine._started) {
+    // Process any queued registrations before starting
+    window.alpineRegistrationQueue.forEach((registrationFn) => {
+      registrationFn(Alpine);
+    });
+
+    // Clear the queue
+    window.alpineRegistrationQueue = [];
+
+    // Start Alpine
+    Alpine.start();
+    console.log("Alpine.js started");
+  }
+}, 100);

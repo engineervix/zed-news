@@ -13,6 +13,7 @@ const options = {
   entry: {
     // multiple entries can be added here
     main: `./${projectRoot}/js/main.js`,
+    fx: `./${projectRoot}/js/fx-charts.js`,
   },
   output: {
     path: path.resolve(__dirname, "public/"),

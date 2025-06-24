@@ -89,6 +89,14 @@ module.exports = (eleventyConfig) => {
   eleventyConfig.addPassthroughCopy({ "app/web/ico": "ico" });
   eleventyConfig.addPassthroughCopy({ "app/web/img": "img" });
 
+  // Copy FX data files
+  eleventyConfig.addPassthroughCopy({
+    "app/web/_data/fx_current.json": "js/fx_current.json",
+  });
+  eleventyConfig.addPassthroughCopy({
+    "app/web/_data/fx_data.json": "js/fx_data.json",
+  });
+
   // Tell 11ty to use the .eleventyignore and ignore our .gitignore file
   eleventyConfig.setUseGitIgnore(false);
 

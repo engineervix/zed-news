@@ -340,6 +340,12 @@ def test(c):
 
 
 @task
+def fx_update(c):
+    """Update foreign exchange rates data"""
+    c.run("python -m app.core.fx.update", pty=True)
+
+
+@task
 def facebook_post(c):
     """Post to Facebook"""
     c.run("python -m app.core.social.post", pty=True)
