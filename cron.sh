@@ -144,6 +144,25 @@ elif [[ "$TASK" == "fx-update" ]]; then
     # Commit FX data changes
     today=$(date  +"%Y-%m-%d %H:%M %Z")
     git add app/web/_data/fx_current.json app/web/_data/fx_data.json || { echo "Failed to stage FX data changes for commit."; send_healthcheck_failure; exit 1; }
+
+    # Run pre-commit on the FX data files
+    echo "Running pre-commit on FX data files..."
+    if pre-commit run --files app/web/_data/fx_current.json app/web/_data/fx_data.json; then
+        echo "Pre-commit passed - no issues found."
+    else
+        precommit_exit_code=$?
+        if [[ $precommit_exit_code -eq 1 ]]; then
+            echo "Pre-commit found and fixed issues. Re-staging files..."
+        else
+            echo "Pre-commit failed with exit code $precommit_exit_code"
+            send_healthcheck_failure
+            exit 1
+        fi
+    fi
+
+    # Re-add files in case pre-commit made changes
+    git add app/web/_data/fx_current.json app/web/_data/fx_data.json || { echo "Failed to re-stage FX data changes after pre-commit."; send_healthcheck_failure; exit 1; }
+
     git commit --no-verify -m "chore: 💱 fx rates update » ${today}" || { echo "Failed to commit FX data changes."; send_healthcheck_failure; exit 1; }
 
     # Push changes to remote
