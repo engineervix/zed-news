@@ -229,12 +229,98 @@ header {
     font-size: 1.375rem;
     font-weight: 500;
     color: var(--bs-emphasis-color);
+    margin-bottom: 2rem;
+  }
+
+  // Section dividers
+  hr {
+    margin: 2.5rem 0;
+    border: 0;
+    border-top: 2px solid var(--bs-border-color);
+    opacity: 0.5;
+  }
+
+  // Section headings
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--bs-emphasis-color);
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+
+    &:not(:first-child) {
+      margin-top: 2rem;
+    }
+  }
+
+  // Ordered list styling for main stories
+  ol {
+    padding-left: 1.5rem;
+    margin-bottom: 2rem;
+
+    li {
+      margin-bottom: 2rem;
+      padding-left: 0.5rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      // Story content paragraphs
+      p {
+        margin-bottom: 1rem;
+
+        // Better line spacing for story content
+        br + text,
+        br ~ text {
+          margin-top: 0.5rem;
+        }
+
+        // First line styling (story titles)
+        &::first-line {
+          font-weight: 600;
+          color: var(--bs-emphasis-color);
+          font-size: 1.05em;
+        }
+      }
+    }
+  }
+
+  // Unordered list styling for brief updates
+  ul {
+    padding-left: 1.5rem;
+    margin-bottom: 2rem;
+
+    li {
+      margin-bottom: 0.75rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // List markers
+  ol li::marker {
+    font-weight: 600;
+    color: var(--bs-primary);
+  }
+
+  ul li::marker {
+    color: var(--bs-primary);
   }
 
   strong,
   b {
     color: var(--bs-emphasis-color);
     font-weight: 600;
+  }
+
+  // Dark mode adjustments
+  [data-bs-theme="dark"] & {
+    hr {
+      border-top-color: var(--bs-border-color);
+    }
   }
 }
 
