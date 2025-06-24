@@ -276,41 +276,76 @@ class FXDataProcessor:
             },
         }
 
-        # Generate historical data (monthly averages for performance)
+        # Generate historical data (hybrid approach: daily for past year, monthly for older)
         historical_data = []
 
-        # Group by year-month for monthly averages
-        df_sorted["year_month"] = df_sorted["date"].dt.to_period("M")
-        monthly_avg = (
-            df_sorted.groupby("year_month")
-            .agg(
-                {
-                    "date_only": "last",  # Use last date of the month
-                    "usd_buy": "mean",
-                    "usd_sale": "mean",
-                    "gbp_buy": "mean",
-                    "gbp_sale": "mean",
-                    "eur_buy": "mean",
-                    "eur_sale": "mean",
-                    "zar_buy": "mean",
-                    "zar_sale": "mean",
-                    "normalized": "first",  # Whether this period is normalized
-                }
-            )
-            .reset_index()
-        )
+        # Calculate cutoff date (12 months ago from latest data)
+        cutoff_date = latest_date - pd.DateOffset(months=12)
+        logger.info(f"Using daily data from {cutoff_date.date()} onwards, monthly averages before")
 
-        for _, row in monthly_avg.iterrows():
-            historical_data.append(
-                {
-                    "date": row["date_only"].isoformat(),
-                    "USD": round((row["usd_buy"] + row["usd_sale"]) / 2, 3),
-                    "GBP": round((row["gbp_buy"] + row["gbp_sale"]) / 2, 3),
-                    "EUR": round((row["eur_buy"] + row["eur_sale"]) / 2, 3),
-                    "ZAR": round((row["zar_buy"] + row["zar_sale"]) / 2, 3),
-                    "normalized": bool(row["normalized"]),
-                }
+        # Split data into recent (daily) and older (monthly) periods
+        recent_data = df_sorted[df_sorted["date_only"] >= cutoff_date.date()].copy()
+        older_data = df_sorted[df_sorted["date_only"] < cutoff_date.date()].copy()
+
+        # Process older data as monthly averages
+        monthly_count = 0
+        if not older_data.empty:
+            older_data["year_month"] = older_data["date"].dt.to_period("M")
+            monthly_avg = (
+                older_data.groupby("year_month")
+                .agg(
+                    {
+                        "date_only": "last",  # Use last date of the month
+                        "usd_buy": "mean",
+                        "usd_sale": "mean",
+                        "gbp_buy": "mean",
+                        "gbp_sale": "mean",
+                        "eur_buy": "mean",
+                        "eur_sale": "mean",
+                        "zar_buy": "mean",
+                        "zar_sale": "mean",
+                        "normalized": "first",  # Whether this period is normalized
+                    }
+                )
+                .reset_index()
             )
+            monthly_count = len(monthly_avg)
+
+            for _, row in monthly_avg.iterrows():
+                historical_data.append(
+                    {
+                        "date": row["date_only"].isoformat(),
+                        "USD": round((row["usd_buy"] + row["usd_sale"]) / 2, 3),
+                        "GBP": round((row["gbp_buy"] + row["gbp_sale"]) / 2, 3),
+                        "EUR": round((row["eur_buy"] + row["eur_sale"]) / 2, 3),
+                        "ZAR": round((row["zar_buy"] + row["zar_sale"]) / 2, 3),
+                        "normalized": bool(row["normalized"]),
+                        "period_type": "monthly",
+                    }
+                )
+
+        # Process recent data as daily values
+        if not recent_data.empty:
+            for _, row in recent_data.iterrows():
+                historical_data.append(
+                    {
+                        "date": row["date_only"].isoformat(),
+                        "USD": round((row["usd_buy"] + row["usd_sale"]) / 2, 3),
+                        "GBP": round((row["gbp_buy"] + row["gbp_sale"]) / 2, 3),
+                        "EUR": round((row["eur_buy"] + row["eur_sale"]) / 2, 3),
+                        "ZAR": round((row["zar_buy"] + row["zar_sale"]) / 2, 3),
+                        "normalized": bool(row["normalized"]),
+                        "period_type": "daily",
+                    }
+                )
+
+        # Sort historical data by date
+        historical_data.sort(key=lambda x: x["date"])
+
+        logger.info(
+            f"Generated {len(historical_data)} historical data points "
+            f"({len(recent_data)} daily, {monthly_count} monthly)"
+        )
 
         # Calculate trends (compare current with previous month)
         trends = {}
@@ -339,12 +374,18 @@ class FXDataProcessor:
             "trends": trends,
             "metadata": {
                 "total_records": len(df),
+                "historical_data_points": len(historical_data),
+                "daily_data_points": len(recent_data),
+                "monthly_data_points": monthly_count,
                 "date_range": {
                     "from": df_sorted["date_only"].min().isoformat(),
                     "to": df_sorted["date_only"].max().isoformat(),
                 },
+                "daily_data_cutoff": cutoff_date.date().isoformat(),
                 "currencies": self.currencies,
                 "rebase_date": self.rebase_date.isoformat(),
+                "data_strategy": "hybrid",
+                "data_strategy_description": "Daily values for past 12 months, monthly averages for older data",
             },
         }
 
