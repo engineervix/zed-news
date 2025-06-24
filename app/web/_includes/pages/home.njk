@@ -193,12 +193,15 @@
                         </div>
 
                         <div class="text-center mt-4">
-                            <!-- Date Information - More Prominent -->
+                            <!-- Date Information -->
                             <template x-if="!loading && !error && fx_current?.current_rates?.date">
                                 <div class="mb-3">
                                     <div class="badge bg-light text-dark fs-6 py-2 px-3">
                                         <i class="fas fa-calendar-day me-2"></i>
-                                        Rates as of <span x-text="new Date(fx_current.current_rates.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                        <span class="d-none d-sm-inline">Rates as of </span>
+                                        <span class="d-sm-none">As of </span>
+                                        <span class="d-none d-md-inline" x-text="new Date(fx_current.current_rates.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                        <span class="d-md-none" x-text="new Date(fx_current.current_rates.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })"></span>
                                     </div>
                                 </div>
                             </template>

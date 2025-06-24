@@ -16,7 +16,7 @@
           <div class="card border-0 shadow-sm bg-gradient fx-data-freshness-card mb-4" style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(25, 135, 84, 0.05) 100%);" x-data="fxWidget">
             <div class="card-body py-3">
               <div class="row align-items-center">
-                <div class="col-auto">
+                <div class="col-auto d-none d-sm-block">
                   <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" style="width: 48px; height: 48px;">
                     <i class="fas fa-calendar-check text-primary fs-5"></i>
                   </div>
@@ -25,8 +25,11 @@
                   <div class="mb-2">
                     <template x-if="!loading && !error && fx_current && fx_current.current_rates && fx_current.current_rates.date">
                       <div class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6 fw-semibold">
-                        <i class="fas fa-chart-line me-2"></i>
-                        <span x-text="`Rates as of ${new Date(fx_current.current_rates.date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
+                        <i class="fas fa-chart-line me-2 d-none d-sm-inline"></i>
+                        <span class="d-none d-sm-inline">Rates as of </span>
+                        <span class="d-sm-none">As of </span>
+                        <span class="d-none d-md-inline" x-text="new Date(fx_current.current_rates.date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                        <span class="d-md-none" x-text="new Date(fx_current.current_rates.date).toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric' })"></span>
                       </div>
                     </template>
                     <template x-if="loading">
