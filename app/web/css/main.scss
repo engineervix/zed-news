@@ -216,22 +216,6 @@ header {
   line-height: 1.7;
   color: var(--bs-body-color);
 
-  p {
-    margin-bottom: 1.5rem;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  // Better spacing for content sections
-  > p:first-child {
-    font-size: 1.375rem;
-    font-weight: 500;
-    color: var(--bs-emphasis-color);
-    margin-bottom: 2rem;
-  }
-
   // Section dividers
   hr {
     margin: 2.5rem 0;
@@ -253,6 +237,11 @@ header {
     }
   }
 
+  // General paragraph styling
+  p {
+    margin-bottom: 1.5rem;
+  }
+
   // Ordered list styling for main stories
   ol {
     padding-left: 1.5rem;
@@ -261,28 +250,6 @@ header {
     li {
       margin-bottom: 2rem;
       padding-left: 0.5rem;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      // Story content paragraphs
-      p {
-        margin-bottom: 1rem;
-
-        // Better line spacing for story content
-        br + text,
-        br ~ text {
-          margin-top: 0.5rem;
-        }
-
-        // First line styling (story titles)
-        &::first-line {
-          font-weight: 600;
-          color: var(--bs-emphasis-color);
-          font-size: 1.05em;
-        }
-      }
     }
   }
 
@@ -293,11 +260,38 @@ header {
 
     li {
       margin-bottom: 0.75rem;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
     }
+  }
+
+  // Story content paragraphs (more specific selector comes first)
+  ol li p {
+    margin-bottom: 1rem;
+
+    // Better line spacing for story content
+    br + text,
+    br ~ text {
+      margin-top: 0.5rem;
+    }
+
+    // First line styling (story titles)
+    &::first-line {
+      font-weight: 600;
+      color: var(--bs-emphasis-color);
+      font-size: 1.05em;
+    }
+  }
+
+  // More specific selectors come after general ones
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  ol li:last-child {
+    margin-bottom: 0;
+  }
+
+  ul li:last-child {
+    margin-bottom: 0;
   }
 
   // List markers
@@ -314,6 +308,14 @@ header {
   b {
     color: var(--bs-emphasis-color);
     font-weight: 600;
+  }
+
+  // Better spacing for content sections (more specific selector)
+  > p:first-child {
+    font-size: 1.375rem;
+    font-weight: 500;
+    color: var(--bs-emphasis-color);
+    margin-bottom: 2rem;
   }
 
   // Dark mode adjustments
