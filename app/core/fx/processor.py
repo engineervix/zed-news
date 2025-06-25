@@ -14,7 +14,7 @@ from typing import Dict, Optional
 import pandas as pd
 import requests
 
-from app.core.utilities import today_iso_fmt
+from app.core.utilities import timezone
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -370,7 +370,7 @@ class FXDataProcessor:
                 }
 
         return {
-            "last_updated": today_iso_fmt,
+            "last_updated": datetime.now(timezone).isoformat(),
             "current_rates": current_rates,
             "historical_data": historical_data,
             "trends": trends,
