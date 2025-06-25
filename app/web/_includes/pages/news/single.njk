@@ -6,8 +6,10 @@
         <div class="row gx-3 gx-md-5 align-items-center justify-content-center">
             <div class="col-12 col-lg-10">
                 <div class="my-3 my-md-5 text-center">
-                    <h1 class="display-6 fw-bolder mb-3">{{ title }}</h1>
-                    <p class="lead mb-4">{{ description }}</p>
+                    <div class="news-header-bg mb-4">
+                        <div class="news-pattern"></div>
+                        <h1 class="display-6 fw-bolder mb-0">{{ title }}</h1>
+                    </div>
                     <div class="d-flex justify-content-center align-items-center gap-4 text-muted mb-4">
                         <div>
                             <i class="fa-solid fa-calendar-days me-2"></i>
@@ -176,4 +178,31 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block js %}
+<script>
+// Wrap story titles in spans for better mobile styling
+function wrapStoryTitles() {
+    // Target paragraphs within the digest content ordered list
+    const storyParagraphs = document.querySelectorAll('.digest-content ol li p');
+
+    storyParagraphs.forEach(paragraph => {
+        const html = paragraph.innerHTML;
+        const brIndex = html.indexOf('<br>');
+
+        // Only process paragraphs that have a <br> tag (story format)
+        if (brIndex !== -1) {
+            const title = html.substring(0, brIndex);
+            const content = html.substring(brIndex + 4); // +4 for '<br>'
+
+            // Replace the content with wrapped title
+            paragraph.innerHTML = `<span class="story-title">${title}</span>${content}`;
+        }
+    });
+}
+
+// Run when DOM is loaded
+document.addEventListener('DOMContentLoaded', wrapStoryTitles);
+</script>
 {% endblock %}

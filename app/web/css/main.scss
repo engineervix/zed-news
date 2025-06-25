@@ -263,7 +263,7 @@ header {
     }
   }
 
-  // Story content paragraphs (more specific selector comes first)
+  // Story content paragraphs
   ol li p {
     margin-bottom: 1rem;
 
@@ -273,15 +273,16 @@ header {
       margin-top: 0.5rem;
     }
 
-    // First line styling (story titles)
-    &::first-line {
+    // Story title styling
+    .story-title {
       font-weight: 600;
       color: var(--bs-emphasis-color);
       font-size: 1.05em;
+      display: block;
+      margin-bottom: 0.5rem;
     }
   }
 
-  // More specific selectors come after general ones
   p:last-child {
     margin-bottom: 0;
   }
@@ -310,7 +311,7 @@ header {
     font-weight: 600;
   }
 
-  // Better spacing for content sections (more specific selector)
+  // Better spacing for content sections
   > p:first-child {
     font-size: 1.375rem;
     font-weight: 500;
