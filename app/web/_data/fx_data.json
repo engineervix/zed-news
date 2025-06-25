@@ -4298,12 +4298,7 @@
       "to": "2025-06-24"
     },
     "daily_data_cutoff": "2024-06-24",
-    "currencies": [
-      "USD",
-      "GBP",
-      "EUR",
-      "ZAR"
-    ],
+    "currencies": ["USD", "GBP", "EUR", "ZAR"],
     "rebase_date": "2013-01-01",
     "data_strategy": "hybrid",
     "data_strategy_description": "Daily values for past 12 months, monthly averages for older data"
