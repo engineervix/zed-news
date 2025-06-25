@@ -224,6 +224,9 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
         # Fix markdown headings that might be missing spaces
         generated_digest = fix_markdown_headings(generated_digest)
 
+        # remove <br> tags from the generated digest
+        generated_digest = generated_digest.replace("<br>", "")
+
         # Write the digest to the destination file
         with open(dest, "w") as f:
             f.write(generated_digest)
