@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-06-24T17:07:07.456534",
+  "last_updated": "2025-06-25T12:05:06.941820",
   "current_rates": {
     "date": "2025-06-24",
     "rates": {
@@ -4298,7 +4298,12 @@
       "to": "2025-06-24"
     },
     "daily_data_cutoff": "2024-06-24",
-    "currencies": ["USD", "GBP", "EUR", "ZAR"],
+    "currencies": [
+      "USD",
+      "GBP",
+      "EUR",
+      "ZAR"
+    ],
     "rebase_date": "2013-01-01",
     "data_strategy": "hybrid",
     "data_strategy_description": "Daily values for past 12 months, monthly averages for older data"
