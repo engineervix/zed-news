@@ -114,6 +114,7 @@ elif [[ "$TASK" == "facebook-post" ]]; then
     echo "Facebook post task completed successfully."
 
 elif [[ "$TASK" == "fx-update" ]]; then
+    git pull || { echo "Failed to pull changes from Git."; send_healthcheck_failure; exit 1; }
     # Check if FX data is already up to date for today
     today_iso=$(date +"%Y-%m-%d")
     fx_current_file="app/web/_data/fx_current.json"
