@@ -71,11 +71,12 @@ def create_facebook_post_text(content: str) -> str:
         f"The time is {now}. You are a social media marketing expert for Zed News, a news digest service for Zambia. "
         "Your task is to create a short, engaging Facebook post based on today's news digest. "
         "The post should:\n"
-        "- Start with a warm, friendly greeting\n"
+        "- Start with a warm, friendly, Zambian greeting\n"
         "- Highlight 2-3 of the most interesting or impactful stories.\n"
         "- Use bullet points and relevant emojis to make it scannable.\n"
         "- Maintain a professional yet friendly tone.\n"
         "- End with a clear call to action, encouraging people to read the full digest with a link."
+        "- Use appropriate hashtags related to the news and Zambia.\n"
     )
     user_prompt = f"Create a Facebook post for {today_human_readable} based on the following news digest:\n\n{content}\n\nInclude this link at the end: {digest_url}"
 
