@@ -109,7 +109,7 @@ function registerFXComponents(Alpine) {
   // FX Charts Component
   Alpine.data("fxCharts", () => ({
     selectedCurrency: "USD",
-    selectedPeriod: "1Y",
+    selectedPeriod: "1M",
     showNormalizedData: true,
     chart: null,
 
@@ -121,6 +121,7 @@ function registerFXComponents(Alpine) {
     ],
 
     periods: [
+      { code: "1M", name: "1 Month" },
       { code: "1Y", name: "1 Year" },
       { code: "2Y", name: "2 Years" },
       { code: "5Y", name: "5 Years" },
@@ -294,9 +295,14 @@ function registerFXComponents(Alpine) {
 
       // Filter by period
       if (this.selectedPeriod !== "ALL") {
-        const yearsBack = parseInt(this.selectedPeriod.replace("Y", ""));
         const cutoffDate = new Date();
-        cutoffDate.setFullYear(cutoffDate.getFullYear() - yearsBack);
+
+        if (this.selectedPeriod === "1M") {
+          cutoffDate.setMonth(cutoffDate.getMonth() - 1);
+        } else {
+          const yearsBack = parseInt(this.selectedPeriod.replace("Y", ""));
+          cutoffDate.setFullYear(cutoffDate.getFullYear() - yearsBack);
+        }
 
         data = data.filter((d) => new Date(d.date) >= cutoffDate);
       }
