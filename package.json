@@ -44,7 +44,7 @@
     "@babel/core": "^7.22.1",
     "@babel/eslint-parser": "^7.21.8",
     "@babel/preset-env": "^7.22.2",
-    "babel-loader": "^9.1.2",
+    "babel-loader": "^10.0.0",
     "commit-and-tag-version": "^12.5.1",
     "commitizen": "^4.3.0",
     "core-js": "^3.30.2",
