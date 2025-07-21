@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.1",
-    "@11ty/eleventy-plugin-rss": "^1.2.0",
+    "@11ty/eleventy-plugin-rss": "^2.0.0",
     "@babel/cli": "^7.21.5",
     "@babel/core": "^7.22.1",
     "@babel/eslint-parser": "^7.21.8",
