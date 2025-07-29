@@ -58,10 +58,10 @@ class TestDigest(unittest.TestCase):
     @patch("app.core.news.digest.update_article_with_summary")
     @patch("app.core.news.digest.brief_summary")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("app.core.news.digest.OpenAI")
+    @patch("app.core.news.digest.client")
     @patch("app.core.news.digest.logger")
     def test_create_news_digest_success(
-        self, mock_logger, mock_openai, mock_open_file, mock_brief_summary, mock_update_article, mock_exit
+        self, mock_logger, mock_client, mock_open_file, mock_brief_summary, mock_update_article, mock_exit
     ):
         news = [
             {
@@ -84,14 +84,14 @@ class TestDigest(unittest.TestCase):
 
         mock_completion = MagicMock()
         mock_completion.choices[0].message.content = "Generated Digest"
-        mock_openai.return_value.chat.completions.create.return_value = mock_completion
+        mock_client.chat.completions.create.return_value = mock_completion
 
         result = create_news_digest(news, dest, summarizer)
 
         self.assertEqual(summarizer.call_count, 2)
         mock_update_article.assert_called()
         self.assertEqual(mock_update_article.call_count, 2)
-        mock_openai.return_value.chat.completions.create.assert_called_once()
+        mock_client.chat.completions.create.assert_called_once()
         mock_logger.info.assert_any_call(f"News digest created successfully: {dest}")
         self.assertIsNotNone(result)
         self.assertEqual(result["total_articles"], 2)
@@ -100,9 +100,9 @@ class TestDigest(unittest.TestCase):
     @patch("app.core.news.digest.update_article_with_summary")
     @patch("app.core.news.digest.brief_summary")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("app.core.news.digest.OpenAI")
+    @patch("app.core.news.digest.client")
     def test_create_news_digest_uses_brief_summary(
-        self, mock_openai, mock_open_file, mock_brief_summary, mock_update_article
+        self, mock_client, mock_open_file, mock_brief_summary, mock_update_article
     ):
         news = [{"source": "ZNBC", "url": "url", "title": f"Title {i}", "content": "content"} for i in range(40)]
         dest = os.path.join(self.temp_dir, "digest.md")
@@ -111,7 +111,7 @@ class TestDigest(unittest.TestCase):
 
         mock_completion = MagicMock()
         mock_completion.choices[0].message.content = "Generated Digest"
-        mock_openai.return_value.chat.completions.create.return_value = mock_completion
+        mock_client.chat.completions.create.return_value = mock_completion
 
         create_news_digest(news, dest, summarizer)
 
@@ -120,16 +120,16 @@ class TestDigest(unittest.TestCase):
 
     @patch("sys.exit")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("app.core.news.digest.OpenAI")
+    @patch("app.core.news.digest.client")
     @patch("app.core.news.digest.logger")
-    def test_create_news_digest_empty_digest(self, mock_logger, mock_openai, mock_open_file, mock_sys_exit):
+    def test_create_news_digest_empty_digest(self, mock_logger, mock_client, mock_open_file, mock_sys_exit):
         news = [{"source": "ZNBC", "url": "url", "title": "Title 1", "content": "Content 1"}]
         dest = os.path.join(self.temp_dir, "digest.md")
         summarizer = MagicMock(return_value="Summary.")
 
         mock_completion = MagicMock()
         mock_completion.choices[0].message.content = ""  # Empty digest
-        mock_openai.return_value.chat.completions.create.return_value = mock_completion
+        mock_client.chat.completions.create.return_value = mock_completion
 
         with patch("app.core.news.digest.update_article_with_summary"):
             create_news_digest(news, dest, summarizer)
@@ -195,10 +195,10 @@ class TestDigest(unittest.TestCase):
     @patch("app.core.news.digest.update_article_with_summary")
     @patch("app.core.news.digest.brief_summary")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("app.core.news.digest.OpenAI")
+    @patch("app.core.news.digest.client")
     @patch("app.core.news.digest.logger")
     def test_create_news_digest_with_markdown_fix(
-        self, mock_logger, mock_openai, mock_open_file, mock_brief_summary, mock_update_article, mock_exit
+        self, mock_logger, mock_client, mock_open_file, mock_brief_summary, mock_update_article, mock_exit
     ):
         """Test that create_news_digest properly fixes markdown headings in the generated content"""
         news = [
@@ -213,10 +213,10 @@ class TestDigest(unittest.TestCase):
         dest = os.path.join(self.temp_dir, "digest.md")
         summarizer = MagicMock(return_value="Summary.")
 
-        # Mock OpenAI to return content with improperly formatted headings
+        # Mock Together AI to return content with improperly formatted headings
         mock_completion = MagicMock()
         mock_completion.choices[0].message.content = "##Main Stories\nSome content\n###Brief Updates\nMore content"
-        mock_openai.return_value.chat.completions.create.return_value = mock_completion
+        mock_client.chat.completions.create.return_value = mock_completion
 
         result = create_news_digest(news, dest, summarizer)
 
