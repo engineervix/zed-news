@@ -13,6 +13,25 @@ from app.core.utilities import DATA_DIR, today, today_human_readable, today_iso_
 logger = logging.getLogger(__name__)
 
 
+def remove_think_tags(text: str) -> str:
+    """Remove <think> tags and their content from DeepSeek-R1 responses
+
+    Args:
+        text: The text content to process
+
+    Returns:
+        Text with think tags and their content removed
+
+    Examples:
+        >>> remove_think_tags("<think>Reasoning here</think>Answer")
+        "Answer"
+        >>> remove_think_tags("Normal text without think tags")
+        "Normal text without think tags"
+    """
+    # Remove <think> tags and everything between them
+    return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+
+
 def fix_markdown_headings(text: str) -> str:
     """Fix markdown headings that might be missing spaces after hash characters
 
@@ -67,10 +86,12 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
             - 'source': The article source.
             - 'url': The URL of the article.
             - 'title': The title of the article.
-            - 'content': The content of the article. This is passed to the OpenAI API for summarization.
+            - 'content': The content of the article. This is passed to the OpenAI API
+              for summarization.
             - 'category': The category of the article.
         dest (str): The destination file path where the digest will be written.
-        summarizer (Callable): The function to use for summarization. This function must accept two arguments:
+        summarizer (Callable): The function to use for summarization. This function
+            must accept two arguments:
             - content (str): The content of the article.
             - title (str): The title of the article.
 
@@ -82,7 +103,8 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
         - TypeError: If the input data is of incorrect type.
 
     Returns:
-        None: The function writes the digest to the specified file but does not return any value.
+        None: The function writes the digest to the specified file but does not
+        return any value.
     """
 
     articles_by_source = {}
@@ -109,7 +131,8 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
             text = article["content"]
 
             if len(news) < 36:
-                # If there are less than 36 articles, summarize each article in the usual way
+                # If there are less than 36 articles, summarize each article in the
+                # usual way
                 summary = summarizer(text, title)
             else:
                 summary = brief_summary(text, title)
@@ -150,60 +173,18 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
         model=model,
         messages=[
             {
-                "role": "system",
-                "content": (
-                    "You are a skilled news editor creating a daily digest of Zambian news for a Zambian audience. "
-                    "Your goal is to create a clear, well-organized synthesis that readers can quickly scan and understand.\n\n"
-                    "ANALYSIS PHASE:\n"
-                    "Before writing, analyze the news items to:\n"
-                    "1. Group stories into logical themes (Economy, Environment, Technology, Agriculture, Politics, Safety/Crime, Sports, etc.)\n"
-                    "2. Identify the 3-5 most significant stories that deserve prominence\n"
-                    "3. Note connections and patterns between stories\n"
-                    "4. Determine which stories provide broader context about Zambia's current situation\n\n"
-                    "STRUCTURE REQUIREMENTS:\n"
-                    "Format your digest with these exact sections (DO NOT include a title - it will be added separately):\n\n"
-                    "Start with an opening summary paragraph (no heading).\n\n"
-                    "## Main Stories\n"
-                    "- Present 5-8 key stories in order of importance\n"
-                    "- Format each story as: 'Story Title<br>Story description and analysis'\n"
-                    "- Start each story with a clear, compelling headline followed by a line break\n"
-                    "- Provide 2-3 sentences of context and analysis after the headline\n"
-                    "- Group related stories together naturally\n"
-                    "- Focus on impact and significance, not just facts\n\n"
-                    "## Brief Updates\n"
-                    "- Cover remaining stories in 1-2 sentences each\n"
-                    "- Group by theme where possible\n\n"
-                    "## Closing Reflection\n"
-                    "- 2-3 sentences summarizing key takeaways\n"
-                    "- What should readers remember or watch for?\n\n"
-                    "TONE AND STYLE:\n"
-                    "- Professional yet accessible\n"
-                    "- Factual and balanced\n"
-                    "- Use active voice and clear, concise language\n"
-                    "- Avoid jargon; explain complex issues simply\n"
-                    "- Include relevant context for international readers\n"
-                    "- Maintain objectivity while highlighting significance\n"
-                    "- For main stories: Lead with compelling headlines, follow with analysis\n"
-                    "- Use the format: 'Headline<br>Analysis and context' for better readability\n\n"
-                    "CRITICAL REQUIREMENTS:\n"
-                    "- Incorporate ALL provided news items without repetition\n"
-                    "- Use consistent formatting throughout\n"
-                    "- Ensure smooth transitions between topics\n"
-                    "- Prioritize stories that affect ordinary Zambians\n"
-                    "- When covering politics, focus on policy impacts rather than personalities"
-                ),
-            },
-            {
                 "role": "user",
                 "content": (
-                    f"Create today's news digest for {today_human_readable}.\n\n"
-                    "INSTRUCTIONS:\n"
+                    f"Create a daily news digest for {today_human_readable} from the following Zambian news articles. "
+                    "Analyze the stories to identify main themes and the most significant developments. "
+                    "Group related stories and prioritize those that affect ordinary Zambians.\n\n"
+                    "Structure the digest as follows:\n"
                     "1. Start with a brief overview paragraph highlighting the day's main themes\n"
-                    "2. Present the most important 5-8 stories using the format: 'Story Title<br>Analysis and context'\n"
+                    "2. Present 5-8 key stories in order of importance using the format: 'Story Title<br>Analysis and context'\n"
                     "3. Cover remaining stories briefly in bullet points, grouped by theme\n"
-                    "4. End with key takeaways and what readers should watch for\n"
-                    "5. Use the specified structure with numbered lists for main stories and bullets for brief updates\n"
-                    "6. Ensure ALL news items below are incorporated without repetition\n\n"
+                    "4. End with key takeaways and what readers should watch for\n\n"
+                    "Use professional yet accessible language, focus on policy impacts rather than personalities, "
+                    "and ensure all news items are incorporated without repetition.\n\n"
                     "**Today's News Items:**\n\n" + f"{digest_content}"
                 ),
             },
@@ -216,6 +197,9 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
     generated_digest = completion.choices[0].message.content
 
     if generated_digest := generated_digest.strip():
+        # Remove think tags from DeepSeek-R1 reasoning
+        generated_digest = remove_think_tags(generated_digest)
+
         # Remove title-level headings since title is added separately
         generated_digest = remove_title_headings(generated_digest)
 
