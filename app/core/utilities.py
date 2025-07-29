@@ -7,6 +7,9 @@ from pathlib import Path
 
 import pytz
 from colorama import Fore, Style
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # specify colors for different logging levels
 LOG_COLORS = {

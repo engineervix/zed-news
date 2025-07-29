@@ -4,11 +4,10 @@ import re
 import sys
 from typing import Callable
 
-from openai import OpenAI
 from pydantic import HttpUrl
 
 from app.core.db.models import Article
-from app.core.summarization.backends.together import brief_summary
+from app.core.summarization.backends.together import brief_summary, client
 from app.core.utilities import DATA_DIR, today, today_human_readable, today_iso_fmt
 
 logger = logging.getLogger(__name__)
@@ -142,12 +141,11 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + digest_content)
 
-    # Generate a cohesive news digest using OpenAI
-    model = "gpt-4.1-nano"
+    # Generate a cohesive news digest using Together AI
+    model = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
     temperature = 0.7
     max_tokens = 3096
 
-    client = OpenAI()
     completion = client.chat.completions.create(
         model=model,
         messages=[
