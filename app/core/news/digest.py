@@ -14,56 +14,41 @@ logger = logging.getLogger(__name__)
 
 
 def remove_think_tags(text: str) -> str:
-    """Remove <think> tags and their content from DeepSeek-R1 responses
-
-    Args:
-        text: The text content to process
-
-    Returns:
-        Text with think tags and their content removed
-
-    Examples:
-        >>> remove_think_tags("<think>Reasoning here</think>Answer")
-        "Answer"
-        >>> remove_think_tags("Normal text without think tags")
-        "Normal text without think tags"
-    """
-    # Remove <think> tags and everything between them
+    """Remove <think> tags and their content from DeepSeek-R1 responses"""
     return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
 
 
 def fix_markdown_headings(text: str) -> str:
-    """Fix markdown headings that might be missing spaces after hash characters
-
-    Args:
-        text: The text content to fix
-
-    Returns:
-        Text with properly formatted markdown headings
-
-    Examples:
-        >>> fix_markdown_headings("##Main Stories\\n###Subsection")
-        "## Main Stories\\n### Subsection"
-    """
+    """Fix markdown headings that might be missing spaces after hash characters"""
     return re.sub(r"^(#{1,6})([^\s#])", r"\1 \2", text, flags=re.MULTILINE)
 
 
 def remove_title_headings(text: str) -> str:
-    """Remove title-level headings (single # at start of line) from text
-
-    Args:
-        text: The text content to process
-
-    Returns:
-        Text with title-level heading lines removed
-
-    Examples:
-        >>> remove_title_headings("# Title\\n## Section\\nContent")
-        "## Section\\nContent"
-        >>> remove_title_headings("# Title without newline")
-        ""
-    """
+    """Remove title-level headings (single # at start of line) from text"""
     return re.sub(r"^# .*\n?", "", text, flags=re.MULTILINE)
+
+
+def clean_digest_output(text: str) -> str:
+    """Clean and standardize the digest output"""
+    # Remove think tags
+    text = remove_think_tags(text)
+
+    # Remove title-level headings
+    text = remove_title_headings(text)
+
+    # Fix markdown headings
+    text = fix_markdown_headings(text)
+
+    # Remove <br> tags
+    text = text.replace("<br>", "")
+
+    # Remove excessive newlines
+    text = re.sub(r'\n{3,}', '\n\n', text)
+
+    # Ensure consistent bullet point formatting
+    text = re.sub(r'^[\*\-]\s+', '* ', text, flags=re.MULTILINE)
+
+    return text.strip()
 
 
 def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, summary: str):
@@ -77,46 +62,16 @@ def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, s
 
 
 def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callable):
-    """Create a news digest from the news articles using the provided summarization function
-    and write it to a file
-
-    Args:
-        news (list[dict[str, str]]): A list of news articles represented as
-            dictionaries, where each dictionary contains the following keys:
-            - 'source': The article source.
-            - 'url': The URL of the article.
-            - 'title': The title of the article.
-            - 'content': The content of the article. This is passed to the OpenAI API
-              for summarization.
-            - 'category': The category of the article.
-        dest (str): The destination file path where the digest will be written.
-        summarizer (Callable): The function to use for summarization. This function
-            must accept two arguments:
-            - content (str): The content of the article.
-            - title (str): The title of the article.
-
-    Raises:
-        - OpenAIException: If there is an issue with the OpenAI API.
-        - TimeoutError: If the summarization request times out.
-        - ConnectionError: If there is a network connectivity issue.
-        - ValueError: If the input data is invalid or in the wrong format.
-        - TypeError: If the input data is of incorrect type.
-
-    Returns:
-        None: The function writes the digest to the specified file but does not
-        return any value.
-    """
+    """Create a news digest from the news articles using the provided summarization function"""
 
     articles_by_source = {}
 
     for article in news:
         source = article["source"].replace("Zambia National Broadcasting Corporation (ZNBC)", "ZNBC")
 
-        # If the source is not already a key in the dictionary, create a new list
         if source not in articles_by_source:
             articles_by_source[source] = []
 
-        # Add the article to the list for the corresponding source
         articles_by_source[source].append(article)
 
     # Create structured content for the digest
@@ -125,14 +80,11 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
     article_summaries = []
 
     for source in articles_by_source:
-        # Iterate over each article in the source
         for article in articles_by_source[source]:
             title = article["title"]
             text = article["content"]
 
             if len(news) < 36:
-                # If there are less than 36 articles, summarize each article in the
-                # usual way
                 summary = summarizer(text, title)
             else:
                 summary = brief_summary(text, title)
@@ -144,7 +96,6 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
 
             counter += 1
 
-            # Store article data for digest generation
             article_summaries.append(
                 {
                     "id": counter,
@@ -156,37 +107,52 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
                 }
             )
 
-            digest_content += f"{counter}. '{title}' (source: {source})"
-            digest_content += f"\n{summary.strip()}\n\n"
+            digest_content += f"{counter}. '{title}' (source: {source})\n"
+            digest_content += f"{summary.strip()}\n\n"
 
     # Write the raw content to a file for reference
     metadata = f"Title: Zed News Digest\nDate: {today_human_readable}\n\n"
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + digest_content)
 
-    # Generate a cohesive news digest using Together AI
-    model = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
-    temperature = 0.7
-    max_tokens = 3096
+    model = "deepseek-ai/DeepSeek-R1-0528-tput"
+    temperature = 0.6
+    max_tokens = 4096
+
+    prompt = f"""<think>
+I need to create a comprehensive daily news digest for {today_human_readable} from Zambian news articles. Let me analyze these stories to identify themes and prioritize by impact on ordinary Zambians.
+</think>
+
+Create a daily news digest for {today_human_readable} from the following Zambian news articles.
+
+INSTRUCTIONS:
+1. Write an overview paragraph (2-3 sentences) identifying the day's dominant themes
+2. Present exactly 8 key stories in order of importance
+3. Group remaining stories by theme in a brief "Other Notable Stories" section
+4. End with 2-3 key takeaways and future developments to watch
+
+FORMAT FOR KEY STORIES:
+1. **[Story Title]**
+[Bold statement about why this matters]. [Additional context explaining the broader implications]. [Specific detail or data point that adds depth].
+
+GUIDELINES:
+- Focus on concrete impacts on citizens, not just political drama
+- Use specific numbers, dates, and names when available
+- Connect stories to show patterns or contradictions
+- Maintain neutral, analytical tone
+- Each key story analysis should be 2-3 sentences
+- Avoid repeating information between sections
+
+TODAY'S NEWS ITEMS:
+
+{digest_content}"""
 
     completion = client.chat.completions.create(
         model=model,
         messages=[
             {
                 "role": "user",
-                "content": (
-                    f"Create a daily news digest for {today_human_readable} from the following Zambian news articles. "
-                    "Analyze the stories to identify main themes and the most significant developments. "
-                    "Group related stories and prioritize those that affect ordinary Zambians.\n\n"
-                    "Structure the digest as follows:\n"
-                    "1. Start with a brief overview paragraph highlighting the day's main themes\n"
-                    "2. Present 5-8 key stories in order of importance using the format: 'Story Title<br>Analysis and context'\n"
-                    "3. Cover remaining stories briefly in bullet points, grouped by theme\n"
-                    "4. End with key takeaways and what readers should watch for\n\n"
-                    "Use professional yet accessible language, focus on policy impacts rather than personalities, "
-                    "and ensure all news items are incorporated without repetition.\n\n"
-                    "**Today's News Items:**\n\n" + f"{digest_content}"
-                ),
+                "content": prompt,
             },
         ],
         temperature=temperature,
@@ -197,17 +163,8 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
     generated_digest = completion.choices[0].message.content
 
     if generated_digest := generated_digest.strip():
-        # Remove think tags from DeepSeek-R1 reasoning
-        generated_digest = remove_think_tags(generated_digest)
-
-        # Remove title-level headings since title is added separately
-        generated_digest = remove_title_headings(generated_digest)
-
-        # Fix markdown headings that might be missing spaces
-        generated_digest = fix_markdown_headings(generated_digest)
-
-        # remove <br> tags from the generated digest
-        generated_digest = generated_digest.replace("<br>", "")
+        # Clean the output
+        generated_digest = clean_digest_output(generated_digest)
 
         # Write the digest to the destination file
         with open(dest, "w") as f:
