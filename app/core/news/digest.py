@@ -142,7 +142,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
         f.write(metadata + "News Items:\n\n" + digest_content)
 
     # Generate a cohesive news digest using Together AI
-    model = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+    model = "deepseek-ai/DeepSeek-R1-0528-tput"
     temperature = 0.7
     max_tokens = 3096
 
