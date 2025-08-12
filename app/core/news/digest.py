@@ -4,8 +4,6 @@ import re
 import sys
 from typing import Callable
 
-from pydantic import HttpUrl
-
 from app.core.db.models import Article
 from app.core.summarization.backends.together import brief_summary, client
 from app.core.utilities import DATA_DIR, today, today_human_readable, today_iso_fmt
@@ -39,8 +37,14 @@ def clean_digest_output(text: str) -> str:
     # Fix markdown headings
     text = fix_markdown_headings(text)
 
-    # Remove <br> tags
-    text = text.replace("<br>", "")
+    # Strip markdown-style links to keep titles/content plain: [Title](url) -> Title
+    text = strip_markdown_links(text)
+
+    # Normalize section headings to canonical set
+    text = normalize_section_headings(text)
+
+    # Ensure key story items use Title + <br> + content format
+    text = standardize_key_story_title_breaks(text)
 
     # Remove excessive newlines
     text = re.sub(r"\n{3,}", "\n\n", text)
@@ -51,7 +55,42 @@ def clean_digest_output(text: str) -> str:
     return text.strip()
 
 
-def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, summary: str):
+def normalize_section_headings(text: str) -> str:
+    """Normalize headings to a canonical set used by the front-end."""
+    replacements: dict[str, str] = {
+        r"^#+\s*Overview.*$": "## Overview",
+        r"^#+\s*(Key Stories.*|Today'?s Top 8 Stories.*)$": "## Today’s Top 8 Stories",
+        r"^#+\s*(Other Notable.*)$": "## Other Notable Stories",
+        r"^#+\s*(Key Takeaways.*|Takeaways.*|Watch.*)$": "## Key Takeaways & Watchpoints",
+    }
+    for pattern, replacement in replacements.items():
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE | re.MULTILINE)
+    return text
+
+
+def strip_markdown_links(text: str) -> str:
+    """Convert [text](url) or [text](#) to plain text."""
+    return re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", text)
+
+
+def standardize_key_story_title_breaks(text: str) -> str:
+    """Ensure each ordered key story uses Title + <br> + content format.
+
+    Handles cases like "1. **[Title]** rest" or "1. **Title** rest".
+    """
+
+    def repl(match: re.Match) -> str:
+        title = match.group(1).strip()
+        rest = match.group(2).strip()
+        return f"{title}\n<br>\n{rest}"
+
+    # Convert bolded titles to Title + <br> + rest
+    text = re.sub(r"^\d+\.\s*\*\*\[?(.+?)\]?\*\*\s+(.+)$", repl, text, flags=re.MULTILINE)
+
+    return text
+
+
+def update_article_with_summary(title: str, url: str, date: datetime.date, summary: str):
     """Find an article by title, URL & date, and update it with the given summary"""
     article = Article.select().where((Article.title == title) & (Article.url == url) & (Article.date == date)).first()
     if article:
@@ -64,7 +103,7 @@ def update_article_with_summary(title: str, url: HttpUrl, date: datetime.date, s
 def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callable):
     """Create a news digest from the news articles using the provided summarization function"""
 
-    articles_by_source = {}
+    articles_by_source: dict[str, list[dict[str, str]]] = {}
 
     for article in news:
         source = article["source"].replace("Zambia National Broadcasting Corporation (ZNBC)", "ZNBC")
@@ -107,7 +146,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
                 }
             )
 
-            digest_content += f"{counter}. '{title}' (source: {source})\n"
+            digest_content += f"{counter}. {title} (source: {source})\n"
             digest_content += f"{summary.strip()}\n\n"
 
     # Write the raw content to a file for reference
@@ -116,36 +155,34 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
         f.write(metadata + "News Items:\n\n" + digest_content)
 
     model = "deepseek-ai/DeepSeek-R1-0528-tput"
-    temperature = 0.6
+    temperature = 0.35
     max_tokens = 4096
 
-    prompt = f"""<think>
-I need to create a comprehensive daily news digest for {today_human_readable} from Zambian news articles. Let me analyze these stories to identify themes and prioritize by impact on ordinary Zambians.
-</think>
+    prompt = f"""
+You are generating Markdown content for a daily news digest on {today_human_readable}.
 
-Create a daily news digest for {today_human_readable} from the following Zambian news articles.
-
-INSTRUCTIONS:
-1. Write an overview paragraph (2-3 sentences) identifying the day's dominant themes
-2. Present exactly 8 key stories in order of importance
-3. Group remaining stories by theme in a brief "Other Notable Stories" section
-4. End with 2-3 key takeaways and future developments to watch
-
-FORMAT FOR KEY STORIES:
-1. **[Story Title]**
-[Bold statement about why this matters]. [Additional context explaining the broader implications]. [Specific detail or data point that adds depth].
-
-GUIDELINES:
-- Focus on concrete impacts on citizens, not just political drama
-- Use specific numbers, dates, and names when available
-- Connect stories to show patterns or contradictions
-- Maintain neutral, analytical tone
-- Each key story analysis should be 2-3 sentences
-- Avoid repeating information between sections
+Rules:
+- Do NOT include a page title anywhere in the body. The page title is handled by the site.
+- Use ONLY these section headings, in this order:
+  ## Overview
+  ## Today’s Top 8 Stories
+  ## Other Notable Stories
+  ## Key Takeaways & Watchpoints
+- Under “Today’s Top 8 Stories” produce EXACTLY 8 ordered list items (1–8).
+  Each item MUST follow this exact format:
+  1. Title
+     <br>
+     **Why this matters:** one bold sentence. Then 1–2 sentences of context with a concrete detail.
+- Under “Other Notable Stories”, group items by bold category labels (e.g., **Governance & Justice:**) and use * bullets for items.
+- Under “Key Takeaways & Watchpoints”, produce 2–3 concise bullet points.
+- No markdown links or HTML tags other than a single <br> after each story title.
+- Neutral, analytical tone. Avoid repetition. Use specific names, numbers, and dates found in the input only.
+- Do not output content before or after these four sections.
 
 TODAY'S NEWS ITEMS:
 
-{digest_content}"""
+{digest_content}
+"""
 
     completion = client.chat.completions.create(
         model=model,
