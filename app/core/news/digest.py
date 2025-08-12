@@ -43,10 +43,10 @@ def clean_digest_output(text: str) -> str:
     text = text.replace("<br>", "")
 
     # Remove excessive newlines
-    text = re.sub(r'\n{3,}', '\n\n', text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
 
     # Ensure consistent bullet point formatting
-    text = re.sub(r'^[\*\-]\s+', '* ', text, flags=re.MULTILINE)
+    text = re.sub(r"^[\*\-]\s+", "* ", text, flags=re.MULTILINE)
 
     return text.strip()
 
