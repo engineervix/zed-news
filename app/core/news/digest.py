@@ -196,15 +196,17 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
     </sections>
 
     <requirements>
-    - Output exactly the three sections above, in that order. No title and no extra text before/after.
+    - Start with a single introductory paragraph (2–3 factual sentences) summarizing the key themes of the day. No heading.
+    - After the paragraph, output exactly the three sections above, in that order. No extra text before/after.
     - Main Stories: ordered list of all significant items found in the input (do NOT limit to 8).
-      Format each item as a single paragraph:
-      1. Title — 1–2 factual sentences with concrete details taken ONLY from the input.
+      For each item, use exactly this layout:
+      1. Title\n
+         1–2 factual sentences with concrete details taken ONLY from the input.
     - Do NOT include “Why this matters:” or any editorial labels.
-    - Other Notable Stories: group by bold category labels (e.g., **Governance & Justice:**) with * bullets.
+    - Other Notable Stories: group by bold category labels (e.g., **Governance & Justice:**) with * bullets. Only include items where at least one concrete detail (name, number, date, place) is present in the input.
     - Key Takeaways & Watchpoints: 2–3 concise, factual watchpoints (no speculation).
     - No markdown links or HTML. Plain text only.
-    - If an item has only a headline and no body, write “Title — No further details provided in source.”
+    - Exclude any item that has only a headline with no supporting details in the input.
     - Neutral, factual tone. Do not infer beyond the provided input.
     </requirements>
 

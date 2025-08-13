@@ -182,27 +182,31 @@
 
 {% block js %}
 <script>
-// Wrap story titles in spans for better mobile styling
+// Wrap story titles split by a line break (Title on first line, details on next)
 function wrapStoryTitles() {
-    // Target paragraphs within the digest content ordered list
     const storyParagraphs = document.querySelectorAll('.digest-content ol li p');
-
     storyParagraphs.forEach(paragraph => {
         const html = paragraph.innerHTML;
-        const brIndex = html.indexOf('<br>');
-
-        // Only process paragraphs that have a <br> tag (story format)
-        if (brIndex !== -1) {
-            const title = html.substring(0, brIndex);
-            const content = html.substring(brIndex + 4); // +4 for '<br>'
-
-            // Replace the content with wrapped title
-            paragraph.innerHTML = `<span class="story-title">${title}</span>${content}`;
+        // Try explicit <br> first (in case markdown renderer preserved it), then fallback to newline text nodes
+        if (html.includes('<br')) {
+            const parts = html.split(/<br\s*\/?\s*>/i);
+            if (parts.length >= 2) {
+                const title = parts[0].trim();
+                const content = parts.slice(1).join(' ').trim();
+                paragraph.innerHTML = `<span class=\"story-title\">${title}</span>${content ? ' ' + content : ''}`;
+            }
+            return;
+        }
+        const text = paragraph.textContent || '';
+        const lines = text.split(/\n+/);
+        if (lines.length >= 2) {
+            const title = lines[0].trim();
+            const content = lines.slice(1).join(' ').trim();
+            paragraph.innerHTML = `<span class=\"story-title\">${title}</span>${content ? ' ' + content : ''}`;
         }
     });
 }
 
-// Run when DOM is loaded
 document.addEventListener('DOMContentLoaded', wrapStoryTitles);
 </script>
 {% endblock %}
