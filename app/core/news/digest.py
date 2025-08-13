@@ -43,8 +43,14 @@ def clean_digest_output(text: str) -> str:
     # Normalize section headings to canonical set
     text = normalize_section_headings(text)
 
-    # Ensure key story items use Title + <br> + content format
-    text = standardize_key_story_title_breaks(text)
+    # Remove any literal HTML line breaks inserted by the model
+    text = remove_html_breaks(text)
+
+    # Remove any occurrences of "Why this matters:" lines
+    text = remove_why_this_matters(text)
+
+    # Drop any Overview section if present
+    text = remove_overview_section(text)
 
     # Remove excessive newlines
     text = re.sub(r"\n{3,}", "\n\n", text)
@@ -59,7 +65,8 @@ def normalize_section_headings(text: str) -> str:
     """Normalize headings to a canonical set used by the front-end."""
     replacements: dict[str, str] = {
         r"^#+\s*Overview.*$": "## Overview",
-        r"^#+\s*(Key Stories.*|Today'?s Top 8 Stories.*)$": "## Today’s Top 8 Stories",
+        # Map variants of the main stories heading to a single canonical label
+        r"^#+\s*(Key Stories.*|Today'?s Top 8 Stories.*|Main Stories.*)$": "## Main Stories",
         r"^#+\s*(Other Notable.*)$": "## Other Notable Stories",
         r"^#+\s*(Key Takeaways.*|Takeaways.*|Watch.*)$": "## Key Takeaways & Watchpoints",
     }
@@ -74,20 +81,34 @@ def strip_markdown_links(text: str) -> str:
 
 
 def standardize_key_story_title_breaks(text: str) -> str:
-    """Ensure each ordered key story uses Title + <br> + content format.
+    """Previously enforced Title + <br> + content format; now deprecated.
 
-    Handles cases like "1. **[Title]** rest" or "1. **Title** rest".
+    Preserve input as-is (no-op) to avoid inserting HTML tags in Markdown.
     """
-
-    def repl(match: re.Match) -> str:
-        title = match.group(1).strip()
-        rest = match.group(2).strip()
-        return f"{title}\n<br>\n{rest}"
-
-    # Convert bolded titles to Title + <br> + rest
-    text = re.sub(r"^\d+\.\s*\*\*\[?(.+?)\]?\*\*\s+(.+)$", repl, text, flags=re.MULTILINE)
-
     return text
+
+
+def remove_html_breaks(text: str) -> str:
+    """Remove literal HTML line breaks that would render as text in Markdown parser with html=False."""
+    # Remove common variants of <br>
+    text = re.sub(r"\s*<\s*br\s*/?\s*>\s*", "\n", text, flags=re.IGNORECASE)
+    if "&lt;br" in text:
+        text = text.replace("&lt;br&gt;", "\n").replace("&lt;br/&gt;", "\n")
+    return text
+
+
+def remove_why_this_matters(text: str) -> str:
+    """Remove the leading 'Why this matters:' label if present on lines."""
+    # Remove bolded or plain variants
+    text = re.sub(r"^\*\*?\s*Why this matters:\s*\*\*?\s*", "", text, flags=re.IGNORECASE | re.MULTILINE)
+    text = re.sub(r"^Why this matters:\s*", "", text, flags=re.IGNORECASE | re.MULTILINE)
+    return text
+
+
+def remove_overview_section(text: str) -> str:
+    """Remove the '## Overview' section entirely (until the next heading)."""
+    pattern = r"^##\s*Overview\s*\n(?:.*?)(?=^##\s|\Z)"
+    return re.sub(pattern, "", text, flags=re.MULTILINE | re.DOTALL)
 
 
 def update_article_with_summary(title: str, url: str, date: datetime.date, summary: str):
@@ -114,6 +135,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
         articles_by_source[source].append(article)
 
     # Create structured content for the digest
+    # Note: Feed the model original article texts (clipped) to reduce compounding summarization
     digest_content = ""
     counter = 0
     article_summaries = []
@@ -146,8 +168,14 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
                 }
             )
 
+            # For the model input, prefer original article content to avoid layered summarization
+            original_excerpt = text.strip()
+            # Clip very long articles to keep prompt within token limits
+            if len(original_excerpt) > 2000:
+                original_excerpt = original_excerpt[:2000].rstrip() + "…"
+
             digest_content += f"{counter}. {title} (source: {source})\n"
-            digest_content += f"{summary.strip()}\n\n"
+            digest_content += f"{original_excerpt}\n\n"
 
     # Write the raw content to a file for reference
     metadata = f"Title: Zed News Digest\nDate: {today_human_readable}\n\n"
@@ -155,34 +183,35 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
         f.write(metadata + "News Items:\n\n" + digest_content)
 
     model = "deepseek-ai/DeepSeek-R1-0528-tput"
-    temperature = 0.35
+    temperature = 0.6
     max_tokens = 4096
 
     prompt = f"""
-You are generating Markdown content for a daily news digest on {today_human_readable}.
+    You are generating Markdown for a daily Zambia news digest.
 
-Rules:
-- Do NOT include a page title anywhere in the body. The page title is handled by the site.
-- Use ONLY these section headings, in this order:
-  ## Overview
-  ## Today’s Top 8 Stories
-  ## Other Notable Stories
-  ## Key Takeaways & Watchpoints
-- Under “Today’s Top 8 Stories” produce EXACTLY 8 ordered list items (1–8).
-  Each item MUST follow this exact format:
-  1. Title
-     <br>
-     **Why this matters:** one bold sentence. Then 1–2 sentences of context with a concrete detail.
-- Under “Other Notable Stories”, group items by bold category labels (e.g., **Governance & Justice:**) and use * bullets for items.
-- Under “Key Takeaways & Watchpoints”, produce 2–3 concise bullet points.
-- No markdown links or HTML tags other than a single <br> after each story title.
-- Neutral, analytical tone. Avoid repetition. Use specific names, numbers, and dates found in the input only.
-- Do not output content before or after these four sections.
+    <sections>
+    - ## Main Stories
+    - ## Other Notable Stories
+    - ## Key Takeaways & Watchpoints
+    </sections>
 
-TODAY'S NEWS ITEMS:
+    <requirements>
+    - Output exactly the three sections above, in that order. No title and no extra text before/after.
+    - Main Stories: ordered list of all significant items found in the input (do NOT limit to 8).
+      Format each item as a single paragraph:
+      1. Title — 1–2 factual sentences with concrete details taken ONLY from the input.
+    - Do NOT include “Why this matters:” or any editorial labels.
+    - Other Notable Stories: group by bold category labels (e.g., **Governance & Justice:**) with * bullets.
+    - Key Takeaways & Watchpoints: 2–3 concise, factual watchpoints (no speculation).
+    - No markdown links or HTML. Plain text only.
+    - If an item has only a headline and no body, write “Title — No further details provided in source.”
+    - Neutral, factual tone. Do not infer beyond the provided input.
+    </requirements>
 
-{digest_content}
-"""
+    <input>
+    {digest_content}
+    </input>
+    """
 
     completion = client.chat.completions.create(
         model=model,
@@ -193,6 +222,7 @@ TODAY'S NEWS ITEMS:
             },
         ],
         temperature=temperature,
+        top_p=0.95,
         max_tokens=max_tokens,
     )
     logger.info(completion)
