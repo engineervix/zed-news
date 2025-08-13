@@ -90,8 +90,9 @@ def build_image_prompt_from_digest(content: str) -> str:
                     "content": (
                         "You generate concise visual prompts for an image model. "
                         "Extract 2-3 prominent topics from the user's Zambian news digest and describe a single coherent scene. "
-                        "Do not include any text overlays or typography. Avoid logos. Keep it friendly and suitable for social media. "
-                        "Return 1-2 sentences, nothing else."
+                        "Describe only objects, scenery, colors, mood, and lighting. "
+                        "Never mention or imply text, words, letters, numbers, typography, signage, labels, or any logos/brands. "
+                        "Return 1 short sentence."
                     ),
                 },
                 {"role": "user", "content": content},
@@ -127,21 +128,43 @@ def generate_promotional_image(content: str) -> str:
     # Build a news-related visual prompt from the digest content
     digest_visual_prompt = build_image_prompt_from_digest(content)
     prompt = (
-        "Create a vibrant, friendly promotional image for a Zambian news digest called 'Zed News'. "
+        "Create a vibrant, friendly promotional image for a daily Zambian news digest. "
         "Use brand-neutral colors and subtle Zambian cultural motifs (patterns or flag colors). "
-        "Avoid all text and logos. Prioritize clarity at social-media thumbnail sizes. "
+        "Strictly exclude any text, words, letters, numbers, typographic elements, signage, labels, watermarks, or logos. "
+        "Prioritize clarity at social-media thumbnail sizes. "
         f"Scene guidance: {digest_visual_prompt}"
     )
 
     try:
         client = genai.Client(api_key=GOOGLE_API_KEY)
+        # Negative prompt to steer away from text/logos
+        # (see https://cloud.google.com/vertex-ai/generative-ai/docs/image/img-gen-prompt-guide)
+        negative_terms = (
+            "text, letters, words, numbers, typography, fonts, signage, labels, captions, titles, headlines, "
+            "ui, interface, screenshot, watermark, watermarks, logos, trademarks, brand names, Zed News"
+        )
+
+        # Try using newer Imagen config fields; fall back if unsupported in current SDK
+        try:
+            config_obj = types.GenerateImagesConfig(
+                number_of_images=1,
+                output_mime_type="image/jpeg",
+                aspect_ratio="1:1",
+                negative_prompt=negative_terms,
+            )
+        except TypeError as e:
+            logger.warning(
+                f"GenerateImagesConfig missing fields (aspect_ratio/negative_prompt): {e}. Falling back to minimal config."
+            )
+            config_obj = types.GenerateImagesConfig(
+                number_of_images=1,
+                output_mime_type="image/jpeg",
+            )
+
         response = client.models.generate_images(
             model="imagen-3.0-generate-002",
             prompt=prompt,
-            config=types.GenerateImagesConfig(
-                number_of_images=1,
-                output_mime_type="image/jpeg",
-            ),
+            config=config_obj,
         )
 
         # Validate response and extract bytes safely
