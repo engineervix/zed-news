@@ -52,7 +52,7 @@ ENV VIRTUAL_ENV=/home/zednews/venv \
     DEVELOPMENT=${DEVELOPMENT}
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip setuptools
 RUN python -m pip install poetry==$POETRY_VERSION
 COPY --chown=zednews ./pyproject.toml .
 COPY --chown=zednews ./poetry.lock .
