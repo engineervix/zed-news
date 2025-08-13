@@ -46,7 +46,7 @@ ENV LC_ALL en_US.UTF-8
 USER zednews
 
 # set up virtual environment & install python dependencies
-ARG POETRY_VERSION=1.8.5
+ARG POETRY_VERSION=2.1.3
 ARG DEVELOPMENT
 ENV VIRTUAL_ENV=/home/zednews/venv \
     DEVELOPMENT=${DEVELOPMENT}
