@@ -178,17 +178,23 @@ def create_facebook_post_text(content: str) -> str:
     """Create a Facebook post using Together AI's Inference API."""
     now = datetime.now(timezone).strftime("%I:%M%p")
     system_prompt = (
-        f"The time is {now}. You are a social media marketing expert for Zed News, a news digest service for Zambia. "
-        "Your task is to create a short, engaging Facebook post based on today's news digest. "
-        "The post should:\n"
-        "- Start with a warm, friendly, greeting. \n"
-        "- Highlight 2-3 of the most interesting or impactful stories.\n"
-        "- Use bullet points and relevant emojis to make it scannable.\n"
-        "- Maintain a professional yet friendly tone.\n"
-        "- End with a clear call to action, encouraging people to read the full digest with a link."
-        "- Use appropriate hashtags related to the news and Zambia.\n"
+        f"The time is {now}. You are a social media editor for Zed News (a Zambian news digest). "
+        "Assume most readers will not click the link, so make the post stand alone and complete while staying concise. "
+        "Craft an engaging Facebook post that:\n"
+        "- Starts with a warm, friendly greeting and a short one-line summary of the day.\n"
+        "- Highlights 3–5 of the most important stories with ultra-brief bullets (1–2 lines each).\n"
+        "- For each bullet, include what happened and why it matters in plain language.\n"
+        "- Uses tasteful, relevant emojis (max 1 per bullet) to aid scannability.\n"
+        "- Keeps a professional, friendly tone suitable for a broad Zambian audience.\n"
+        "- Limits hashtags to 2–4 targeted tags at the end (e.g., #Zambia, #News).\n"
+        "- Includes the link at the very end, after the hashtags."
     )
-    user_prompt = f"Create a Facebook post for {today_human_readable} based on the following news digest:\n\n{content}\n\nInclude this link at the end: {digest_url}"
+    user_prompt = (
+        f"Create a Facebook post for {today_human_readable} based on the following news digest. "
+        "Make the post self-contained and valuable even if the reader never clicks the link.\n\n"
+        f"DIGEST:\n{content}\n\n"
+        f"End the post with 2–4 concise hashtags, then the link: {digest_url}"
+    )
 
     try:
         completion = client.chat.completions.create(
@@ -262,6 +268,31 @@ def post_to_facebook(text: str, image_path: str):
             requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
 
 
+def post_text_only_to_facebook(text: str):
+    """Post a text-only update to Facebook when no image is available."""
+    if not all([graph, FACEBOOK_PAGE_ID, text]):
+        logger.error("Missing necessary data for Facebook text-only post. Aborting.")
+        if HEALTHCHECKS_PING_URL:
+            requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
+        return
+
+    logger.info(f"Posting text-only update to Facebook page {FACEBOOK_PAGE_ID}...")
+    try:
+        # Post to the page feed with message only
+        graph.put_object(parent_object=FACEBOOK_PAGE_ID, connection_name="feed", message=text)
+        logger.info("Successfully posted text-only update to Facebook.")
+        if HEALTHCHECKS_PING_URL:
+            requests.get(HEALTHCHECKS_PING_URL, timeout=10)
+    except facebook.GraphAPIError as e:
+        logger.error(f"Facebook API Error (text-only): {e}")
+        if HEALTHCHECKS_PING_URL:
+            requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
+    except Exception as e:
+        logger.error(f"An unexpected error occurred (text-only): {e}")
+        if HEALTHCHECKS_PING_URL:
+            requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
+
+
 def main():
     """Main function to generate and post the daily digest to Facebook."""
     configure_logging()
@@ -280,10 +311,9 @@ def main():
     # Try generating a fresh image; if unavailable, fallback to curated daily image
     image_to_post = generate_promotional_image(digest_content) or get_daily_image(IMAGES_DIR)
     if not image_to_post:
-        logger.warning("No promotional image found. Posting without an image is not supported.")
-        # Do we wanna post text-only or fail?
-        # For now, we fail.
-        sys.exit(1)
+        logger.warning("No promotional image available. Proceeding with text-only Facebook post.")
+        post_text_only_to_facebook(post_text)
+        return
 
     post_to_facebook(post_text, image_to_post)
 

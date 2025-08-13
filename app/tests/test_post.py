@@ -131,6 +131,19 @@ class TestSocialPost(unittest.TestCase):
         mock_post_fb.assert_called_once_with("post text", "image.jpg")
         mock_exit.assert_not_called()
 
+    @patch("app.core.social.post.post_text_only_to_facebook")
+    @patch("app.core.social.post.get_daily_image", return_value="")
+    @patch("app.core.social.post.generate_promotional_image", return_value="")
+    @patch("app.core.social.post.create_facebook_post_text", return_value="post text")
+    @patch("app.core.social.post.get_digest_content", return_value='{"content":"digest"}')
+    def test_main_text_only_when_no_image(
+        self, mock_get_digest, mock_create_text, mock_generate_image, mock_get_image, mock_post_text_only
+    ):
+        post.main()
+        mock_generate_image.assert_called_once()
+        mock_get_image.assert_called_once()
+        mock_post_text_only.assert_called_once_with("post text")
+
 
 if __name__ == "__main__":
     unittest.main()
