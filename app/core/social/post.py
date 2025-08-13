@@ -137,25 +137,16 @@ def generate_promotional_image(content: str) -> str:
 
     try:
         client = genai.Client(api_key=GOOGLE_API_KEY)
-        # Negative prompt to steer away from text/logos
-        # (see https://cloud.google.com/vertex-ai/generative-ai/docs/image/img-gen-prompt-guide)
-        negative_terms = (
-            "text, letters, words, numbers, typography, fonts, signage, labels, captions, titles, headlines, "
-            "ui, interface, screenshot, watermark, watermarks, logos, trademarks, brand names, Zed News"
-        )
-
-        # Try using newer Imagen config fields; fall back if unsupported in current SDK
+        # Gemini API does not support a separate negative_prompt; incorporate exclusions in the main prompt.
+        # Try using aspect_ratio if supported; fall back to minimal config otherwise.
         try:
             config_obj = types.GenerateImagesConfig(
                 number_of_images=1,
                 output_mime_type="image/jpeg",
                 aspect_ratio="1:1",
-                negative_prompt=negative_terms,
             )
         except TypeError as e:
-            logger.warning(
-                f"GenerateImagesConfig missing fields (aspect_ratio/negative_prompt): {e}. Falling back to minimal config."
-            )
+            logger.warning(f"GenerateImagesConfig missing fields (aspect_ratio): {e}. Falling back to minimal config.")
             config_obj = types.GenerateImagesConfig(
                 number_of_images=1,
                 output_mime_type="image/jpeg",
