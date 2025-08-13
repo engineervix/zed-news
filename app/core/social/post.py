@@ -17,6 +17,8 @@ from datetime import datetime
 import facebook
 import requests
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 from together import Together
 
 from app.core.utilities import (
@@ -38,6 +40,7 @@ HEALTHCHECKS_PING_URL = os.getenv("HEALTHCHECKS_FACEBOOK_PING_URL")
 FACEBOOK_ACCESS_TOKEN = os.getenv("FACEBOOK_ACCESS_TOKEN")
 FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # --- Initialize Clients ---
 client = Together(api_key=TOGETHER_API_KEY)
@@ -48,7 +51,7 @@ except Exception as e:
     graph = None
 
 # --- File Paths ---
-digest_file_path = f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}_digest.json"
+digest_file_path = f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}_digest-content.txt"
 digest_url = f"https://zednews.pages.dev/news/{today_iso_fmt}/"
 IMAGES_DIR = f"{ASSETS_DIR}/images/promotional"
 
@@ -61,6 +64,113 @@ def get_digest_content() -> str:
             return f.read()
     except FileNotFoundError:
         logger.error(f"Digest file not found at {digest_file_path}")
+        return ""
+
+
+def build_image_prompt_from_digest(content: str) -> str:
+    """Derive a concise visual prompt from the digest content.
+
+    Uses Together to pick 2-3 key topics and describe a safe, text-free scene.
+    Falls back to a simple heuristic if the model fails.
+    """
+    base_fallback = (
+        "An abstract, modern composition that evokes today's key Zambian news themes, "
+        "with subtle national color accents and positive, community-focused energy."
+    )
+
+    if not content or not TOGETHER_API_KEY:
+        return base_fallback
+
+    try:
+        completion = client.chat.completions.create(
+            model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You generate concise visual prompts for an image model. "
+                        "Extract 2-3 prominent topics from the user's Zambian news digest and describe a single coherent scene. "
+                        "Do not include any text overlays or typography. Avoid logos. Keep it friendly and suitable for social media. "
+                        "Return 1-2 sentences, nothing else."
+                    ),
+                },
+                {"role": "user", "content": content},
+            ],
+            temperature=0.5,
+            max_tokens=160,
+        )
+        prompt = completion.choices[0].message.content or ""
+        # Basic sanitation: collapse whitespace, strip
+        prompt = " ".join(prompt.split()).strip()
+        if not prompt:
+            return base_fallback
+        return prompt
+    except Exception as e:
+        logger.error(f"Failed to build image prompt from digest: {e}")
+        return base_fallback
+
+
+def generate_promotional_image(content: str) -> str:
+    """Generate a fresh promotional image using Google GenAI and save it locally.
+
+    Returns the absolute file path to the generated image, or an empty string on failure.
+    """
+    if not GOOGLE_API_KEY:
+        logger.warning("GOOGLE_API_KEY is not set. Skipping image generation.")
+        return ""
+
+    # Create output directory under DATA_DIR/today/social
+    output_dir = os.path.join(DATA_DIR, today_iso_fmt, "social")
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, "facebook-promotional.jpeg")
+
+    # Build a news-related visual prompt from the digest content
+    digest_visual_prompt = build_image_prompt_from_digest(content)
+    prompt = (
+        "Create a vibrant, friendly promotional image for a Zambian news digest called 'Zed News'. "
+        "Use brand-neutral colors and subtle Zambian cultural motifs (patterns or flag colors). "
+        "Avoid all text and logos. Prioritize clarity at social-media thumbnail sizes. "
+        f"Scene guidance: {digest_visual_prompt}"
+    )
+
+    try:
+        client = genai.Client(api_key=GOOGLE_API_KEY)
+        response = client.models.generate_images(
+            model="imagen-3.0-generate-002",
+            prompt=prompt,
+            config=types.GenerateImagesConfig(
+                number_of_images=1,
+                output_mime_type="image/jpeg",
+            ),
+        )
+
+        # Validate response and extract bytes safely
+        if not response or not getattr(response, "generated_images", None):
+            logger.error("Image generation failed: empty response or no images returned.")
+            return ""
+
+        image_obj = response.generated_images[0].image if response.generated_images else None
+        image_bytes = getattr(image_obj, "image_bytes", None)
+        if not image_bytes:
+            logger.error("Image generation failed: no image bytes found in response.")
+            return ""
+
+        with open(output_path, "wb") as f:
+            f.write(image_bytes)
+
+        # Ensure the file was actually written and has content
+        try:
+            if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
+                logger.error("Image generation failed: output file missing or empty.")
+                return ""
+        except OSError:
+            logger.error("Image generation failed: could not validate output file size.")
+            return ""
+
+        logger.info(f"Generated promotional image at {output_path}")
+        return output_path
+    except Exception as e:
+        logger.error(f"Failed to generate promotional image: {e}")
         return ""
 
 
@@ -167,7 +277,8 @@ def main():
         logger.error("Failed to generate post text. Exiting.")
         sys.exit(1)
 
-    image_to_post = get_daily_image(IMAGES_DIR)
+    # Try generating a fresh image; if unavailable, fallback to curated daily image
+    image_to_post = generate_promotional_image(digest_content) or get_daily_image(IMAGES_DIR)
     if not image_to_post:
         logger.warning("No promotional image found. Posting without an image is not supported.")
         # Do we wanna post text-only or fail?
