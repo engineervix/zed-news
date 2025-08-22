@@ -1,27 +1,27 @@
 {
-  "last_updated": "2025-08-22T17:05:06.208585+02:00",
+  "last_updated": "2025-08-22T18:05:05.724328+02:00",
   "current_rates": {
-    "date": "2025-08-21",
+    "date": "2025-08-22",
     "rates": {
       "USD": {
-        "buy": 23.232261904761902,
-        "sell": 23.282261904761906,
-        "mid": 23.257261904761904
+        "buy": 23.224285714285713,
+        "sell": 23.274285714285714,
+        "mid": 23.249285714285712
       },
       "GBP": {
-        "buy": 31.242745809523807,
-        "sell": 31.32162694047619,
-        "mid": 31.282186375
+        "buy": 31.16234657142857,
+        "sell": 31.24340114285714,
+        "mid": 31.202873857142855
       },
       "EUR": {
-        "buy": 27.056292214285712,
-        "sell": 27.11917866666667,
-        "mid": 27.08773544047619
+        "buy": 26.975007857142856,
+        "sell": 27.03773771428571,
+        "mid": 27.006372785714284
       },
       "ZAR": {
-        "buy": 1.3130542015769755,
-        "sell": 1.315880130035771,
-        "mid": 1.3144671658063731
+        "buy": 1.3186251647571732,
+        "sell": 1.321464057588969,
+        "mid": 1.320044611173071
       }
     }
   },
@@ -2034,22 +2034,13 @@
       "period_type": "monthly"
     },
     {
-      "date": "2024-08-20",
-      "USD": 26.072,
-      "GBP": 33.399,
-      "EUR": 28.537,
-      "ZAR": 1.437,
+      "date": "2024-08-21",
+      "USD": 26.063,
+      "GBP": 33.431,
+      "EUR": 28.56,
+      "ZAR": 1.438,
       "normalized": false,
       "period_type": "monthly"
-    },
-    {
-      "date": "2024-08-21",
-      "USD": 25.947,
-      "GBP": 33.847,
-      "EUR": 28.862,
-      "ZAR": 1.45,
-      "normalized": false,
-      "period_type": "daily"
     },
     {
       "date": "2024-08-22",
@@ -4282,40 +4273,49 @@
       "ZAR": 1.314,
       "normalized": false,
       "period_type": "daily"
+    },
+    {
+      "date": "2025-08-22",
+      "USD": 23.249,
+      "GBP": 31.203,
+      "EUR": 27.006,
+      "ZAR": 1.32,
+      "normalized": false,
+      "period_type": "daily"
     }
   ],
   "trends": {
     "USD": {
-      "change": -0.089,
-      "change_percent": 0.38,
+      "change": -0.008,
+      "change_percent": 0.03,
       "direction": "up"
     },
     "GBP": {
-      "change": -0.195,
-      "change_percent": 0.62,
+      "change": -0.079,
+      "change_percent": 0.25,
       "direction": "up"
     },
     "EUR": {
-      "change": -0.141,
-      "change_percent": 0.52,
+      "change": -0.082,
+      "change_percent": 0.3,
       "direction": "up"
     },
     "ZAR": {
-      "change": -0.004,
-      "change_percent": 0.3,
-      "direction": "up"
+      "change": 0.006,
+      "change_percent": -0.46,
+      "direction": "down"
     }
   },
   "metadata": {
-    "total_records": 4866,
+    "total_records": 4867,
     "historical_data_points": 473,
     "daily_data_points": 249,
     "monthly_data_points": 224,
     "date_range": {
       "from": "2006-01-12",
-      "to": "2025-08-21"
+      "to": "2025-08-22"
     },
-    "daily_data_cutoff": "2024-08-21",
+    "daily_data_cutoff": "2024-08-22",
     "currencies": ["USD", "GBP", "EUR", "ZAR"],
     "rebase_date": "2013-01-01",
     "data_strategy": "hybrid",
