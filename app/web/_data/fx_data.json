@@ -1,27 +1,27 @@
 {
-  "last_updated": "2025-08-26T17:05:07.687687+02:00",
+  "last_updated": "2025-08-26T18:05:08.230160+02:00",
   "current_rates": {
-    "date": "2025-08-25",
+    "date": "2025-08-26",
     "rates": {
       "USD": {
-        "buy": 23.26785714285715,
-        "sell": 23.317857142857147,
-        "mid": 23.292857142857148
+        "buy": 23.30547619047619,
+        "sell": 23.355476190476192,
+        "mid": 23.33047619047619
       },
       "GBP": {
-        "buy": 31.42324107142858,
-        "sell": 31.50009321428572,
-        "mid": 31.461667142857152
+        "buy": 31.39946807142857,
+        "sell": 31.480846357142863,
+        "mid": 31.440157214285716
       },
       "EUR": {
-        "buy": 27.221066071428577,
-        "sell": 27.28189285714286,
-        "mid": 27.25147946428572
+        "buy": 27.129904833333327,
+        "sell": 27.192780928571427,
+        "mid": 27.161342880952375
       },
       "ZAR": {
-        "buy": 1.3243097327719808,
-        "sell": 1.3271555249836164,
-        "mid": 1.3257326288777986
+        "buy": 1.3201543135947449,
+        "sell": 1.3229865970949943,
+        "mid": 1.3215704553448697
       }
     }
   },
@@ -4273,40 +4273,49 @@
       "ZAR": 1.326,
       "normalized": false,
       "period_type": "daily"
+    },
+    {
+      "date": "2025-08-26",
+      "USD": 23.33,
+      "GBP": 31.44,
+      "EUR": 27.161,
+      "ZAR": 1.322,
+      "normalized": false,
+      "period_type": "daily"
     }
   ],
   "trends": {
     "USD": {
-      "change": 0.044,
-      "change_percent": -0.19,
+      "change": 0.037,
+      "change_percent": -0.16,
       "direction": "down"
     },
     "GBP": {
-      "change": 0.259,
-      "change_percent": -0.83,
-      "direction": "down"
+      "change": -0.022,
+      "change_percent": 0.07,
+      "direction": "up"
     },
     "EUR": {
-      "change": 0.245,
-      "change_percent": -0.91,
-      "direction": "down"
+      "change": -0.09,
+      "change_percent": 0.33,
+      "direction": "up"
     },
     "ZAR": {
-      "change": 0.006,
-      "change_percent": -0.45,
-      "direction": "down"
+      "change": -0.004,
+      "change_percent": 0.3,
+      "direction": "up"
     }
   },
   "metadata": {
-    "total_records": 4868,
-    "historical_data_points": 472,
-    "daily_data_points": 248,
+    "total_records": 4869,
+    "historical_data_points": 473,
+    "daily_data_points": 249,
     "monthly_data_points": 224,
     "date_range": {
       "from": "2006-01-12",
-      "to": "2025-08-25"
+      "to": "2025-08-26"
     },
-    "daily_data_cutoff": "2024-08-25",
+    "daily_data_cutoff": "2024-08-26",
     "currencies": ["USD", "GBP", "EUR", "ZAR"],
     "rebase_date": "2013-01-01",
     "data_strategy": "hybrid",
