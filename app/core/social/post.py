@@ -59,34 +59,39 @@ IMAGES_DIR = f"{ASSETS_DIR}/images/promotional"
 # --- Mood-based Visual Prompts ---
 MOOD_VISUAL_PROMPTS = {
     "positive": (
-        "Person peacefully reading a newspaper in warm golden hour lighting, "
-        "vibrant Zambian landscape backdrop, optimistic atmosphere, clear blue skies, "
-        "lush green vegetation, subtle flag-color accents, uplifting mood, "
-        "natural daylight, relaxed reading posture, newspaper without visible text or headlines"
+        "Professional person in business attire reading a clearly printed newspaper with visible text and headlines, "
+        "modern Zambian office or urban setting, bright natural lighting, "
+        "contemporary architecture, technology elements like smartphones or tablets nearby, "
+        "sophisticated atmosphere, newspaper with legible content, "
+        "prosperous and forward-looking environment, clean modern aesthetic"
     ),
     "serious": (
-        "Person thoughtfully reading a newspaper in soft overcast lighting, "
-        "peaceful Zambian countryside backdrop, contemplative mood, gentle shadows, "
-        "serene atmosphere, respectful composition, natural lighting, "
-        "quiet reading moment, newspaper without visible text or headlines"
+        "Thoughtful professional reading a well-printed newspaper with clear text, "
+        "modern indoor setting with contemporary furniture, soft natural lighting, "
+        "urban Zambian backdrop through windows, sophisticated workspace, "
+        "newspaper with visible headlines and articles, "
+        "calm professional environment, modern African business context"
     ),
     "dynamic": (
-        "Person reading newspaper in dynamic composition, modern elements in background, "
-        "energetic lighting, contemporary Zambian cityscape or development backdrop, "
-        "bold contrasts, progressive atmosphere, vibrant colors, "
-        "engaged reading posture, newspaper without visible text or headlines"
+        "Business professional engaging with news content on tablet and printed newspaper, "
+        "dynamic modern office space, bright lighting, contemporary Zambian cityscape visible, "
+        "mix of digital and traditional media, newspaper with clear readable text, "
+        "progressive workspace with modern technology, "
+        "vibrant urban professional setting, forward-thinking atmosphere"
     ),
     "mixed": (
-        "Person reading newspaper in balanced natural lighting, "
-        "diverse Zambian scenery backdrop, harmonious composition, peaceful morning light, "
-        "subtle cultural motifs, stable and reassuring mood, "
-        "calm reading moment, newspaper without visible text or headlines"
+        "Person in smart casual attire reading a newspaper with visible headlines, "
+        "comfortable modern living space or café setting, balanced natural lighting, "
+        "contemporary Zambian urban environment, newspaper with clear printed content, "
+        "relaxed but professional atmosphere, modern African lifestyle, "
+        "mix of traditional and contemporary elements"
     ),
     "economic": (
-        "Professional person reading newspaper in business-like atmosphere, "
-        "clean modern composition, subtle copper and green tones representing Zambian prosperity, "
-        "structured lighting, growth-oriented imagery, focused reading, "
-        "newspaper without visible text or headlines"
+        "Business professional reviewing financial newspaper with visible charts and headlines, "
+        "modern office environment with computers and financial displays, "
+        "contemporary Zambian business district backdrop, newspaper with clear economic content, "
+        "professional corporate setting, emphasis on growth and development, "
+        "sophisticated business atmosphere with modern technology"
     ),
 }
 
@@ -157,14 +162,15 @@ def build_image_prompt_from_mood(mood: str) -> str:
     """Build an Imagen prompt based on the analyzed mood."""
     base_visual = MOOD_VISUAL_PROMPTS.get(mood, MOOD_VISUAL_PROMPTS["mixed"])
 
-    # Core prompt structure that avoids text generation
+    # Core prompt structure that ensures readable newspaper content
     prompt = (
-        "Create a beautiful, atmospheric image with no text, words, letters, numbers, "
-        "signs, logos, or written elements of any kind. "
+        "Create a high-quality, professional photograph with absolutely no overlaid text, logos, or graphics. "
         f"{base_visual}. "
-        "High quality photography style, clean composition, "
-        "suitable for social media thumbnail, brand-neutral aesthetic, "
-        "strictly no typography or textual elements anywhere in the image."
+        "The newspaper should show realistic printed text, headlines, and articles - make it look like a real newspaper with actual content. "
+        "High-end photography style, sharp focus, professional lighting, "
+        "modern African professional aesthetic, avoid rural or poverty imagery, "
+        "emphasize contemporary urban development and prosperity, "
+        "no text overlays, watermarks, or graphic elements added to the image."
     )
 
     return prompt
@@ -245,44 +251,106 @@ def generate_promotional_image(content: str) -> str:
 
 def create_facebook_post_text(content: str, mood_override: str | None = None) -> str:
     """Create a Facebook post using Together AI's Inference API."""
-    now = datetime.now(timezone).strftime("%I:%M%p")
+    now = datetime.now(timezone)
+    hour = now.hour
+
+    # Determine time of day for context (but don't mention specific time)
+    if 5 <= hour < 12:
+        time_context = "morning"
+    elif 12 <= hour < 17:
+        time_context = "afternoon"
+    elif 17 <= hour < 21:
+        time_context = "evening"
+    else:
+        time_context = "night"
 
     # Keep text generation deterministic for tests; avoid extra LLM call here
     mood = mood_override if mood_override in MOOD_VISUAL_PROMPTS else "mixed"
 
-    # Mood-specific opening styles (time-aware)
-    mood_openings = {
-        "positive": "🌅 Great developments happening today in Zambia:",
-        "serious": "Here's what's important today in Zambia:",
-        "dynamic": "🔥 Big moves and changes happening in Zambia:",
-        "economic": "📈 Today's business and economy update for Zambia:",
-        "mixed": "Here's what's happening today in Zambia:",
+    # Varied greeting styles based on time context
+    greeting_variations = {
+        "morning": [
+            "Good morning, Zambia! 🌅",
+            "Rise and shine! ☀️",
+            "Morning update for Zambia:",
+            "Starting the day with important news:",
+            "What's happening this morning in Zambia:",
+        ],
+        "afternoon": [
+            "Good afternoon! 🌞",
+            "Midday news update:",
+            "Here's what's happening this afternoon:",
+            "Your afternoon news briefing:",
+            "Checking in with today's developments:",
+        ],
+        "evening": [
+            "Good evening, Zambia! 🌆",
+            "Evening news wrap-up:",
+            "As the day winds down, here's what happened:",
+            "Your evening update:",
+            "End-of-day news summary:",
+        ],
+        "night": [
+            "Late night update:",
+            "Before you rest, here's today's news:",
+            "Tonight's summary:",
+            "As the day ends, here's what mattered:",
+            "Your late evening update:",
+        ],
     }
 
-    opening = mood_openings.get(mood, mood_openings["mixed"])
+    # Varied call-to-action endings
+    call_to_action_variations = [
+        "What story resonates with you?",
+        "Which development matters most to your family?",
+        "What's your take on today's news?",
+        "Which story will you be discussing tomorrow?",
+        "What caught your attention today?",
+        "Which development affects you most?",
+        "What story are you sharing with friends?",
+        "Which news impacts your community?",
+        "What's most important to you here?",
+        "Which story deserves more attention?",
+    ]
+
+    # Mood-specific context additions
+    mood_contexts = {
+        "positive": "celebrating progress and achievements",
+        "serious": "focusing on important developments",
+        "dynamic": "covering major changes and updates",
+        "economic": "examining business and financial news",
+        "mixed": "bringing you diverse stories",
+    }
+
+    # Randomly select greeting and call-to-action
+    selected_greeting = random.choice(greeting_variations[time_context])
+    selected_cta = random.choice(call_to_action_variations)
+    mood_context = mood_contexts.get(mood, mood_contexts["mixed"])
 
     system_prompt = (
-        f"The time is {now}. You are a social media editor for Zed News (a Zambian news digest). "
-        f"The overall mood of today's news is: {mood}. "
+        f"You are a social media editor for Zed News (a Zambian news digest). "
+        f"It's {time_context} and you're {mood_context}. "
+        f"NEVER mention specific times (like 5:45PM) in your post. "
         "CRITICAL: Most readers will NEVER click the link - make this post completely valuable on its own. "
         "Facebook posts do NOT support markdown - use plain text with strategic formatting.\n\n"
         "Craft an engaging Facebook post that:\n"
-        f"- Starts with a time-appropriate greeting based on the current time ({now}), then this mood-specific opener: '{opening}'\n"
+        f"- Starts with this greeting: '{selected_greeting}'\n"
         "- Presents 4-5 key stories in conversational paragraphs (NOT bullet points)\n"
         "- Each story should be 1-2 short sentences explaining WHAT happened and WHY it matters to ordinary Zambians\n"
         "- Use emojis strategically (1 per story max) for visual breaks and emotion\n"
         "- Use line breaks between stories for mobile readability\n"
         "- Include specific numbers/facts that people want to share in WhatsApp groups\n"
         "- Make each story relatable to daily life (jobs, money, safety, family)\n"
-        "- End with an encouraging call-to-action like 'What story matters most to you?'\n"
+        f"- End with this call-to-action: '{selected_cta}'\n"
         "- Add 2-3 hashtags: #Zambia #ZedNews and one relevant tag\n"
         "- Include the link at the very end\n\n"
-        "Write for mobile users scrolling fast - make it instantly valuable and shareable."
+        "Write for mobile users scrolling fast - make it instantly valuable and shareable. "
+        "Vary your language and avoid repetitive phrases."
     )
 
     user_prompt = (
         f"Create a Facebook post for {today_human_readable} based on this news digest. "
-        "Remember: NO markdown, NO bullet points - use plain text with line breaks and emojis.\n\n"
+        "Remember: NO markdown, NO bullet points, NO specific times mentioned - use plain text with line breaks and emojis.\n\n"
         f"DIGEST:\n{content}\n\n"
         f"End with hashtags, then this link: {digest_url}"
     )
