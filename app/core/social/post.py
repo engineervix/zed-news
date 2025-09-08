@@ -262,52 +262,6 @@ def create_facebook_post_text(content: str, mood_override: str | None = None) ->
     # Keep text generation deterministic for tests; avoid extra LLM call here
     mood = mood_override if mood_override in MOOD_VISUAL_PROMPTS else "mixed"
 
-    # Varied greeting styles based on time context
-    greeting_variations = {
-        "morning": [
-            "Good morning, Zambia! 🌅",
-            "Rise and shine! ☀️",
-            "Morning update for Zambia:",
-            "Starting the day with important news:",
-            "What's happening this morning in Zambia:",
-        ],
-        "afternoon": [
-            "Good afternoon! 🌞",
-            "Midday news update:",
-            "Here's what's happening this afternoon:",
-            "Your afternoon news briefing:",
-            "Checking in with today's developments:",
-        ],
-        "evening": [
-            "Good evening, Zambia! 🌆",
-            "Evening news wrap-up:",
-            "As the day winds down, here's what happened:",
-            "Your evening update:",
-            "End-of-day news summary:",
-        ],
-        "night": [
-            "Late night update:",
-            "Before you rest, here's today's news:",
-            "Tonight's summary:",
-            "As the day ends, here's what mattered:",
-            "Your late evening update:",
-        ],
-    }
-
-    # Varied call-to-action endings
-    call_to_action_variations = [
-        "What story resonates with you?",
-        "Which development matters most to your family?",
-        "What's your take on today's news?",
-        "Which story will you be discussing tomorrow?",
-        "What caught your attention today?",
-        "Which development affects you most?",
-        "What story are you sharing with friends?",
-        "Which news impacts your community?",
-        "What's most important to you here?",
-        "Which story deserves more attention?",
-    ]
-
     # Mood-specific context additions
     mood_contexts = {
         "positive": "celebrating progress and achievements",
@@ -317,9 +271,6 @@ def create_facebook_post_text(content: str, mood_override: str | None = None) ->
         "mixed": "bringing you diverse stories",
     }
 
-    # Randomly select greeting and call-to-action
-    selected_greeting = random.choice(greeting_variations[time_context])
-    selected_cta = random.choice(call_to_action_variations)
     mood_context = mood_contexts.get(mood, mood_contexts["mixed"])
 
     system_prompt = (
@@ -329,14 +280,14 @@ def create_facebook_post_text(content: str, mood_override: str | None = None) ->
         "CRITICAL: Most readers will NEVER click the link - make this post completely valuable on its own. "
         "Facebook posts do NOT support markdown - use plain text with strategic formatting.\n\n"
         "Craft an engaging Facebook post that:\n"
-        f"- Starts with this greeting: '{selected_greeting}'\n"
+        f"- Starts with a creative, context-aware greeting suitable for the {time_context}.\n"
         "- Presents 4-5 key stories in conversational paragraphs (NOT bullet points)\n"
         "- Each story should be 1-2 short sentences explaining WHAT happened and WHY it matters to ordinary Zambians\n"
         "- Use emojis strategically (1 per story max) for visual breaks and emotion\n"
         "- Use line breaks between stories for mobile readability\n"
         "- Include specific numbers/facts that people want to share in WhatsApp groups\n"
         "- Make each story relatable to daily life (jobs, money, safety, family)\n"
-        f"- End with this call-to-action: '{selected_cta}'\n"
+        "- End with a creative, engaging call-to-action to spark conversation.\n"
         "- Add 2-3 hashtags: #Zambia #ZedNews and one relevant tag\n"
         "- Include the link at the very end\n\n"
         "Write for mobile users scrolling fast - make it instantly valuable and shareable. "
