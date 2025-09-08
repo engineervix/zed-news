@@ -59,39 +59,34 @@ IMAGES_DIR = f"{ASSETS_DIR}/images/promotional"
 # --- Mood-based Visual Prompts ---
 MOOD_VISUAL_PROMPTS = {
     "positive": (
-        "Professional person in business attire reading a clearly printed newspaper with visible text and headlines, "
-        "modern Zambian office or urban setting, bright natural lighting, "
+        "Professional person in business attire reading a newspaper. The newspaper should feature generic, unreadable text to avoid showing fake content. "
+        "Scene: modern Zambian office or urban setting, bright natural lighting, "
         "contemporary architecture, technology elements like smartphones or tablets nearby, "
-        "sophisticated atmosphere, newspaper with legible content, "
-        "prosperous and forward-looking environment, clean modern aesthetic"
+        "sophisticated atmosphere, prosperous and forward-looking environment, clean modern aesthetic."
     ),
     "serious": (
-        "Thoughtful professional reading a well-printed newspaper with clear text, "
-        "modern indoor setting with contemporary furniture, soft natural lighting, "
+        "Thoughtful professional reading a newspaper where the text is generic and not legible. "
+        "Scene: modern indoor setting with contemporary furniture, soft natural lighting, "
         "urban Zambian backdrop through windows, sophisticated workspace, "
-        "newspaper with visible headlines and articles, "
-        "calm professional environment, modern African business context"
+        "calm professional environment, modern African business context."
     ),
     "dynamic": (
-        "Business professional engaging with news content on tablet and printed newspaper, "
-        "dynamic modern office space, bright lighting, contemporary Zambian cityscape visible, "
-        "mix of digital and traditional media, newspaper with clear readable text, "
-        "progressive workspace with modern technology, "
-        "vibrant urban professional setting, forward-thinking atmosphere"
+        "Business professional engaging with news content on a tablet and a printed newspaper. The newspaper text must be generic and unreadable. "
+        "Scene: dynamic modern office space, bright lighting, contemporary Zambian cityscape visible, "
+        "mix of digital and traditional media, progressive workspace with modern technology, "
+        "vibrant urban professional setting, forward-thinking atmosphere."
     ),
     "mixed": (
-        "Person in smart casual attire reading a newspaper with visible headlines, "
-        "comfortable modern living space or café setting, balanced natural lighting, "
-        "contemporary Zambian urban environment, newspaper with clear printed content, "
-        "relaxed but professional atmosphere, modern African lifestyle, "
-        "mix of traditional and contemporary elements"
+        "Person in smart casual attire reading a newspaper with generic, non-legible text. "
+        "Scene: comfortable modern living space or café setting, balanced natural lighting, "
+        "contemporary Zambian urban environment, relaxed but professional atmosphere, "
+        "modern African lifestyle, mix of traditional and contemporary elements."
     ),
     "economic": (
-        "Business professional reviewing financial newspaper with visible charts and headlines, "
-        "modern office environment with computers and financial displays, "
-        "contemporary Zambian business district backdrop, newspaper with clear economic content, "
-        "professional corporate setting, emphasis on growth and development, "
-        "sophisticated business atmosphere with modern technology"
+        "Business professional reviewing a financial newspaper. The text, charts, and headlines must be generic and unreadable to avoid showing fake data. "
+        "Scene: modern office environment with computers and financial displays, "
+        "contemporary Zambian business district backdrop, professional corporate setting, "
+        "emphasis on growth and development, sophisticated business atmosphere with modern technology."
     ),
 }
 
