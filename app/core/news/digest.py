@@ -1,12 +1,9 @@
-import datetime
 import logging
 import re
 import sys
-from typing import Callable
 
-from app.core.db.models import Article
-from app.core.summarization.backends.together import brief_summary, client
-from app.core.utilities import DATA_DIR, today, today_human_readable, today_iso_fmt
+from app.core.summarization.backends.together import client
+from app.core.utilities import DATA_DIR, today_human_readable, today_iso_fmt
 
 logger = logging.getLogger(__name__)
 
@@ -111,18 +108,12 @@ def remove_overview_section(text: str) -> str:
     return re.sub(pattern, "", text, flags=re.MULTILINE | re.DOTALL)
 
 
-def update_article_with_summary(title: str, url: str, date: datetime.date, summary: str):
-    """Find an article by title, URL & date, and update it with the given summary"""
-    article = Article.select().where((Article.title == title) & (Article.url == url) & (Article.date == date)).first()
-    if article:
-        article.summary = summary
-        article.save()
-    else:
-        logger.warning(f"Could not find article with title '{title}', URL '{url}', and date '{date}'")
-
-
-def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callable):
+def create_news_digest(news: list[dict[str, str]], dest: str):
     """Create a news digest from the news articles using the provided summarization function"""
+
+    if not news:
+        logger.info("No news to create digest from.")
+        return
 
     articles_by_source: dict[str, list[dict[str, str]]] = {}
 
@@ -145,15 +136,12 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
             title = article["title"]
             text = article["content"]
 
-            if len(news) < 36:
-                summary = summarizer(text, title)
-            else:
-                summary = brief_summary(text, title)
-
-            if summary.strip().startswith("Summary: "):
-                summary = summary.replace("Summary: ", "")
-
-            update_article_with_summary(title, article["url"], today, summary)
+            # For the model input, prefer original article content to avoid layered summarization
+            original_excerpt = text.strip()
+            # Clip very long articles to keep prompt within token limits
+            max_length = 2200
+            if len(original_excerpt) > max_length:
+                original_excerpt = original_excerpt[:max_length].rstrip() + "…"
 
             counter += 1
 
@@ -163,16 +151,9 @@ def create_news_digest(news: list[dict[str, str]], dest: str, summarizer: Callab
                     "title": title,
                     "source": source,
                     "url": article["url"],
-                    "summary": summary.strip(),
                     "category": article.get("category"),
                 }
             )
-
-            # For the model input, prefer original article content to avoid layered summarization
-            original_excerpt = text.strip()
-            # Clip very long articles to keep prompt within token limits
-            if len(original_excerpt) > 2000:
-                original_excerpt = original_excerpt[:2000].rstrip() + "…"
 
             digest_content += f"{counter}. {title} (source: {source})\n"
             digest_content += f"{original_excerpt}\n\n"

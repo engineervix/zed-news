@@ -14,7 +14,6 @@ from app.core.db.config import close_database, initialize_database
 from app.core.news.digest import create_news_digest
 from app.core.news.eleventify import render_jinja_template
 from app.core.news.fetch import get_latest_news, save_news_to_db, save_news_to_file
-from app.core.summarization.backends import together as together_backend
 from app.core.utilities import DATA_DIR, configure_logging, today_iso_fmt
 
 
@@ -54,7 +53,7 @@ def main():
 
     # Create news digest
     logging.info("Creating news digest...")
-    digest_data = create_news_digest(news, digest_content, together_backend.summarize)
+    digest_data = create_news_digest(news, digest_content)
 
     end_time = time.time()
     processing_time = int(end_time - start_time)
