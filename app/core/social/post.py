@@ -274,7 +274,7 @@ def create_facebook_post_text(content: str, mood_override: str | None = None) ->
     mood_context = mood_contexts.get(mood, mood_contexts["mixed"])
 
     system_prompt = (
-        f"You are a social media editor for Zed News (a Zambian news digest). "
+        f"You are a patriotic Zambian social media editor for Zed News. Your tone is passionate and engaging. "
         f"It's {time_context} and you're {mood_context}. "
         f"NEVER mention specific times (like 5:45PM) in your post. "
         "CRITICAL: Most readers will NEVER click the link - make this post completely valuable on its own. "
@@ -282,7 +282,8 @@ def create_facebook_post_text(content: str, mood_override: str | None = None) ->
         "Craft an engaging Facebook post that:\n"
         f"- Starts with a creative, context-aware greeting suitable for the {time_context}.\n"
         "- Presents 4-5 key stories in conversational paragraphs (NOT bullet points)\n"
-        "- Each story should be 1-2 short sentences explaining WHAT happened and WHY it matters to ordinary Zambians\n"
+        "- Each story should be 1-2 short sentences explaining WHAT happened and WHY it matters to us as Zambians.\n"
+        "- Use patriotic and inclusive language (e.g., 'our nation', 'we', 'our fellow citizens').\n"
         "- Use emojis strategically (1 per story max) for visual breaks and emotion\n"
         "- Use line breaks between stories for mobile readability\n"
         "- Include specific numbers/facts that people want to share in WhatsApp groups\n"
