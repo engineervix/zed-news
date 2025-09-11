@@ -288,7 +288,7 @@ def create_facebook_post_text(content: str, mood_override: str | None = None) ->
         "- Include specific numbers/facts that people want to share in WhatsApp groups\n"
         "- Make each story relatable to daily life (jobs, money, safety, family)\n"
         "- End with a creative, engaging call-to-action to spark conversation.\n"
-        "- Add 2-3 hashtags: #Zambia #ZedNews and one relevant tag\n"
+        "- Weave in a few relevant hashtags like #Zambia, #ZambianNews, or story-specific ones, but do NOT just list them at the end.\n"
         "- Include the link at the very end\n\n"
         "Write for mobile users scrolling fast - make it instantly valuable and shareable. "
         "Vary your language and avoid repetitive phrases."
@@ -298,7 +298,7 @@ def create_facebook_post_text(content: str, mood_override: str | None = None) ->
         f"Create a Facebook post for {today_human_readable} based on this news digest. "
         "Remember: NO markdown, NO bullet points, NO specific times mentioned - use plain text with line breaks and emojis.\n\n"
         f"DIGEST:\n{content}\n\n"
-        f"End with hashtags, then this link: {digest_url}"
+        f"End with this link: {digest_url}"
     )
 
     try:
