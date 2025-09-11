@@ -58,36 +58,24 @@ IMAGES_DIR = f"{ASSETS_DIR}/images/promotional"
 
 # --- Mood-based Visual Prompts ---
 MOOD_VISUAL_PROMPTS = {
-    "positive": (
-        "Professional person in business attire reading a newspaper. The newspaper should feature generic, unreadable text to avoid showing fake content. "
-        "Scene: modern Zambian office or urban setting, bright natural lighting, "
-        "contemporary architecture, technology elements like smartphones or tablets nearby, "
-        "sophisticated atmosphere, prosperous and forward-looking environment, clean modern aesthetic."
-    ),
-    "serious": (
-        "Thoughtful professional reading a newspaper where the text is generic and not legible. "
-        "Scene: modern indoor setting with contemporary furniture, soft natural lighting, "
-        "urban Zambian backdrop through windows, sophisticated workspace, "
-        "calm professional environment, modern African business context."
-    ),
-    "dynamic": (
-        "Business professional engaging with news content on a tablet and a printed newspaper. The newspaper text must be generic and unreadable. "
-        "Scene: dynamic modern office space, bright lighting, contemporary Zambian cityscape visible, "
-        "mix of digital and traditional media, progressive workspace with modern technology, "
-        "vibrant urban professional setting, forward-thinking atmosphere."
-    ),
-    "mixed": (
-        "Person in smart casual attire reading a newspaper with generic, non-legible text. "
-        "Scene: comfortable modern living space or café setting, balanced natural lighting, "
-        "contemporary Zambian urban environment, relaxed but professional atmosphere, "
-        "modern African lifestyle, mix of traditional and contemporary elements."
-    ),
-    "economic": (
-        "Business professional reviewing a financial newspaper. The text, charts, and headlines must be generic and unreadable to avoid showing fake data. "
-        "Scene: modern office environment with computers and financial displays, "
-        "contemporary Zambian business district backdrop, professional corporate setting, "
-        "emphasis on growth and development, sophisticated business atmosphere with modern technology."
-    ),
+    "positive": "A person smiling subtly while reading a newspaper, with an optimistic expression. The newspaper is held naturally but is slightly out of focus.",
+    "serious": "A thoughtful person deeply engaged in reading a newspaper. The camera angle is from the side, focusing on their contemplative expression, with the newspaper angled away to make the text unreadable.",
+    "dynamic": "A person captured in motion while glancing at a newspaper. A slight motion blur on the newspaper conveys a sense of a busy, forward-thinking environment.",
+    "mixed": "A person reading a newspaper in a relaxed setting. The camera has a shallow depth of field, focusing on the person while the newspaper is softly blurred.",
+    "economic": "A person seen from over the shoulder, reviewing a financial newspaper. The focus is on the charts and columns, which are stylistically blurred and unrecognizable.",
+}
+
+# --- Scenario-based Visual Prompts ---
+SCENARIO_PROMPTS = {
+    "office": "A professional in a bright, modern Zambian office with large windows and a clean, prosperous atmosphere.",
+    "construction": "A construction worker in safety gear at a modern Zambian construction site during a break. The background shows progress and development, with a hopeful and industrious mood.",
+    "farm": "A farmer on a thriving Zambian farm, with lush fields and modern farming equipment visible in the background, conveying growth.",
+    "workshop": "A skilled worker in a well-lit, organized workshop or factory in Zambia, surrounded by tools and machinery, suggesting craftsmanship and industry.",
+    "cafe": "A person in smart casual attire in a modern café or comfortable living space with a contemporary Zambian urban environment.",
+    "market": "A marketeer at a bustling, vibrant Zambian market, surrounded by fresh produce and goods, showcasing local commerce and community.",
+    "salon": "A hairdresser or barber attending to a client in a stylish, modern Zambian salon or barbershop, reflecting local entrepreneurship.",
+    "teacher": "A teacher in a classroom with engaged students in a Zambian school, conveying the importance of education and future growth.",
+    "transport": "A bus driver or conductor by their minibus during a stop in a busy urban Zambian area, representing the daily movement of people.",
 }
 
 
@@ -154,15 +142,24 @@ def analyze_digest_mood(content: str, override_mood: str | None = None) -> str:
 
 
 def build_image_prompt_from_mood(mood: str) -> str:
-    """Build an Imagen prompt based on the analyzed mood."""
-    base_visual = MOOD_VISUAL_PROMPTS.get(mood, MOOD_VISUAL_PROMPTS["mixed"])
+    """Build an Imagen prompt based on the analyzed mood and a random scenario."""
+    mood_visual = MOOD_VISUAL_PROMPTS.get(mood, MOOD_VISUAL_PROMPTS["mixed"])
+    scenario_visual = random.choice(list(SCENARIO_PROMPTS.values()))
 
-    # Core prompt structure that ensures readable newspaper content
+    # Randomly select gender to ensure balance
+    gender = random.choice(["man", "woman"])
+    # Replace placeholder "person" with the selected gender
+    mood_visual = mood_visual.replace("A person", f"A {gender}")
+
+    # Combine the mood description and the scenario
+    base_visual = f"{mood_visual} {scenario_visual}"
+
+    # Core prompt structure
     prompt = (
         "Create a high-quality, professional photograph with absolutely no overlaid text, logos, or graphics. "
         f"{base_visual}. "
-        "The newspaper should show realistic printed text, headlines, and articles - make it look like a real newspaper with actual content. "
-        "High-end photography style, sharp focus, professional lighting, "
+        "The newspaper should be held naturally, with text, headlines, and articles appearing realistic but blurred or out of focus. "
+        "High-end photography style, sharp focus on the person, professional lighting, "
         "modern African professional aesthetic, avoid rural or poverty imagery, "
         "emphasize contemporary urban development and prosperity, "
         "no text overlays, watermarks, or graphic elements added to the image."
