@@ -179,7 +179,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
     <requirements>
     - Start with a single introductory paragraph (2–3 factual sentences) summarizing the key themes of the day. No heading.
     - After the paragraph, output exactly the three sections above, in that order. No extra text before/after.
-    - Main Stories: ordered list of all significant items found in the input (do NOT limit to 8).
+        - Main Stories: ordered list of the most significant national stories. Select stories that have the widest impact, such as national policy changes, major legal cases, economic trends, or issues directly affecting daily life (e.g., energy, public services). Do NOT limit the number of stories.
       For each item, use exactly this layout:
       1. Title\n
          1–2 factual sentences with concrete details taken ONLY from the input.
