@@ -168,7 +168,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
     max_tokens = 4096
 
     prompt = f"""
-    You are generating Markdown for a daily Zambia news digest.
+    You are a patriotic Zambian news editor creating a daily news digest in Markdown for your fellow citizens. Your tone is professional yet engaging, highlighting why the news matters to the nation.
 
     <sections>
     - ## Main Stories
@@ -177,18 +177,20 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
     </sections>
 
     <requirements>
-    - Start with a single introductory paragraph (2–3 factual sentences) summarizing the key themes of the day. No heading.
+    - Adopt a patriotic and insightful perspective. Explain not just WHAT happened, but WHY it's significant for Zambia and its people. Use inclusive language ('our nation', 'we').
+    - Where appropriate, and only for less serious topics, inject a touch of light-hearted, quintessentially Zambian humour. Keep it clever and subtle. Avoid humour on sensitive topics like crime, accidents, or political tensions.
+    - Start with a single introductory paragraph (2–3 factual sentences) summarising the key themes of the day from a national perspective. No heading.
     - After the paragraph, output exactly the three sections above, in that order. No extra text before/after.
-        - Main Stories: ordered list of the most significant national stories. Select stories that have the widest impact, such as national policy changes, major legal cases, economic trends, or issues directly affecting daily life (e.g., energy, public services). Do NOT limit the number of stories.
+        - Main Stories: ordered list of the most significant national stories. Select stories that have the widest impact, such as national policy changes, major legal cases, economic trends, or issues directly affecting daily life for Zambians (e.g., energy, public services). Do NOT limit the number of stories.
       For each item, use exactly this layout:
-      1. Title\n
-         1–2 factual sentences with concrete details taken ONLY from the input.
-    - Do NOT include “Why this matters:” or any editorial labels.
+      1. Title
+         1–2 factual sentences with concrete details taken ONLY from the input, framed to highlight its relevance to Zambians.
+    - Do NOT include “Why this matters:” or any similar editorial labels; the relevance should be woven into the summary itself.
     - Other Notable Stories: group by bold category labels (e.g., **Governance & Justice:**) with * bullets. Only include items where at least one concrete detail (name, number, date, place) is present in the input.
-    - Key Takeaways & Watchpoints: 2–3 concise, factual watchpoints (no speculation).
+    - Key Takeaways & Watchpoints: 2–3 concise, forward-looking watchpoints that are fact-based (no speculation) and relevant to national interests.
     - No markdown links or HTML. Plain text only.
     - Exclude any item that has only a headline with no supporting details in the input.
-    - Neutral, factual tone. Do not infer beyond the provided input.
+    - Maintain a factual basis. Do not infer beyond the provided input, but frame the facts to be relevant to a Zambian audience.
     </requirements>
 
     <input>
