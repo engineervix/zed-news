@@ -43,6 +43,13 @@ FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
+# --- Model Configuration ---
+TEXT_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+# IMAGE_MODEL = "imagen-3.0-generate-002"
+IMAGE_MODEL = "imagen-4.0-generate-preview-06-06"
+IMAGE_CONCEPT_TEMP = 0.8
+FACEBOOK_POST_TEMP = 0.7
+
 # --- Initialize Clients ---
 client = Together(api_key=TOGETHER_API_KEY)
 try:
@@ -56,28 +63,6 @@ digest_file_path = f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}_digest-content.t
 digest_url = f"https://zednews.pages.dev/news/{today_iso_fmt}/"
 IMAGES_DIR = f"{ASSETS_DIR}/images/promotional"
 
-# --- Mood-based Visual Prompts ---
-MOOD_VISUAL_PROMPTS = {
-    "positive": "A person smiling subtly while reading a newspaper, with an optimistic expression. The newspaper is held naturally but is slightly out of focus.",
-    "serious": "A thoughtful person deeply engaged in reading a newspaper. The camera angle is from the side, focusing on their contemplative expression, with the newspaper angled away to make the text unreadable.",
-    "dynamic": "A person captured in motion while glancing at a newspaper. A slight motion blur on the newspaper conveys a sense of a busy, forward-thinking environment.",
-    "mixed": "A person reading a newspaper in a relaxed setting. The camera has a shallow depth of field, focusing on the person while the newspaper is softly blurred.",
-    "economic": "A person seen from over the shoulder, reviewing a financial newspaper. The focus is on the charts and columns, which are stylistically blurred and unrecognizable.",
-}
-
-# --- Scenario-based Visual Prompts ---
-SCENARIO_PROMPTS = {
-    "office": "A professional in a bright, modern Zambian office with large windows and a clean, prosperous atmosphere.",
-    "construction": "A construction worker in safety gear at a modern Zambian construction site during a break. The background shows progress and development, with a hopeful and industrious mood.",
-    "farm": "A farmer on a thriving Zambian farm, with lush fields and modern farming equipment visible in the background, conveying growth.",
-    "workshop": "A skilled worker in a well-lit, organized workshop or factory in Zambia, surrounded by tools and machinery, suggesting craftsmanship and industry.",
-    "cafe": "A person in smart casual attire in a modern café or comfortable living space with a contemporary Zambian urban environment.",
-    "market": "A marketeer at a bustling, vibrant Zambian market, surrounded by fresh produce and goods, showcasing local commerce and community.",
-    "salon": "A hairdresser or barber attending to a client in a stylish, modern Zambian salon or barbershop, reflecting local entrepreneurship.",
-    "teacher": "A teacher in a classroom with engaged students in a Zambian school, conveying the importance of education and future growth.",
-    "transport": "A bus driver or conductor by their minibus during a stop in a busy urban Zambian area, representing the daily movement of people.",
-}
-
 
 def get_digest_content() -> str:
     """Get the news digest content from the JSON file."""
@@ -89,80 +74,64 @@ def get_digest_content() -> str:
         return ""
 
 
-def analyze_digest_mood(content: str, override_mood: str | None = None) -> str:
-    """Analyze the overall mood/sentiment of the digest using LLM."""
-    if override_mood:
-        logger.info(f"Using override mood: {override_mood}")
-        return override_mood
-
+def get_image_prompt_concept(content: str) -> str:
+    """Generate a creative image prompt concept from the digest content using an LLM."""
     if not content:
-        return "mixed"
+        logger.warning("No content provided to generate image prompt concept.")
+        return ""
 
-    # If Together API key isn't configured, skip external call to keep things fast/testable
     if not TOGETHER_API_KEY:
-        return "mixed"
+        logger.warning("TOGETHER_API_KEY not set, skipping image prompt concept generation.")
+        return ""
 
     system_prompt = (
-        "You are a sentiment analyzer for news content. Analyze the overall mood/tone "
-        "of the provided news digest and return ONE of these categories:\n"
-        "- 'positive': Predominantly good news (economic growth, achievements, progress)\n"
-        "- 'serious': Predominantly serious/somber news (deaths, accidents, crises)\n"
-        "- 'dynamic': Focus on policy changes, developments, government actions\n"
-        "- 'economic': Primarily economic/financial news\n"
-        "- 'mixed': Balanced mix of different types of news\n\n"
-        "Consider the prominence and emotional weight of stories. Respond with ONLY the category word."
+        "You are a Creative Director for Zed News, a Zambian news outlet. "
+        "Your goal is to create a concept for a promotional image that captures the essence of today's news digest. "
+        "The image should be symbolic, professional, and optimistic, reflecting themes of innovation, development, "
+        "community, and national pride in Zambia. Read the provided news digest, identify the most visually "
+        "compelling or impactful story, and describe a single, clear photographic scene.\n\n"
+        "GUIDELINES:\n"
+        "- Read the entire digest to understand the key stories.\n"
+        "- Select the ONE story that is most visually interesting or emotionally resonant.\n"
+        "- Describe a photograph that represents this story symbolically. Do NOT be literal.\n"
+        "- Depict Zambians as professionals, innovators, community members, and families.\n"
+        "- If your concept includes a person, specify their gender (e.g., 'a Zambian man...', 'a Zambian woman...') to ensure balanced representation.\n"
+        "- The tone must be professional, hopeful, and forward-looking.\n"
+        "- AVOID: Clichés, poverty imagery, political figures, direct depictions of negative events (e.g., accidents, crime). "
+        "If the news is negative, find a positive or neutral angle (e.g., for a cholera outbreak, show a scientist in a lab).\n"
+        "- OUTPUT FORMAT: Respond with ONLY the concise, one-sentence description of the photographic scene. Do not add any other text."
     )
 
-    user_prompt = f"Analyze the mood/sentiment of this Zambian news digest and classify it:\n\n{content}"
+    user_prompt = f"Here is today's news digest for Zambia. Generate a creative photo concept based on it:\n\n{content}"
 
     try:
         completion = client.chat.completions.create(
-            model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
+            model=TEXT_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            temperature=0.3,
-            max_tokens=50,
+            temperature=IMAGE_CONCEPT_TEMP,
+            max_tokens=150,
         )
-
-        mood = completion.choices[0].message.content.strip().lower()
-
-        # Validate the response
-        if mood in MOOD_VISUAL_PROMPTS:
-            logger.info(f"Detected digest mood: {mood}")
-            return mood
-        else:
-            logger.warning(f"Invalid mood response '{mood}', defaulting to 'mixed'")
-            return "mixed"
-
+        concept = completion.choices[0].message.content.strip()
+        logger.info(f"Generated image prompt concept: {concept}")
+        return concept
     except Exception as e:
-        logger.error(f"Failed to analyze digest mood: {e}")
-        return "mixed"
+        logger.error(f"Failed to generate image prompt concept: {e}")
+        return ""
 
 
-def build_image_prompt_from_mood(mood: str) -> str:
-    """Build an Imagen prompt based on the analyzed mood and a random scenario."""
-    mood_visual = MOOD_VISUAL_PROMPTS.get(mood, MOOD_VISUAL_PROMPTS["mixed"])
-    scenario_visual = random.choice(list(SCENARIO_PROMPTS.values()))
-
-    # Randomly select gender to ensure balance
-    gender = random.choice(["man", "woman"])
-    # Replace placeholder "person" with the selected gender
-    mood_visual = mood_visual.replace("A person", f"A {gender}")
-
-    # Combine the mood description and the scenario
-    base_visual = f"{mood_visual} {scenario_visual}"
-
-    # Core prompt structure
+def build_final_image_prompt(concept: str) -> str:
+    """Build the final Imagen prompt by combining the creative concept with technical and stylistic requirements."""
     prompt = (
         "Create a high-quality, professional photograph with absolutely no overlaid text, logos, or graphics. "
-        f"{base_visual}. "
-        "The newspaper should be held naturally, with text, headlines, and articles appearing realistic but blurred or out of focus. "
-        "High-end photography style, sharp focus on the person, professional lighting, "
+        f"{concept}. "
+        "High-end photography style, sharp focus on the subject, professional lighting, "
         "modern African professional aesthetic, avoid rural or poverty imagery, "
         "emphasize contemporary urban development and prosperity, "
-        "no text overlays, watermarks, or graphic elements added to the image."
+        "4K HDR quality, taken by a professional photographer, "
+        "no text overlays, watermarks, graphic elements, frames, borders, or captions added to the image."
     )
 
     return prompt
@@ -182,11 +151,14 @@ def generate_promotional_image(content: str) -> str:
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "facebook-promotional.jpeg")
 
-    # Analyze mood and build appropriate visual prompt
-    mood = analyze_digest_mood(content)
-    prompt = build_image_prompt_from_mood(mood)
+    # Generate a creative concept and build the final prompt
+    concept = get_image_prompt_concept(content)
+    if not concept:
+        logger.error("Failed to generate image prompt concept.")
+        return ""
+    prompt = build_final_image_prompt(concept)
 
-    logger.info(f"Generating image with mood '{mood}' and prompt: {prompt[:100]}...")
+    logger.info(f"Generating image with concept: {concept}")
 
     try:
         client_genai = genai.Client(api_key=GOOGLE_API_KEY)
@@ -205,8 +177,7 @@ def generate_promotional_image(content: str) -> str:
             )
 
         response = client_genai.models.generate_images(
-            # model="imagen-3.0-generate-002",
-            model="imagen-4.0-generate-preview-06-06",
+            model=IMAGE_MODEL,
             prompt=prompt,
             config=config_obj,
         )
@@ -234,14 +205,14 @@ def generate_promotional_image(content: str) -> str:
             logger.error("Image generation failed: could not validate output file size.")
             return ""
 
-        logger.info(f"Generated promotional image at {output_path} (mood: {mood})")
+        logger.info(f"Generated promotional image at {output_path} (concept: {concept})")
         return output_path
     except Exception as e:
         logger.error(f"Failed to generate promotional image: {e}")
         return ""
 
 
-def create_facebook_post_text(content: str, mood_override: str | None = None) -> str:
+def create_facebook_post_text(content: str) -> str:
     """Create a Facebook post using Together AI's Inference API."""
     now = datetime.now(timezone)
     hour = now.hour
@@ -256,40 +227,36 @@ def create_facebook_post_text(content: str, mood_override: str | None = None) ->
     else:
         time_context = "night"
 
-    # Keep text generation deterministic for tests; avoid extra LLM call here
-    mood = mood_override if mood_override in MOOD_VISUAL_PROMPTS else "mixed"
-
-    # Mood-specific context additions
-    mood_contexts = {
-        "positive": "celebrating progress and achievements",
-        "serious": "focusing on important developments",
-        "dynamic": "covering major changes and updates",
-        "economic": "examining business and financial news",
-        "mixed": "bringing you diverse stories",
-    }
-
-    mood_context = mood_contexts.get(mood, mood_contexts["mixed"])
-
     system_prompt = (
         f"You are a patriotic Zambian social media editor for Zed News. Your tone is passionate and engaging. "
-        f"It's {time_context} and you're {mood_context}. "
+        f"It's {time_context} and you're bringing Zambians the day's most important stories. "
+        "Adapt your tone naturally to match the content - celebratory for good news, respectful for serious matters, "
+        "informative for policy changes, and balanced for mixed content. "
         f"NEVER mention specific times (like 5:45PM) in your post. "
         "CRITICAL: Most readers will NEVER click the link - make this post completely valuable on its own. "
-        "Facebook posts do NOT support markdown - use plain text with strategic formatting.\n\n"
+        "FORMATTING RULES - STRICTLY ENFORCE:\n"
+        "- Use ONLY plain text with line breaks and emojis\n"
+        "- NEVER use markdown syntax (**, *, _, `, #, -, etc.)\n"
+        "- NEVER use bullet points (•, -, *, 1., 2., etc.)\n"
+        "- NEVER use asterisks for emphasis\n"
+        "- NEVER use underscores for emphasis\n"
+        "- NEVER use hashtags as headers\n"
+        "- Use natural paragraph breaks and emojis for visual structure\n\n"
         "Craft an engaging Facebook post that:\n"
-        f"- Starts with a creative, context-aware greeting suitable for the {time_context}.\n"
-        "- Presents 4-5 key stories in conversational paragraphs (NOT bullet points)\n"
-        "- Each story should be 1-2 short sentences explaining WHAT happened and WHY it matters to us as Zambians.\n"
-        "- Use patriotic and inclusive language (e.g., 'our nation', 'we', 'our fellow citizens').\n"
+        f"- Starts with a creative, context-aware greeting suitable for the {time_context}\n"
+        "- Presents 4-5 key stories in conversational paragraphs (NOT lists or bullet points)\n"
+        "- Each story should be 1-2 short sentences explaining WHAT happened and WHY it matters to us as Zambians\n"
+        "- Use patriotic and inclusive language (e.g., 'our nation', 'we', 'our fellow citizens')\n"
         "- Use emojis strategically (1 per story max) for visual breaks and emotion\n"
         "- Use line breaks between stories for mobile readability\n"
         "- Include specific numbers/facts that people want to share in WhatsApp groups\n"
         "- Make each story relatable to daily life (jobs, money, safety, family)\n"
-        "- End with a creative, engaging call-to-action to spark conversation.\n"
-        "- Weave in a few relevant hashtags like #Zambia, #ZambianNews, or story-specific ones, but do NOT just list them at the end.\n"
+        "- End with a creative, engaging call-to-action to spark conversation\n"
+        "- Weave in a few relevant hashtags like #Zambia, #ZambianNews, or story-specific ones, but do NOT just list them at the end\n"
         "- Include the link at the very end\n\n"
         "Write for mobile users scrolling fast - make it instantly valuable and shareable. "
-        "Vary your language and avoid repetitive phrases."
+        "Vary your language and avoid repetitive phrases. "
+        "Remember: NO markdown formatting whatsoever - only plain text, line breaks, and emojis."
     )
 
     user_prompt = (
@@ -301,16 +268,16 @@ def create_facebook_post_text(content: str, mood_override: str | None = None) ->
 
     try:
         completion = client.chat.completions.create(
-            model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
+            model=TEXT_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            temperature=0.7,
-            max_tokens=1200,
+            temperature=FACEBOOK_POST_TEMP,
+            max_tokens=1800,
         )
         post_text = completion.choices[0].message.content
-        logger.info(f"Generated Facebook post text (mood: {mood}):\n{post_text}")
+        logger.info(f"Generated Facebook post text:\n{post_text}")
         return post_text
     except Exception as e:
         logger.error(f"Failed to generate Facebook post text: {e}")
@@ -396,23 +363,71 @@ def post_text_only_to_facebook(text: str):
             requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
 
 
-def generate_image_only(content: str, override_mood: str | None = None) -> str:
+def generate_image_only(content: str) -> str:
     """Generate only the promotional image without posting to Facebook."""
     logger.info("Image-only mode: Generating promotional image...")
-
-    # Analyze mood (with potential override)
-    mood = analyze_digest_mood(content, override_mood)
 
     image_path = generate_promotional_image(content)
     if image_path:
         logger.info(f"Image generated successfully: {image_path}")
-        print(f"\n  Image generated: {image_path}")
-        print(f" Detected mood: {mood}")
+        print(f"\nImage generated: {image_path}")
         return image_path
     else:
         logger.error("Failed to generate image")
         print("\nFailed to generate image")
         return ""
+
+
+def generate_text_only(content: str) -> str:
+    """Generate only the post text without posting to Facebook."""
+    logger.info("Text-only mode: Generating post text...")
+
+    post_text = create_facebook_post_text(content)
+    if post_text:
+        logger.info("Post text generated successfully")
+        print("\nGenerated Facebook post text:")
+        print("=" * 60)
+        print(post_text)
+        print("=" * 60)
+        return post_text
+    else:
+        logger.error("Failed to generate post text")
+        print("\nFailed to generate post text")
+        return ""
+
+
+def dry_run_mode(content: str):
+    """Generate both text and image but don't post to Facebook."""
+    logger.info("Dry-run mode: Generating text and image without posting...")
+
+    print("\nDry run mode - No posting to Facebook")
+    print("=" * 50)
+
+    # Generate text
+    post_text = create_facebook_post_text(content)
+    if post_text:
+        print("\nGenerated Facebook post text:")
+        print("-" * 40)
+        print(post_text)
+        print("-" * 40)
+    else:
+        print("\nFailed to generate post text")
+
+    # Generate image
+    image_path = generate_promotional_image(content) or get_daily_image(IMAGES_DIR)
+    if image_path:
+        print(f"\nImage ready: {image_path}")
+    else:
+        print("\nNo image available - would post text-only")
+
+    if post_text and image_path:
+        print("\nReady to post: Text + Image")
+    elif post_text:
+        print("\nReady to post: Text only")
+    else:
+        print("\nNothing ready to post")
+
+    print("\n" + "=" * 50)
 
 
 def main():
@@ -422,10 +437,9 @@ def main():
     parser.add_argument(
         "--image-only", action="store_true", help="Generate promotional image only, without posting to Facebook"
     )
+    parser.add_argument("--text-only", action="store_true", help="Generate post text only, without posting to Facebook")
     parser.add_argument(
-        "--mood",
-        choices=list(MOOD_VISUAL_PROMPTS.keys()),
-        help="Override mood detection with specific mood for image generation",
+        "--dry-run", action="store_true", help="Generate both text and image but don't post to Facebook"
     )
     # Use parse_known_args so tests (or parent processes) passing extra args don't cause SystemExit
     args, _ = parser.parse_known_args()
@@ -438,9 +452,27 @@ def main():
         logger.error("No digest content found. Exiting.")
         sys.exit(1)
 
+    # Check for mutually exclusive flags
+    mode_flags = [args.image_only, args.text_only, args.dry_run]
+    if sum(mode_flags) > 1:
+        logger.error(
+            "Cannot use multiple test modes simultaneously. Choose one: --image-only, --text-only, or --dry-run"
+        )
+        sys.exit(1)
+
     # Image-only mode
     if args.image_only:
-        generate_image_only(digest_content, args.mood)
+        generate_image_only(digest_content)
+        return
+
+    # Text-only mode
+    if args.text_only:
+        generate_text_only(digest_content)
+        return
+
+    # Dry-run mode
+    if args.dry_run:
+        dry_run_mode(digest_content)
         return
 
     # Normal posting mode
