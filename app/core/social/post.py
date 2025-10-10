@@ -95,7 +95,6 @@ def get_image_prompt_concept(content: str) -> str:
         "- Select the ONE story that is most visually interesting or emotionally resonant.\n"
         "- Describe a photograph that represents this story symbolically. Do NOT be literal.\n"
         "- Depict Zambians as professionals, innovators, community members, and families.\n"
-        "- If your concept includes a person, specify their gender (e.g., 'a Zambian man...', 'a Zambian woman...') to ensure balanced representation.\n"
         "- The tone must be professional, hopeful, and forward-looking.\n"
         "- AVOID: Clichés, poverty imagery, political figures, direct depictions of negative events (e.g., accidents, crime). "
         "If the news is negative, find a positive or neutral angle (e.g., for a cholera outbreak, show a scientist in a lab).\n"
