@@ -226,19 +226,14 @@ window.registerAlpineComponent = function (registrationFn) {
   }
 };
 
-// Start Alpine after a brief delay to allow other components to register
-setTimeout(() => {
+// DOMContentLoaded is guaranteed to fire after all deferred (type="module") scripts execute, so fx.min.js has always queued its registrations by this point.
+document.addEventListener("DOMContentLoaded", () => {
   if (!Alpine._started) {
-    // Process any queued registrations before starting
     window.alpineRegistrationQueue.forEach((registrationFn) => {
       registrationFn(Alpine);
     });
-
-    // Clear the queue
     window.alpineRegistrationQueue = [];
-
-    // Start Alpine
     Alpine.start();
     console.log("Alpine.js started");
   }
-}, 100);
+});
