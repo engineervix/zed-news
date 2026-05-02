@@ -64,7 +64,6 @@
     "markdown-it": "^14.1.0",
     "mini-css-extract-plugin": "^2.7.6",
     "mustache": "^4.2.0",
-    "node-sass": "^9.0.0",
     "npm-run-all2": "^5.0.0",
     "postcss": "^8.4.24",
     "postcss-custom-properties": "^13.1.5",
