@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def remove_think_tags(text: str) -> str:
-    """Remove <think> tags and their content from DeepSeek-R1 responses"""
+    """Remove <think> tags if present (safety fallback; Kimi returns reasoning separately)"""
     return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
 
 
@@ -163,8 +163,8 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + digest_content)
 
-    model = "deepseek-ai/DeepSeek-R1-0528-tput"
-    temperature = 0.6
+    model = "moonshotai/Kimi-K2.6"
+    temperature = 1.0  # thinking mode (use 0.6 for instant mode)
     max_tokens = 4096
 
     prompt = f"""
@@ -201,6 +201,10 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
     completion = client.chat.completions.create(
         model=model,
         messages=[
+            {
+                "role": "system",
+                "content": "You are Kimi, an AI assistant created by Moonshot AI.",
+            },
             {
                 "role": "user",
                 "content": prompt,
