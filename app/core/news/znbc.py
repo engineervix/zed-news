@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Fetches today's news from https://www.znbc.co.zm/news/
+Fetches today's news from https://znbc.co.zm/?page_id=4187
 """
 
 import logging
 
+import dateutil.parser
 import requests
 import urllib3
 from bs4 import BeautifulSoup
@@ -23,18 +24,14 @@ def get_article_detail(url):
     """
     Fetches the article detail from the URL
     """
-    response = requests.get(url)
+    response = requests.get(url, verify=False)
     soup = BeautifulSoup(response.text, "html.parser")
-    article = soup.find("article")
 
-    # Extract article content
     try:
-        content_element = article.select_one("div.entry-content")
+        content_element = soup.select_one("div.elementor-widget-theme-post-content")
         if content_element:
             paragraphs = content_element.find_all("p")
             content = "\n".join([p.get_text(strip=True) for p in paragraphs])
-
-            # Remove "Post Views: number" from the content
             content = content.split("Post Views:")[0].strip()
         else:
             content = None
@@ -44,60 +41,65 @@ def get_article_detail(url):
     return content
 
 
+def _parse_article(article, encountered_titles):
+    """
+    Extracts a news item from an article element, or returns None if it
+    doesn't belong to today or can't be parsed.
+    """
+    date_element = article.select_one("span.elementor-post-date")
+    if not date_element:
+        return None
+
+    try:
+        article_date = dateutil.parser.parse(date_element.get_text(strip=True)).date().isoformat()
+    except (ValueError, OverflowError):
+        return None
+
+    if article_date != today_iso_fmt:
+        return None
+
+    title_element = article.select_one("h3.elementor-post__title a")
+    if not title_element:
+        return None
+
+    title = title_element.get_text(strip=True)
+    if title in encountered_titles:
+        return None
+
+    detail_url = title_element["href"]
+    content = get_article_detail(detail_url)
+    if not content:
+        return None
+
+    return {
+        "source": "Zambia National Broadcasting Corporation (ZNBC)",
+        "url": detail_url,
+        "title": title,
+        "content": content,
+        "category": "",
+    }
+
+
 def get_news():
     """
-    Fetches today's news from https://znbc.co.zm/news/
+    Fetches today's news from https://znbc.co.zm/?page_id=4187
     """
-    url = "https://znbc.co.zm/news/"
+    url = "https://znbc.co.zm/?page_id=4187"
     headers = {"User-Agent": ua.firefox}
 
     try:
         response = requests.get(url, headers=headers, timeout=60, verify=False)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        news = soup.find_all("article")
+        news = soup.find_all("article", class_="elementor-post")
         latest_news = []
         encountered_titles = set()
-        # Skip the first item because it seems to be
-        # all the news articles wrapped in an article tag
-        for article in reversed(news[1:]):
-            time_element = article.find("time", class_="entry-date")
-            if time_element and time_element.get("datetime") and time_element.get("datetime").startswith(today_iso_fmt):
-                # Extract article title
-                title_element = article.select_one("h3.entry-title a")
-                title = title_element.text.strip()
 
-                if title not in encountered_titles:
-                    # Extract author
-                    # author_element = article.select_one("div.author a")
-                    # author = author_element.text.strip() if author_element else ""
-
-                    # Extract detail URL
-                    detail_url = title_element["href"]
-
-                    # Extract category
-                    category_element = article.select_one("a.category-item")
-                    category = category_element.text.strip() if category_element else ""
-
-                    # Extract article detail
-                    content = get_article_detail(detail_url)
-                    if content.startswith("(ZANIS)"):
-                        content.replace("(ZANIS)", "", 1)
-
-                    if content:
-                        latest_news.append(
-                            {
-                                "source": "Zambia National Broadcasting Corporation (ZNBC)",
-                                "url": detail_url,
-                                "title": title,
-                                "content": content,
-                                "category": category,
-                                # "author": author,
-                            }
-                        )
-
-                        # Add title to encountered titles set
-                        encountered_titles.add(title)
+        for article in reversed(news):
+            item = _parse_article(article, encountered_titles)
+            if item:
+                latest_news.append(item)
+                encountered_titles.add(item["title"])
 
         return latest_news[::-1]
     except requests.exceptions.ConnectionError as conn_err:
