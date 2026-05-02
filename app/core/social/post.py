@@ -160,6 +160,7 @@ def generate_promotional_image(content: str) -> str:
             prompt=prompt,
             width=1024,
             height=1024,
+            steps=None,
             response_format="base64",
         )
 
