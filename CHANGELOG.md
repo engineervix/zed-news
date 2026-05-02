@@ -4,6 +4,78 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.0](https://github.com/engineervix/zed-news/compare/v1.1.0...v1.2.0) (2026-05-02)
+
+
+### 🚀 Features
+
+* deepseek ([49e88a5](https://github.com/engineervix/zed-news/commit/49e88a5f44544954e2255c908d16a414dcfd5461))
+* **fx:** add cache-busting to "Reload Charts" button ([ed400da](https://github.com/engineervix/zed-news/commit/ed400daaf56b3c13a6146feb4b4172789c0a9e18))
+* use deepseek-ai/DeepSeek-R1-0528-tput ([002dcb4](https://github.com/engineervix/zed-news/commit/002dcb489a69f9099313175348460e0745e6138d))
+* use GEMINI to create fb post image ([5b33166](https://github.com/engineervix/zed-news/commit/5b33166c7454e647ce69930639cc1ee2b98158a3))
+
+
+### 🐛 Bug Fixes
+
+* bug in fx data fetch ([23e7b6f](https://github.com/engineervix/zed-news/commit/23e7b6f9c4e042ed0f7417ca09fcce991fdef2a2))
+* deepseek prompting ([dfd3c3c](https://github.com/engineervix/zed-news/commit/dfd3c3c4f81fb9c703890efaf8301e71111bcc24))
+* ensure we have latest changes before fx update ([9df5ae2](https://github.com/engineervix/zed-news/commit/9df5ae225dc2d763e2e2c286451171e69046d112))
+* exit gracefully when no news is available for digest ([5841799](https://github.com/engineervix/zed-news/commit/5841799b7fd91741be0cba5c4d19085a7c7a1fd6))
+* negative_prompt parameter is not supported in Gemini API ([3f1f3be](https://github.com/engineervix/zed-news/commit/3f1f3bec0d11f5746ad5fcf9f5c7329dc9f98d4d))
+* pass browser User-Agent when fetching article content ([6c4d17d](https://github.com/engineervix/zed-news/commit/6c4d17d5489387f7f742907820197f646b869047))
+* resolve empty digest by switching to streaming with higher max_tokens ([c36c6f3](https://github.com/engineervix/zed-news/commit/c36c6f3d050a2f50b09d58d7847edd0dbc73558b))
+* use consistent time ([fcab867](https://github.com/engineervix/zed-news/commit/fcab8672c0e85dc41cce32338827f11b96fbb965))
+* use meta-llama/Llama-3.3-70B-Instruct-Turbo ([494784c](https://github.com/engineervix/zed-news/commit/494784c080d8f91617e68f4f07446158b74ac98f))
+* we don't want newspaper text on generated images ([ee2c52d](https://github.com/engineervix/zed-news/commit/ee2c52df5051583be67d843262942b8deb393b1d))
+
+
+### ♻️ Code Refactoring
+
+* add variety in image generation prompt ([f159da5](https://github.com/engineervix/zed-news/commit/f159da5b502ad405623e0e5d30d7389590b5d2af))
+* additional prompt tweaks and news template adjustment ([d4fce51](https://github.com/engineervix/zed-news/commit/d4fce51574ca7137d458f8f1105e99a0762433f4))
+* better define what constitutes main stories ([92a4da5](https://github.com/engineervix/zed-news/commit/92a4da5a960bcd5f9a979b11b42065125569e51f))
+* better image generation & social prompt ([a6bbdbb](https://github.com/engineervix/zed-news/commit/a6bbdbb2bce504141689299c97526a705de4877c))
+* hashtags ([dbb3449](https://github.com/engineervix/zed-news/commit/dbb344926318bef63c8e2c4772e8aaece4d0ca47))
+* image generation prompt ([aac93b1](https://github.com/engineervix/zed-news/commit/aac93b1b243b70126ebd9887ff5064a9324c659e))
+* invert the fx history chart and make use of cubic interpolation ([9a9832f](https://github.com/engineervix/zed-news/commit/9a9832f2fe02f9e1a06784b9213903c6da2cdfed))
+* make the machine fit in a Zambian's shoes 🇿🇲 ([680d81e](https://github.com/engineervix/zed-news/commit/680d81e9188122fb73b28b6be8a57775218b98a1))
+* more dynamic intros and endings ([09be4cf](https://github.com/engineervix/zed-news/commit/09be4cff4d842de2a9d62c7bb79282db999aa353))
+* podcast episode audio file URL ([d7cf5b0](https://github.com/engineervix/zed-news/commit/d7cf5b08c03fb8558a91385940d1a974a970f56d))
+* prompt improvements and post-processing enhancements ([a7c0e75](https://github.com/engineervix/zed-news/commit/a7c0e751d1b1bb88690fc32c23cddd1960634d86))
+* readjust deepseek R1 prompt ([5dbe872](https://github.com/engineervix/zed-news/commit/5dbe8722de04f1de6282c8ec6f83a2dc8f251317))
+* self-contained Facebook post content ([9e0ec87](https://github.com/engineervix/zed-news/commit/9e0ec87bbaac15de761dcb87f32c50f5c159b599))
+* show fx history for past 1 month ([8d3e5c0](https://github.com/engineervix/zed-news/commit/8d3e5c036794c68b540dfd917ee0f0e1bc13a24c))
+* similar to 680d81e, let the machine 'feel' like one of us ([863caef](https://github.com/engineervix/zed-news/commit/863caef17d33576989cc06342ebee0b91e0b7c7d))
+* update image generation logic and social text ([fe7f49b](https://github.com/engineervix/zed-news/commit/fe7f49b3eae669f1cda7a53e3fd8ed91c0cc818a))
+* update news fetching ([1c738bd](https://github.com/engineervix/zed-news/commit/1c738bdded61d228fb1c2027bc748c2c5c8c1273))
+* update ZNBC fetch ([e1a5b7a](https://github.com/engineervix/zed-news/commit/e1a5b7a4d18c7a03a1896c728b34f1249d98b621))
+* use Together AI for news digest generation ([6130e6c](https://github.com/engineervix/zed-news/commit/6130e6caee83d1eb963d3a142b5f9a90c73ea6b8))
+* we don't need to summarize anything ([2ffabdc](https://github.com/engineervix/zed-news/commit/2ffabdc735b95cb9a2d3cab0cf142b4763fbf6de))
+
+
+### ⚙️ Build System
+
+* add cloudscraper and update some tooling deps ([67c12d5](https://github.com/engineervix/zed-news/commit/67c12d528e6aad83150669207f77aebb0b30a3d6))
+* **deps-dev:** update dependency babel-loader to v10 ([#176](https://github.com/engineervix/zed-news/issues/176)) ([d356e73](https://github.com/engineervix/zed-news/commit/d356e73b59407e51b9a95e11aa7cdca10b370ac2))
+* **deps:** update babel monorepo ([#167](https://github.com/engineervix/zed-news/issues/167)) ([ab308e0](https://github.com/engineervix/zed-news/commit/ab308e059a291a655ace47af55438520a050ea28))
+* **deps:** update dependency apprise to v1.9.6 ([#184](https://github.com/engineervix/zed-news/issues/184)) ([271c580](https://github.com/engineervix/zed-news/commit/271c58067402bd022bd491a642e91f3cf75864d6))
+* **deps:** update dependency commit-and-tag-version to v12.6.0 ([#182](https://github.com/engineervix/zed-news/issues/182)) ([58cdd94](https://github.com/engineervix/zed-news/commit/58cdd9449f2cfc5ccf0cc706329df2d4841b20ae))
+* **deps:** update dependency coverage to v7.10.7 ([#178](https://github.com/engineervix/zed-news/issues/178)) ([e42c442](https://github.com/engineervix/zed-news/commit/e42c442681111f3d081fcdf81e2a9d3afb1b3db9))
+* **deps:** update dependency feedparser to v6.0.12 ([#188](https://github.com/engineervix/zed-news/issues/188)) ([12a1cf6](https://github.com/engineervix/zed-news/commit/12a1cf6d768d6f477a3cdb343dbe34981deec03d))
+* **deps:** update dependency google-genai to v1.42.0 ([#172](https://github.com/engineervix/zed-news/issues/172)) ([27a55b0](https://github.com/engineervix/zed-news/commit/27a55b06d4a8da7a1a03daa1b4c9882ca0ea84eb))
+* **deps:** update dependency invoke to v2.2.1 ([#189](https://github.com/engineervix/zed-news/issues/189)) ([32d02ae](https://github.com/engineervix/zed-news/commit/32d02ae5f34ca56c9b355055f9fe68a39660028e))
+* **deps:** update dependency langchain-community to v0.3.27 [security] ([#183](https://github.com/engineervix/zed-news/issues/183)) ([a0d640d](https://github.com/engineervix/zed-news/commit/a0d640d342b0b91ea69614e2a7512fbb13c07ac2))
+* **deps:** update dependency langchain-openai to v0.3.35 ([#171](https://github.com/engineervix/zed-news/issues/171)) ([b7808e3](https://github.com/engineervix/zed-news/commit/b7808e3cf1cc8d14fe35becb287e0fc998f0291e))
+* **deps:** update dependency openai to v1.109.1 ([#173](https://github.com/engineervix/zed-news/issues/173)) ([2836a4e](https://github.com/engineervix/zed-news/commit/2836a4e2d8e02cfd03b3d95256ba42c8e0232ccf))
+* **deps:** update dependency requests to v2.32.4 [security] ([#177](https://github.com/engineervix/zed-news/issues/177)) ([b50086f](https://github.com/engineervix/zed-news/commit/b50086f6f95268582bc91da030b814eed9b941c6))
+* poetry 2.1.3 ([3bb4880](https://github.com/engineervix/zed-news/commit/3bb48808ed367ffaa8c4ae69506c8dbcbd5d44d5))
+* poetry needs setuptools ([9525321](https://github.com/engineervix/zed-news/commit/9525321a4d99a2bdeb9c6e7bcaf6dd0045955144))
+
+
+### 👷 CI/CD
+
+* cleanup ([3986849](https://github.com/engineervix/zed-news/commit/39868492191d2cc87849422d2cefe97605dba8f7))
+
 ## [v1.1.0](https://github.com/engineervix/zed-news/compare/v1.0.0...v1.1.0) (2025-06-24)
 
 
