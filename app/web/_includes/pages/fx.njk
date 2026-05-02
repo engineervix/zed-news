@@ -152,7 +152,7 @@
                   <p class="text-muted mb-0 mt-1">Interactive chart showing currency trends over time</p>
                 </div>
                 <div class="col-md-4 text-md-end">
-                  <button class="btn btn-outline-primary btn-sm" @click="$store.fxData.loadData()" :disabled="$store.fxData.loading">
+                  <button class="btn btn-outline-primary btn-sm" @click="$store.fxData.loadData(true)" :disabled="$store.fxData.loading">
                     <i class="fas fa-sync-alt me-1" :class="{ 'fa-spin': $store.fxData.loading }"></i>
                     Reload Charts
                   </button>

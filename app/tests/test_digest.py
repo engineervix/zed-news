@@ -44,9 +44,10 @@ class TestDigest(unittest.TestCase):
         ]
         dest = os.path.join(self.temp_dir, "digest.md")
 
-        mock_completion = MagicMock()
-        mock_completion.choices[0].message.content = "Generated Digest"
-        mock_client.chat.completions.create.return_value = mock_completion
+        mock_chunk = MagicMock()
+        mock_chunk.choices = [MagicMock()]
+        mock_chunk.choices[0].delta.content = "Generated Digest"
+        mock_client.chat.completions.create.return_value = [mock_chunk]
 
         result = create_news_digest(news, dest)
 
@@ -68,9 +69,7 @@ class TestDigest(unittest.TestCase):
         ]
         dest = os.path.join(self.temp_dir, "digest.md")
 
-        mock_completion = MagicMock()
-        mock_completion.choices[0].message.content = ""  # Empty response
-        mock_client.chat.completions.create.return_value = mock_completion
+        mock_client.chat.completions.create.return_value = []  # Empty stream
 
         create_news_digest(news, dest)
 
@@ -167,9 +166,10 @@ class TestDigest(unittest.TestCase):
         dest = os.path.join(self.temp_dir, "digest.md")
 
         # Mock Together AI to return content with improperly formatted headings
-        mock_completion = MagicMock()
-        mock_completion.choices[0].message.content = "##Main Stories\nSome content\n###Brief Updates\nMore content"
-        mock_client.chat.completions.create.return_value = mock_completion
+        mock_chunk = MagicMock()
+        mock_chunk.choices = [MagicMock()]
+        mock_chunk.choices[0].delta.content = "##Main Stories\nSome content\n###Brief Updates\nMore content"
+        mock_client.chat.completions.create.return_value = [mock_chunk]
 
         result = create_news_digest(news, dest)
 

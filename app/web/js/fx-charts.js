@@ -20,20 +20,25 @@ function registerFXComponents(Alpine) {
     metadata: {},
     fx_current: {},
 
-    async loadData() {
+    async loadData(force = false) {
       this.loading = true;
       this.error = null;
 
       try {
+        const cacheBuster = force ? `?t=${new Date().getTime()}` : "";
         // Load historical data
-        const historicalResponse = await fetch("/js/fx_data.json");
+        const historicalResponse = await fetch(
+          `/js/fx_data.json${cacheBuster}`
+        );
         if (!historicalResponse.ok) {
           throw new Error(`HTTP error! status: ${historicalResponse.status}`);
         }
         const historicalData = await historicalResponse.json();
 
         // Load current data with dates
-        const currentResponse = await fetch("/js/fx_current.json");
+        const currentResponse = await fetch(
+          `/js/fx_current.json${cacheBuster}`
+        );
         if (!currentResponse.ok) {
           throw new Error(`HTTP error! status: ${currentResponse.status}`);
         }

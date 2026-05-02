@@ -108,6 +108,16 @@ def remove_overview_section(text: str) -> str:
     return re.sub(pattern, "", text, flags=re.MULTILINE | re.DOTALL)
 
 
+def _collect_stream_content(stream) -> str:
+    content = ""
+    for chunk in stream:
+        if chunk.choices:
+            delta = chunk.choices[0].delta
+            if hasattr(delta, "content") and delta.content:
+                content += delta.content
+    return content
+
+
 def create_news_digest(news: list[dict[str, str]], dest: str):
     """Create a news digest from the news articles using the provided summarization function"""
 
@@ -165,7 +175,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
 
     model = "moonshotai/Kimi-K2.6"
     temperature = 1.0  # thinking mode (use 0.6 for instant mode)
-    max_tokens = 4096
+    max_tokens = 16384
 
     prompt = f"""
     You are a patriotic Zambian news editor creating a daily news digest in Markdown for your fellow citizens. Your tone is professional yet engaging, highlighting why the news matters to the nation.
@@ -198,7 +208,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
     </input>
     """
 
-    completion = client.chat.completions.create(
+    stream = client.chat.completions.create(
         model=model,
         messages=[
             {
@@ -213,10 +223,10 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
         temperature=temperature,
         top_p=0.95,
         max_tokens=max_tokens,
+        stream=True,
     )
-    logger.info(completion)
 
-    generated_digest = completion.choices[0].message.content
+    generated_digest = _collect_stream_content(stream)
 
     if generated_digest := generated_digest.strip():
         # Clean the output
