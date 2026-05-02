@@ -63,8 +63,7 @@ The original podcast episodes have been archived, and the project now focuses on
 
 ### Core
 
-> **Note**
->
+> [!NOTE]
 > You need to have `docker` and `docker-compose` on your machine.
 
 - Install [Poetry](https://python-poetry.org/).
@@ -125,8 +124,7 @@ See other available scripts in `package.json`.
 
 The project's final output is a **static site**, which can be hosted on any platform that supports static files, such as [Cloudflare Pages](https://pages.cloudflare.com/), [Netlify](https://www.netlify.com/), [Vercel](https://vercel.com/), or [GitHub Pages](https://pages.github.com/).
 
-> **Warning**
->
+> [!WARNING]
 > Ensure that environment variables are updated accordingly for both the **core** application and the **web** build process.
 
 For an automated, hands-off setup, follow these steps:
@@ -135,8 +133,7 @@ For an automated, hands-off setup, follow these steps:
 2.  Configure a cron job to run the `cron.sh` script located in the project root. This script automates the generation and deployment process.
 3.  Ensure `git` is configured correctly on the machine, as the `cron.sh` script pushes the generated content to the repository, which in turn triggers the website's build and deployment pipeline.
 
-> **Note**
->
+> [!NOTE]
 > The `cron.sh` script uses [Apprise](https://github.com/caronc/apprise) to send notifications when a new digest is ready. You will need to configure the notification service (e.g., ntfy.sh) in your `.env` file.
 
 ## Contributing
