@@ -3,7 +3,7 @@ import re
 import sys
 import time
 
-from together import Together, error
+from together import Together, TogetherError
 
 from app.core.utilities import TOGETHER_API_KEY
 
@@ -69,7 +69,7 @@ def summarize(content: str, title: str) -> str:
                 # Remove everything between <think> and </think> tags
                 return re.sub(r"<think>.*?</think>", "", result_with_no_linebreaks, flags=re.DOTALL)
 
-        except error.ServiceUnavailableError:
+        except TogetherError:
             retries += 1
             logging.error(f"Service unavailable. Retrying {retries}/{max_retries} in 10 seconds...")
             time.sleep(10)
@@ -127,7 +127,7 @@ def brief_summary(content: str, title: str) -> str:
                     result = "\n".join(result.split("\n")[1:])
 
                 return result.replace("\n", "")  # Remove newlines
-        except error.ServiceUnavailableError:
+        except TogetherError:
             retries += 1
             logging.error(f"Service unavailable. Retrying {retries}/{max_retries} in 10 seconds...")
             time.sleep(10)

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from together import error
+from together import TogetherError
 
 from app.core.summarization.backends.together import brief_summary, summarize
 
@@ -34,7 +34,7 @@ class TestTogether(unittest.TestCase):
     def test_summarize_with_service_error(self, mock_client, mock_logging, mock_sleep):
         # Set up mock to raise error and then succeed
         mock_client.chat.completions.create.side_effect = [
-            error.ServiceUnavailableError(),
+            TogetherError("service unavailable"),
             MagicMock(choices=[MagicMock(message=MagicMock(content=self.mock_summary))]),
         ]
 
@@ -58,7 +58,7 @@ class TestTogether(unittest.TestCase):
     @patch("app.core.summarization.backends.together.sys.exit")
     def test_summarize_max_retries(self, mock_exit, mock_client, mock_logging, mock_sleep):
         # Make all calls fail with service error
-        mock_client.chat.completions.create.side_effect = error.ServiceUnavailableError()
+        mock_client.chat.completions.create.side_effect = TogetherError("service unavailable")
 
         # Call the function
         summarize(self.content, self.title)

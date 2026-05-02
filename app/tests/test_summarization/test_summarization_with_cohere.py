@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from cohere.error import CohereAPIError
+from cohere import BadRequestError as CohereAPIError
 
 from app.core.summarization.backends.cohere import summarize
 
@@ -52,7 +52,7 @@ class TestCohere(unittest.TestCase):
             summarize("", self.title)
 
         # Verify the error message
-        self.assertEqual(str(context.exception), "invalid request: required 'text' param is missing or empty.")
+        self.assertEqual(context.exception.body, "invalid request: required 'text' param is missing or empty.")
 
         # Verify logging was still called
         mock_logging.info.assert_called_once_with(f"Summarizing '{self.title}' via Cohere ...")
@@ -68,7 +68,7 @@ class TestCohere(unittest.TestCase):
             summarize("This is too short", self.title)
 
         # Verify the error message
-        self.assertEqual(str(context.exception), "invalid request: text must be longer than 250 characters")
+        self.assertEqual(context.exception.body, "invalid request: text must be longer than 250 characters")
 
     @patch("app.core.summarization.backends.cohere.logging")
     @patch("app.core.summarization.backends.cohere.co")
@@ -81,7 +81,7 @@ class TestCohere(unittest.TestCase):
             summarize(self.content, self.title)
 
         # Verify the error message
-        self.assertEqual(str(context.exception), "API Error")
+        self.assertEqual(context.exception.body, "API Error")
 
 
 if __name__ == "__main__":
