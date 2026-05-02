@@ -6,13 +6,14 @@ Fetches today's news from https://www.znbc.co.zm/news/
 import logging
 
 import requests
+import urllib3
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
 from app.core.utilities import today_iso_fmt
 
 logger = logging.getLogger(__name__)
-
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ua = UserAgent(
     fallback="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17720",
 )
@@ -51,7 +52,7 @@ def get_news():
     headers = {"User-Agent": ua.firefox}
 
     try:
-        response = requests.get(url, headers=headers, timeout=60)
+        response = requests.get(url, headers=headers, timeout=60, verify=False)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         news = soup.find_all("article")

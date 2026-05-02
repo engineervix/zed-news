@@ -3,6 +3,7 @@ import traceback
 from http import HTTPStatus
 from urllib.parse import urlparse, urlunparse
 
+import cloudscraper
 import dateutil.parser
 import feedparser
 import requests
@@ -152,10 +153,12 @@ def get_muvitv_article_detail(url):
         article = soup.find("article")
 
         if article:
-            content_element = article.select_one("div.tdb_single_content")
-            paragraphs = content_element.find_all("p")
-
-            content = "\n".join([p.get_text(strip=True) for p in paragraphs])
+            content_element = article.select_one("div.td-post-content")
+            if content_element:
+                paragraphs = content_element.find_all("p")
+                content = "\n".join([p.get_text(strip=True) for p in paragraphs])
+            else:
+                content = None
         else:
             content = None
 
@@ -177,7 +180,8 @@ def get_diggers_article_detail(url):
         # Create a new URL without query parameters
         new_url = urlunparse(parsed_url._replace(query=""))
 
-        response = requests.get(new_url, headers={"User-Agent": ua.chrome})
+        scraper = cloudscraper.create_scraper(browser="chrome")
+        response = scraper.get(new_url)
         soup = BeautifulSoup(response.text, "html.parser")
 
         article = soup.select_one("div.article-text")

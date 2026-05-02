@@ -132,7 +132,7 @@ class TestOtherNews(unittest.TestCase):
         <html>
             <body>
                 <article>
-                    <div class="tdb_single_content">
+                    <div class="td-post-content">
                         <p>Paragraph 0.</p>
                         <p>Paragraph 1.</p>
                     </div>
@@ -146,8 +146,8 @@ class TestOtherNews(unittest.TestCase):
         article_detail = get_muvitv_article_detail(self.muvitv_url)
         self.assertEqual(article_detail, "Paragraph 0.\nParagraph 1.")
 
-    @patch("app.core.news.other.requests.get")
-    def test_get_diggers_article_detail(self, mock_get):
+    @patch("app.core.news.other.cloudscraper.create_scraper")
+    def test_get_diggers_article_detail(self, mock_create_scraper):
         mock_response = MagicMock()
         mock_response.text = """
         <html>
@@ -160,7 +160,9 @@ class TestOtherNews(unittest.TestCase):
         </html>
         """
 
-        mock_get.return_value = mock_response
+        mock_scraper = MagicMock()
+        mock_scraper.get.return_value = mock_response
+        mock_create_scraper.return_value = mock_scraper
 
         article_detail = get_diggers_article_detail(self.diggers_url)
         self.assertEqual(article_detail, "Paragraph 0.\nParagraph 1.")
