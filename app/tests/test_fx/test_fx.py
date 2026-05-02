@@ -70,16 +70,31 @@ class TestFXDataProcessor(unittest.TestCase):
     @patch("app.core.fx.processor.requests.get")
     def test_fetch_data_success(self, mock_get):
         """Test successful data fetching from Bank of Zambia."""
-        # Mock successful response
-        mock_response = Mock()
-        mock_response.raise_for_status.return_value = None
-        mock_response.content = b"mock_excel_content"
-        mock_get.return_value = mock_response
+        # Mock successful responses for the 3 sequential requests
+
+        # 1. Metadata response
+        mock_meta_response = Mock()
+        mock_meta_response.raise_for_status.return_value = None
+        mock_meta_response.json.return_value = {"data": [{"id": "test-node-id"}]}
+
+        # 2. File Metadata response
+        mock_file_meta_response = Mock()
+        mock_file_meta_response.raise_for_status.return_value = None
+        mock_file_meta_response.json.return_value = {
+            "data": {"attributes": {"uri": {"url": "/sites/default/files/test.xlsx"}}}
+        }
+
+        # 3. Actual file download response
+        mock_file_response = Mock()
+        mock_file_response.raise_for_status.return_value = None
+        mock_file_response.content = b"mock_excel_content"
+
+        mock_get.side_effect = [mock_meta_response, mock_file_meta_response, mock_file_response]
 
         result = self.processor.fetch_data()
 
         self.assertEqual(result, b"mock_excel_content")
-        mock_get.assert_called_once_with(self.processor.url, timeout=30)
+        self.assertEqual(mock_get.call_count, 3)
 
     @patch("app.core.fx.processor.requests.get")
     def test_fetch_data_failure(self, mock_get):

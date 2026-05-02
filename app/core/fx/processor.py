@@ -13,8 +13,13 @@ from typing import Dict, Optional
 
 import pandas as pd
 import requests
+from fake_useragent import UserAgent
 
 from app.core.utilities import timezone
+
+ua = UserAgent(
+    fallback="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -52,7 +57,34 @@ class FXDataProcessor:
         """Download the Excel file from Bank of Zambia"""
         logger.info("Fetching FX data from Bank of Zambia...")
         try:
-            response = requests.get(self.url, timeout=30)
+            # 1. Fetch latest node metadata
+            api_url = "https://www.boz.zm/jsonapi/node/historical_average_exchange_rate?sort=-created&page[limit]=1"
+            headers = {"User-Agent": ua.chrome}
+            logger.info("Fetching latest file metadata...")
+            meta_resp = requests.get(api_url, headers=headers, timeout=30)
+            meta_resp.raise_for_status()
+            meta_data = meta_resp.json()
+
+            if not meta_data.get("data"):
+                raise ValueError("No historical data node found in BOZ API")
+
+            node_id = meta_data["data"][0]["id"]
+
+            # 2. Fetch file URL using the node_id
+            file_meta_url = f"https://www.boz.zm/jsonapi/node/historical_average_exchange_rate/{node_id}/field_average_historical_file"
+            file_meta_resp = requests.get(file_meta_url, headers=headers, timeout=30)
+            file_meta_resp.raise_for_status()
+            file_meta_data = file_meta_resp.json()
+
+            if "data" not in file_meta_data or "attributes" not in file_meta_data["data"]:
+                raise ValueError("Could not find file attributes in BOZ API response")
+
+            file_path = file_meta_data["data"]["attributes"]["uri"]["url"]
+            download_url = f"https://www.boz.zm{file_path}"
+
+            # 3. Download the actual Spreadsheet
+            logger.info(f"Downloading FX data from {download_url}...")
+            response = requests.get(download_url, headers=headers, timeout=30)
             response.raise_for_status()
 
             # Save raw file for backup
@@ -65,6 +97,9 @@ class FXDataProcessor:
 
         except requests.RequestException as e:
             logger.error(f"Failed to fetch FX data: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Error fetching FX data URL: {e}")
             raise
 
     def _setup_column_names(self, df: pd.DataFrame) -> pd.DataFrame:
