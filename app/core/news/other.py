@@ -14,7 +14,7 @@ from app.core.utilities import today_iso_fmt
 logger = logging.getLogger(__name__)
 
 ua = UserAgent(
-    fallback="Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.648.204",
+    fallback="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
 )
 
 URLs = [
@@ -38,7 +38,7 @@ def get_daily_mail_article_detail(url):
         # Create a new URL without query parameters
         new_url = urlunparse(parsed_url._replace(query=""))
 
-        response = requests.get(new_url)
+        response = requests.get(new_url, headers={"User-Agent": ua.chrome})
         soup = BeautifulSoup(response.text, "html.parser")
         if article := soup.find("article"):
             content_element = article.select_one("div.entry-content")
@@ -78,7 +78,7 @@ def get_times_of_zambia_article_detail(url):
         logger.error(f"{url} is not a Times of Zambia URL")
         return None
     else:
-        response = requests.get(url)
+        response = requests.get(url, headers={"User-Agent": ua.chrome})
 
         if response.status_code != HTTPStatus.OK:
             logger.error(f"Failed to fetch the article from {url}")
@@ -114,7 +114,7 @@ def get_mwebantu_article_detail(url):
         # Create a new URL without query parameters
         new_url = urlunparse(parsed_url._replace(query=""))
 
-        response = requests.get(new_url)
+        response = requests.get(new_url, headers={"User-Agent": ua.chrome})
         soup = BeautifulSoup(response.text, "html.parser")
 
         article = soup.find("article")
@@ -146,7 +146,7 @@ def get_muvitv_article_detail(url):
         # Create a new URL without query parameters
         new_url = urlunparse(parsed_url._replace(query=""))
 
-        response = requests.get(new_url)
+        response = requests.get(new_url, headers={"User-Agent": ua.chrome})
         soup = BeautifulSoup(response.text, "html.parser")
 
         article = soup.find("article")
@@ -177,7 +177,7 @@ def get_diggers_article_detail(url):
         # Create a new URL without query parameters
         new_url = urlunparse(parsed_url._replace(query=""))
 
-        response = requests.get(new_url)
+        response = requests.get(new_url, headers={"User-Agent": ua.chrome})
         soup = BeautifulSoup(response.text, "html.parser")
 
         article = soup.select_one("div.article-text")
