@@ -55,6 +55,11 @@ def main():
     logging.info("Creating news digest...")
     digest_data = create_news_digest(news, digest_content)
 
+    if digest_data is None:
+        logging.warning("No digest produced (no articles fetched). Exiting.")
+        close_database()
+        return
+
     end_time = time.time()
     processing_time = int(end_time - start_time)
 
