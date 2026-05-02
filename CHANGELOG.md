@@ -4,6 +4,37 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.1](https://github.com/engineervix/zed-news/compare/v1.2.0...v1.2.1) (2026-05-02)
+
+
+### 🐛 Bug Fixes
+
+* restore node_modules resolution for sass imports ([d329136](https://github.com/engineervix/zed-news/commit/d329136b7da7d839c57ff83c8c9a4141677fcee0))
+* suppress steps parameter for Google Imagen on Together AI ([4efe8f4](https://github.com/engineervix/zed-news/commit/4efe8f4b8ee1e5373bfdfc099fec48cae3d66c1b))
+* update summarization backends for breaking API changes in cohere, together, and langchain ([a818961](https://github.com/engineervix/zed-news/commit/a818961fb80b8fb732cc113680ed018c8f41bbe2))
+
+
+### ♻️ Code Refactoring
+
+* switch promotional image generation from Google GenAI to Together AI ([64980ec](https://github.com/engineervix/zed-news/commit/64980ec79d90bcd0085e48620cd50251c2555f49))
+
+
+### ⚙️ Build System
+
+* **deps:** update dependency @11ty/eleventy to v3.1.5 ([#217](https://github.com/engineervix/zed-news/issues/217)) ([a93311e](https://github.com/engineervix/zed-news/commit/a93311e6d60017b11f27afc287a0021d7a539312))
+* **deps:** update dependency alpinejs to v3.15.12 ([#208](https://github.com/engineervix/zed-news/issues/208)) ([7dcbf78](https://github.com/engineervix/zed-news/commit/7dcbf784ccc802794043a9ce737425b5c9eaca1f))
+* **deps:** update dependency babel to v2.18.0 ([#209](https://github.com/engineervix/zed-news/issues/209)) ([3a8d16b](https://github.com/engineervix/zed-news/commit/3a8d16ba8a0ef53ac2f646e7b4baa69c55373bd5))
+* **deps:** update dependency beautifulsoup4 to v4.14.3 ([#211](https://github.com/engineervix/zed-news/issues/211)) ([af59355](https://github.com/engineervix/zed-news/commit/af59355ad6521c9f89a6247352bbbdcb55a29a85))
+* **deps:** update dependency cohere to v4.57 ([#213](https://github.com/engineervix/zed-news/issues/213)) ([c2be2a8](https://github.com/engineervix/zed-news/commit/c2be2a8f4d5ccdc5ef5d984f401bf57a6eb237ce))
+* **deps:** update dependency postcss to v8.5.13 ([#207](https://github.com/engineervix/zed-news/issues/207)) ([8ce3cc8](https://github.com/engineervix/zed-news/commit/8ce3cc8bd08ed904cdb6f1b41ec6a0cbacbd1b82))
+* **deps:** update dependency requests to v2.33.0 [security] ([#216](https://github.com/engineervix/zed-news/issues/216)) ([bcbcc40](https://github.com/engineervix/zed-news/commit/bcbcc4082638e9f462116422e5a5b45c8010cc2a))
+* npm update ([d0e813d](https://github.com/engineervix/zed-news/commit/d0e813d1667182918e49c671d3be9c3208a9cceb))
+* poetry add bpython cohere invoke pandas pytz together ([79ec55f](https://github.com/engineervix/zed-news/commit/79ec55f0d281db726380288df46affd6ce600d95))
+* poetry add langchain langchain-community langchain-openai openai ([618472b](https://github.com/engineervix/zed-news/commit/618472bd1c705a167ab8179809488d2b42668776))
+* poetry update ([44cab0f](https://github.com/engineervix/zed-news/commit/44cab0f2b42a700425fad2de47bf47fe8ff38ce4))
+* poetry update ([c2fac57](https://github.com/engineervix/zed-news/commit/c2fac57340d500d12c17362c90b7469a28afdf54))
+* remove node-sass and run npm audit fix ([7e6c64d](https://github.com/engineervix/zed-news/commit/7e6c64df9885f48148304c08c0aa6797c4f84a5c))
+
 ## [v1.2.0](https://github.com/engineervix/zed-news/compare/v1.1.0...v1.2.0) (2026-05-02)
 
 
