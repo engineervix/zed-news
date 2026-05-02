@@ -74,15 +74,15 @@ class TestEleventify(unittest.TestCase):
                 self.assertEqual(data, {})
                 mock_logger.error.assert_called_with("Digest metadata file not found: non_existent_file.json")
 
-    @patch("app.core.news.eleventify.gemini_client")
-    def test_create_digest_description_success(self, mock_gemini_client):
-        mock_response = MagicMock()
-        mock_response.text = "This is a generated description."
-        mock_gemini_client.models.generate_content.return_value = mock_response
+    @patch("app.core.news.eleventify.TOGETHER_API_KEY", "test_key")
+    @patch("app.core.news.eleventify.client")
+    def test_create_digest_description_success(self, mock_client):
+        mock_completion = MagicMock()
+        mock_completion.choices[0].message.content = "This is a generated description."
+        mock_client.chat.completions.create.return_value = mock_completion
 
-        with patch.dict(os.environ, {"GEMINI_API_KEY": "test_key"}):
-            description = create_digest_description("content", "date")
-            self.assertIn("This is a generated description.", description)
+        description = create_digest_description("content", "date")
+        self.assertIn("This is a generated description.", description)
 
 
 if __name__ == "__main__":
