@@ -8,6 +8,7 @@ post to social media
 __version__ = "1.2.0"
 
 import argparse
+import base64
 import logging
 import os
 import pathlib
@@ -18,8 +19,6 @@ from datetime import datetime
 import facebook
 import requests
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
 from together import Together
 
 from app.core.utilities import (
@@ -41,12 +40,10 @@ HEALTHCHECKS_PING_URL = os.getenv("HEALTHCHECKS_FACEBOOK_PING_URL")
 FACEBOOK_ACCESS_TOKEN = os.getenv("FACEBOOK_ACCESS_TOKEN")
 FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # --- Model Configuration ---
 TEXT_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
-# IMAGE_MODEL = "imagen-3.0-generate-002"
-IMAGE_MODEL = "imagen-4.0-generate-preview-06-06"
+IMAGE_MODEL = "google/imagen-4.0-preview"
 IMAGE_CONCEPT_TEMP = 0.8
 FACEBOOK_POST_TEMP = 0.7
 
@@ -137,20 +134,18 @@ def build_final_image_prompt(concept: str) -> str:
 
 
 def generate_promotional_image(content: str) -> str:
-    """Generate a fresh promotional image using Google GenAI and save it locally.
+    """Generate a fresh promotional image using Together AI and save it locally.
 
     Returns the absolute file path to the generated image, or an empty string on failure.
     """
-    if not GOOGLE_API_KEY:
-        logger.warning("GOOGLE_API_KEY is not set. Skipping image generation.")
+    if not TOGETHER_API_KEY:
+        logger.warning("TOGETHER_API_KEY is not set. Skipping image generation.")
         return ""
 
-    # Create output directory under DATA_DIR/today/social
     output_dir = os.path.join(DATA_DIR, today_iso_fmt, "social")
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "facebook-promotional.jpeg")
 
-    # Generate a creative concept and build the final prompt
     concept = get_image_prompt_concept(content)
     if not concept:
         logger.error("Failed to generate image prompt concept.")
@@ -160,48 +155,28 @@ def generate_promotional_image(content: str) -> str:
     logger.info(f"Generating image with concept: {concept}")
 
     try:
-        client_genai = genai.Client(api_key=GOOGLE_API_KEY)
-
-        try:
-            config_obj = types.GenerateImagesConfig(
-                number_of_images=1,
-                output_mime_type="image/jpeg",
-                aspect_ratio="1:1",
-            )
-        except TypeError as e:
-            logger.warning(f"GenerateImagesConfig missing fields (aspect_ratio): {e}. Falling back to minimal config.")
-            config_obj = types.GenerateImagesConfig(
-                number_of_images=1,
-                output_mime_type="image/jpeg",
-            )
-
-        response = client_genai.models.generate_images(
+        response = client.images.generate(
             model=IMAGE_MODEL,
             prompt=prompt,
-            config=config_obj,
+            width=1024,
+            height=1024,
+            response_format="base64",
         )
 
-        # Validate response and extract bytes safely
-        if not response or not getattr(response, "generated_images", None):
+        if not response or not response.data:
             logger.error("Image generation failed: empty response or no images returned.")
             return ""
 
-        image_obj = response.generated_images[0].image if response.generated_images else None
-        image_bytes = getattr(image_obj, "image_bytes", None)
-        if not image_bytes:
-            logger.error("Image generation failed: no image bytes found in response.")
+        b64 = response.data[0].b64_json
+        if not b64:
+            logger.error("Image generation failed: no base64 data in response.")
             return ""
 
         with open(output_path, "wb") as f:
-            f.write(image_bytes)
+            f.write(base64.b64decode(b64))
 
-        # Ensure the file was actually written and has content
-        try:
-            if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
-                logger.error("Image generation failed: output file missing or empty.")
-                return ""
-        except OSError:
-            logger.error("Image generation failed: could not validate output file size.")
+        if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
+            logger.error("Image generation failed: output file missing or empty.")
             return ""
 
         logger.info(f"Generated promotional image at {output_path} (concept: {concept})")
