@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Poetry
         shell: bash
@@ -77,7 +77,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Poetry
         shell: bash
@@ -98,7 +98,7 @@ jobs:
           source .venv/bin/activate
           black . --check
 
-  stylelint:
+  js-lint:
     runs-on: ubuntu-24.04
 
     steps:
@@ -120,58 +120,13 @@ jobs:
           npm ci --no-optional --no-audit --progress=false
 
       - name: Stylelint
-        run: |
-          npm run lint:style
-
-  eslint:
-    runs-on: ubuntu-24.04
-
-    steps:
-      - name: Checkout Code Repository
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - id: node-cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
-      - if: steps.node-cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci --no-optional --no-audit --progress=false
+        run: npm run lint:style
 
       - name: ESLint
-        run: |
-          npm run lint:js
-
-  prettier:
-    runs-on: ubuntu-24.04
-
-    steps:
-      - name: Checkout Code Repository
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - id: node-cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
-      - if: steps.node-cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci --no-optional --no-audit --progress=false
+        run: npm run lint:js
 
       - name: Prettier
-        run: |
-          npm run lint:format
+        run: npm run lint:format
 
   shellcheck:
     runs-on: ubuntu-24.04
@@ -183,7 +138,7 @@ jobs:
       - name: Install Dependencies
         shell: bash
         run: |
-          sudo apt install shellcheck -y
+          sudo apt-get update && sudo apt-get install -y shellcheck
 
       - name: Run shellcheck
         shell: bash
@@ -194,7 +149,7 @@ jobs:
   # Runs the python test suite on the VM
   test:
     runs-on: ubuntu-24.04
-    needs: [ruff, black, stylelint, eslint, prettier, shellcheck]
+    needs: [ruff, black, js-lint, shellcheck]
 
     steps:
       - name: Checkout Code Repository
@@ -212,7 +167,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Poetry
         shell: bash
@@ -278,7 +233,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Poetry
         shell: bash
@@ -322,7 +277,7 @@ jobs:
   # Runs the next steps on the VM
   # Creates a GitHub Release when the lint & test jobs succeeds, and only on pushes to tags.
   release:
-    needs: [ruff, black, stylelint, eslint, prettier, shellcheck, test]
+    needs: [ruff, black, js-lint, shellcheck, test]
 
     permissions:
       contents: write
@@ -347,7 +302,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Poetry
         shell: bash
@@ -366,14 +321,14 @@ jobs:
         id: get_version
         run: |
           echo "${{ github.ref }}"
-          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+          echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
       - name: Generate Release Title
         id: get_release_title
         shell: bash
         run: |
           export TODAY="($(TZ=Africa/Lusaka date --iso))"
-          echo ::set-output name=RELEASE_NAME::"${{ steps.get_version.outputs.VERSION }} $TODAY"
+          echo "RELEASE_NAME=${{ steps.get_version.outputs.VERSION }} $TODAY" >> $GITHUB_OUTPUT
 
       - name: Extract Release Notes
         # This creates a file LATEST_RELEASE_NOTES.md in the parent directory (../)
