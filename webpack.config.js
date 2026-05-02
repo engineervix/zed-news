@@ -79,6 +79,7 @@ const options = {
               implementation: sass,
               sassOptions: {
                 outputStyle: "compressed",
+                includePaths: [path.resolve(__dirname, "node_modules")],
               },
             },
           },
