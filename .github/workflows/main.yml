@@ -34,7 +34,7 @@ jobs:
         run: python -m venv .venv
 
       - id: poetry-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .venv
           key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
@@ -74,7 +74,7 @@ jobs:
         run: python -m venv .venv
 
       - id: poetry-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .venv
           key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
@@ -110,7 +110,7 @@ jobs:
           node-version-file: .nvmrc
 
       - id: node-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -164,7 +164,7 @@ jobs:
         run: python -m venv .venv
 
       - id: poetry-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .venv
           key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
@@ -230,7 +230,7 @@ jobs:
         run: python -m venv .venv
 
       - id: poetry-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .venv
           key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
@@ -299,7 +299,7 @@ jobs:
         run: python -m venv .venv
 
       - id: poetry-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .venv
           key: ${{ runner.os }}-py3.12-poetry-${{ hashFiles('**/poetry.lock') }}
