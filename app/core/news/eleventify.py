@@ -17,7 +17,7 @@ base_template = env.get_template("digest.njk.jinja")
 dist_file = f"app/web/_pages/news/{today_iso_fmt}.njk"
 
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-DESCRIPTION_MODEL = "google/gemma-4-31B-it"
+DESCRIPTION_MODEL = "Qwen/Qwen3-235B-A22B-Instruct-2507-tput"
 
 client = Together(api_key=TOGETHER_API_KEY)
 
@@ -53,14 +53,17 @@ Digest Content:
             model=DESCRIPTION_MODEL,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=150,
+            reasoning={"enabled": False},
         )
 
-        result = completion.choices[0].message.content.strip()
+        choice = completion.choices[0]
+        finish_reason = choice.finish_reason
+        result = (choice.message.content or "").strip()
 
-        logger.info(result)
+        logger.info(f"finish_reason={finish_reason} result={result!r}")
 
         if not result:
-            logger.error("Digest description is empty")
+            logger.error(f"Digest description is empty (finish_reason={finish_reason})")
             return fallback
 
         result = result.replace("```", "")
