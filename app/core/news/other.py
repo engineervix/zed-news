@@ -86,7 +86,7 @@ def get_times_of_zambia_article_detail(url):
             return None
 
         soup = BeautifulSoup(response.text, "html.parser")
-        article_content = soup.find("div", class_="single-content")
+        article_content = soup.find("div", class_="ts-contain")
 
         if not article_content:
             logger.error("No article content found")
