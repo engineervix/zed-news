@@ -118,8 +118,8 @@ def _collect_stream_content(stream) -> str:
                 delta = chunk.choices[0].delta
                 if hasattr(delta, "content") and delta.content:
                     content += delta.content
-    except httpx.RemoteProtocolError as e:
-        logger.error(f"Stream connection dropped mid-response: {e}")
+    except (httpx.RemoteProtocolError, GeneratorExit) as e:
+        logger.error(f"Stream interrupted mid-response ({type(e).__name__}): {e}")
         if not content:
             raise
     return content
