@@ -109,12 +109,19 @@ def remove_overview_section(text: str) -> str:
 
 
 def _collect_stream_content(stream) -> str:
+    import httpx
+
     content = ""
-    for chunk in stream:
-        if chunk.choices:
-            delta = chunk.choices[0].delta
-            if hasattr(delta, "content") and delta.content:
-                content += delta.content
+    try:
+        for chunk in stream:
+            if chunk.choices:
+                delta = chunk.choices[0].delta
+                if hasattr(delta, "content") and delta.content:
+                    content += delta.content
+    except httpx.RemoteProtocolError as e:
+        logger.error(f"Stream connection dropped mid-response: {e}")
+        if not content:
+            raise
     return content
 
 
@@ -174,7 +181,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
         f.write(metadata + "News Items:\n\n" + digest_content)
 
     model = "moonshotai/Kimi-K2.6"
-    temperature = 1.0  # thinking mode (use 0.6 for instant mode)
+    temperature = 0.6  # instant mode
     max_tokens = 16384
 
     prompt = f"""
@@ -223,6 +230,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
         temperature=temperature,
         top_p=0.95,
         max_tokens=max_tokens,
+        reasoning={"enabled": False},
         stream=True,
     )
 
