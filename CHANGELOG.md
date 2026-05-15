@@ -4,6 +4,41 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.2](https://github.com/engineervix/zed-news/compare/v1.2.1...v1.2.2) (2026-05-15)
+
+
+### 🐛 Bug Fixes
+
+* **digest:** catch GeneratorExit in stream error handler ([b9d8e49](https://github.com/engineervix/zed-news/commit/b9d8e491092c0841aca29a9e60cae4f2bd64893c))
+* **digest:** disable reasoning mode to prevent stream timeouts ([7fb9e45](https://github.com/engineervix/zed-news/commit/7fb9e45ece29fdb1668ffbe462279f0fc6b7322a))
+* **eleventify:** switch to Qwen3 235B for digest description ([a249bd7](https://github.com/engineervix/zed-news/commit/a249bd78453b34c74a950613fa839ccd8501f4b1))
+* **scraper:** update Times of Zambia article content selector ([9b95374](https://github.com/engineervix/zed-news/commit/9b9537445d1019f8d1950ba8cd21bc56d54dc13e))
+* start Alpine after DOMContentLoaded to avoid race on first load ([6140056](https://github.com/engineervix/zed-news/commit/61400566a9626e258f3c9d348947fdd1e5711aff))
+
+
+### ♻️ Code Refactoring
+
+* switch digest description generation from Gemini to Together AI ([dad09a1](https://github.com/engineervix/zed-news/commit/dad09a1e9ca8f2d80716efee3a5a04d5be29b00b))
+* we're not using GEMINI_API_KEY, so let's remove it ([a886a18](https://github.com/engineervix/zed-news/commit/a886a1826dc7552eb6aff6142869456ccc27d033))
+
+
+### ⚙️ Build System
+
+* **deps:** update dependency @11ty/eleventy-plugin-rss to v3 ([#228](https://github.com/engineervix/zed-news/issues/228)) ([f5ed202](https://github.com/engineervix/zed-news/commit/f5ed20294f80769e8d5a5d1a4bdf8ccd5be523db))
+* **deps:** update dependency cross-env to v10 ([#229](https://github.com/engineervix/zed-news/issues/229)) ([9fd62ee](https://github.com/engineervix/zed-news/commit/9fd62eee79181a9ff413a9a3996c6dc5c5cfa3c1))
+* **deps:** update dependency css-loader to v7 ([#230](https://github.com/engineervix/zed-news/issues/230)) ([d6fdb52](https://github.com/engineervix/zed-news/commit/d6fdb5220211d297265b333687c4b7d7be20d2f0))
+* **deps:** update dependency requests to v2.33.1 ([#221](https://github.com/engineervix/zed-news/issues/221)) ([227b60b](https://github.com/engineervix/zed-news/commit/227b60b3bcb43258b30aeb3f1961ff3d5ebcdf22))
+* **deps:** update sosedoff/pgweb docker tag to v0.17.0 ([#223](https://github.com/engineervix/zed-news/issues/223)) ([3c48cff](https://github.com/engineervix/zed-news/commit/3c48cff1da3b4877b70f2cb0826c007d3d303805))
+
+
+### 👷 CI/CD
+
+* **deps:** update actions/cache action to v5 ([#224](https://github.com/engineervix/zed-news/issues/224)) ([11852a6](https://github.com/engineervix/zed-news/commit/11852a6bc3f82f3d31b728328df00aa396022949))
+* **deps:** update actions/checkout action to v6 ([#225](https://github.com/engineervix/zed-news/issues/225)) ([4e6a03c](https://github.com/engineervix/zed-news/commit/4e6a03c8d001f2c7851daf1207cb6e4d7436e73f))
+* **deps:** update actions/setup-node action to v6 ([#226](https://github.com/engineervix/zed-news/issues/226)) ([1c03004](https://github.com/engineervix/zed-news/commit/1c03004c366558866535b4fe9eb9079e579c11e7))
+* **deps:** update actions/setup-python action to v6 ([#227](https://github.com/engineervix/zed-news/issues/227)) ([083b657](https://github.com/engineervix/zed-news/commit/083b65711adb560cd99f61e84a931a0b22aa49ef))
+* **deps:** update schneegans/dynamic-badges-action action to v1.8.0 ([#222](https://github.com/engineervix/zed-news/issues/222)) ([2826018](https://github.com/engineervix/zed-news/commit/28260186ef9041016cbe387ed19765a26eef6885))
+
 ## [v1.2.1](https://github.com/engineervix/zed-news/compare/v1.2.0...v1.2.1) (2026-05-02)
 
 
