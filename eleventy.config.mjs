@@ -1,6 +1,12 @@
-const path = require("path");
-const pluginRss = require("@11ty/eleventy-plugin-rss");
-const md = require("markdown-it")({
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import pluginRss from "@11ty/eleventy-plugin-rss";
+import markdownIt from "markdown-it";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const md = markdownIt({
   html: false,
   breaks: true,
   linkify: true,
@@ -8,7 +14,7 @@ const md = require("markdown-it")({
 
 // const searchFilter = require("./app/utils/searchFilter.js");
 
-module.exports = (eleventyConfig) => {
+export default function (eleventyConfig) {
   // Plugins
   eleventyConfig.addPlugin(pluginRss);
 
@@ -121,4 +127,4 @@ module.exports = (eleventyConfig) => {
     markdownTemplateEngine: "njk",
     htmlTemplateEngine: "njk",
   };
-};
+}
