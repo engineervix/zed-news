@@ -1,50 +1,50 @@
 {
-  "last_updated": "2026-07-20T15:08:10.687220+02:00",
+  "last_updated": "2026-07-20T16:08:10.830974+02:00",
   "current_rates": {
-    "date": "2026-07-17",
+    "date": "2026-07-20",
     "rates": {
       "USD": {
-        "buy": 18.198690476190475,
-        "sell": 18.248690476190475,
-        "mid": 18.223690476190477
+        "buy": 18.2125,
+        "sell": 18.2625,
+        "mid": 18.237499999999997
       },
       "GBP": {
-        "buy": 24.47359895238095,
-        "sell": 24.54266382142857,
-        "mid": 24.508131386904758
+        "buy": 24.49763375,
+        "sell": 24.570367499999996,
+        "mid": 24.534000624999997
       },
       "EUR": {
-        "buy": 20.810202559523805,
-        "sell": 20.871027297619044,
-        "mid": 20.840614928571426
+        "buy": 20.79321125,
+        "sell": 20.852122499999997,
+        "mid": 20.822666874999996
       },
       "ZAR": {
-        "buy": 1.1008959322108112,
-        "sell": 1.1040942435468155,
-        "mid": 1.1024950878788133
+        "buy": 1.1038012581970689,
+        "sell": 1.1076774710078119,
+        "mid": 1.1057393646024405
       }
     }
   },
   "trends": {
     "USD": {
-      "change": -0.059,
-      "change_percent": 0.32,
-      "direction": "up"
+      "change": 0.013,
+      "change_percent": -0.07,
+      "direction": "down"
     },
     "GBP": {
-      "change": -0.187,
-      "change_percent": 0.76,
-      "direction": "up"
+      "change": 0.026,
+      "change_percent": -0.11,
+      "direction": "down"
     },
     "EUR": {
-      "change": -0.093,
-      "change_percent": 0.44,
+      "change": -0.018,
+      "change_percent": 0.09,
       "direction": "up"
     },
     "ZAR": {
-      "change": -0.011,
-      "change_percent": 0.99,
-      "direction": "up"
+      "change": 0.004,
+      "change_percent": -0.36,
+      "direction": "down"
     }
   }
 }
