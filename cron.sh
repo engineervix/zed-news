@@ -134,6 +134,10 @@ elif [[ "$TASK" == "fx-update" ]]; then
         echo "FX current file not found, proceeding with update..."
     fi
 
+    # Snapshot current rates (excluding last_updated, which always changes) so we
+    # can tell whether BOZ actually published new rates or we just refetched the same data
+    pre_update_snapshot=$(jq -c 'del(.last_updated)' "$fx_current_file" 2>/dev/null || echo "")
+
     echo "Running FX rates update task natively..."
     # Run FX update task natively (no Docker)
     inv fx-update || {
@@ -141,6 +145,15 @@ elif [[ "$TASK" == "fx-update" ]]; then
         send_healthcheck_failure
         exit 1
     }
+
+    post_update_snapshot=$(jq -c 'del(.last_updated)' "$fx_current_file" 2>/dev/null || echo "")
+
+    if [[ "$pre_update_snapshot" == "$post_update_snapshot" ]]; then
+        echo "FX rates unchanged (BOZ has not published new data yet). Discarding no-op changes."
+        git checkout -- app/web/_data/fx_current.json app/web/_data/fx_data.json
+        send_healthcheck_success
+        exit 0
+    fi
 
     # Commit FX data changes
     today=$(date  +"%Y-%m-%d %H:%M %Z")
