@@ -112,7 +112,7 @@ class TestOtherNews(unittest.TestCase):
         <html>
             <body>
                 <article>
-                    <div class="theiaPostSlider_preloadedSlide">
+                    <div class="m26-article-content">
                         <p>Paragraph 1.</p>
                         <p>Paragraph 2.</p>
                     </div>

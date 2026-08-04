@@ -119,8 +119,8 @@ def get_mwebantu_article_detail(url):
         soup = BeautifulSoup(response.text, "html.parser")
 
         article = soup.find("article")
-        if article:
-            content_element = article.select_one("div.theiaPostSlider_preloadedSlide")
+        content_element = article.select_one("div.m26-article-content") if article else None
+        if content_element:
             paragraphs = content_element.find_all("p")
 
             # Remove "(Mwebantu ...)" from the content
@@ -236,8 +236,9 @@ def get_rss_feed_entries():
     """
     Parses URLs and fetches today's feeds
 
-    TODO: This is a poor implementation - everything breaks if something goes wrong
-    when fetching article content. We need to refactor this to handle errors better.
+    Each entry is fetched independently so that a single source failing (e.g. a
+    site changing its HTML) doesn't discard articles already fetched from the
+    other sources.
     """
 
     try:
@@ -249,21 +250,34 @@ def get_rss_feed_entries():
             for url in URLs
         ]
         feed = [item for feed in feeds for item in feed.entries]
+    except Exception:
+        logger.error(traceback.format_exc())
+        return []
 
-        return [
+    entries = []
+    for i in feed:
+        if not i.get("published"):
+            continue
+        if dateutil.parser.parse(i["published"]).date().isoformat() != today_iso_fmt:
+            continue
+
+        try:
+            content = get_description(i["link"])
+        except Exception:
+            logger.error(f"Failed to fetch article content for {i['link']}\n{traceback.format_exc()}")
+            continue
+
+        if not content:
+            continue
+
+        entries.append(
             {
                 "source": get_feed_title(i["link"]),
                 "url": i["link"],
                 "title": i["title"],
-                "content": get_description(i["link"]),
+                "content": content,
                 "category": "",
-                # "published": i["published"],
             }
-            for i in feed
-            if i.get("published")
-            and dateutil.parser.parse(i["published"]).date().isoformat() == today_iso_fmt
-            and get_description(i["link"])
-        ]
-    except Exception:
-        logger.error(traceback.format_exc())
-        return []
+        )
+
+    return entries
