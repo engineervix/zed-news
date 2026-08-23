@@ -17,7 +17,7 @@ base_template = env.get_template("digest.njk.jinja")
 dist_file = f"app/web/_pages/news/{today_iso_fmt}.njk"
 
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-DESCRIPTION_MODEL = "Qwen/Qwen3-235B-A22B-Instruct-2507-tput"
+DESCRIPTION_MODEL = "google/gemma-3n-E4B-it"
 
 client = Together(api_key=TOGETHER_API_KEY)
 
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 def create_digest_description(content: str, date: str) -> str:
     """
-    Using Together AI's Gemma 4, create a brief description for the news digest.
+    Using Together AI's Gemma 3n, create a brief description for the news digest.
 
     Args:
         content: The digest content to summarize
