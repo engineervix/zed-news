@@ -2,6 +2,7 @@ import copy
 import datetime
 import logging
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -69,6 +70,11 @@ def configure_logging():
 
     # adding handler to our logger
     logger.addHandler(handler)
+
+
+def remove_think_tags(text: str) -> str:
+    """Strip <think>...</think> blocks some models (e.g. DeepSeek) may leak into content."""
+    return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
 
 
 def suffix(d):

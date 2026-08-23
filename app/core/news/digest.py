@@ -3,14 +3,9 @@ import re
 import sys
 
 from app.core.summarization.backends.together import client
-from app.core.utilities import DATA_DIR, today_human_readable, today_iso_fmt
+from app.core.utilities import DATA_DIR, remove_think_tags, today_human_readable, today_iso_fmt
 
 logger = logging.getLogger(__name__)
-
-
-def remove_think_tags(text: str) -> str:
-    """Remove <think> tags if present (safety fallback; DeepSeek returns reasoning separately)"""
-    return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
 
 
 def fix_markdown_headings(text: str) -> str:

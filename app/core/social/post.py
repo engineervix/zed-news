@@ -25,6 +25,7 @@ from app.core.utilities import (
     ASSETS_DIR,  # noqa: F401
     DATA_DIR,
     configure_logging,
+    remove_think_tags,
     timezone,
     today_human_readable,
     today_iso_fmt,
@@ -42,7 +43,7 @@ FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 
 # --- Model Configuration ---
-TEXT_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+TEXT_MODEL = "deepseek-ai/DeepSeek-V4-Flash-0731"
 IMAGE_MODEL = "google/imagen-4.0-preview"
 IMAGE_CONCEPT_TEMP = 0.8
 FACEBOOK_POST_TEMP = 0.7
@@ -110,7 +111,7 @@ def get_image_prompt_concept(content: str) -> str:
             temperature=IMAGE_CONCEPT_TEMP,
             max_tokens=150,
         )
-        concept = completion.choices[0].message.content.strip()
+        concept = remove_think_tags(completion.choices[0].message.content or "").strip()
         logger.info(f"Generated image prompt concept: {concept}")
         return concept
     except Exception as e:
@@ -251,7 +252,7 @@ def create_facebook_post_text(content: str) -> str:
             temperature=FACEBOOK_POST_TEMP,
             max_tokens=1800,
         )
-        post_text = completion.choices[0].message.content
+        post_text = remove_think_tags(completion.choices[0].message.content or "").strip()
         logger.info(f"Generated Facebook post text:\n{post_text}")
         return post_text
     except Exception as e:
