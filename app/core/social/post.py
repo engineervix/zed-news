@@ -44,7 +44,7 @@ TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 
 # --- Model Configuration ---
 TEXT_MODEL = "deepseek-ai/DeepSeek-V4-Flash-0731"
-IMAGE_MODEL = "google/imagen-4.0-preview"
+IMAGE_MODEL = "black-forest-labs/FLUX.2-pro"
 IMAGE_CONCEPT_TEMP = 0.8
 FACEBOOK_POST_TEMP = 0.7
 
@@ -162,7 +162,6 @@ def generate_promotional_image(content: str) -> str:
             prompt=prompt,
             width=1024,
             height=1024,
-            steps=None,
             response_format="base64",
         )
 
