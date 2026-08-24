@@ -15,8 +15,8 @@ $info: #17a2b8;
 
 // If you wanna override fonts ...
 // $font-family-sans-serif: "Merriweather Sans", sans-serif !default;
-$font-family-serif: "Iowan Old Style", "Palatino Linotype", "URW Palladio L",
-  p052, serif;
+$font-family-serif:
+  "Iowan Old Style", "Palatino Linotype", "URW Palladio L", p052, serif;
 
 // $font-family-monospace: "Menlo", "Monaco", "Consolas", "Liberation Mono",
 //   "Courier New", monospace !default;
@@ -372,7 +372,9 @@ header {
 .footer {
   background-color: var(--bs-light-bg-subtle);
   color: var(--bs-emphasis-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 
   .text-emphasis-light {
     color: var(--bs-secondary-color);

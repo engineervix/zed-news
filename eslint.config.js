@@ -1,7 +1,7 @@
 "use strict";
 
 const globals = require("globals");
-const eslintConfigPrettier = require("eslint-config-prettier/flat");
+const eslintPluginPrettierRecommended = require("eslint-plugin-prettier/recommended");
 
 module.exports = [
   {
@@ -19,5 +19,5 @@ module.exports = [
       },
     },
   },
-  eslintConfigPrettier,
+  eslintPluginPrettierRecommended,
 ];

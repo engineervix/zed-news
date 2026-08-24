@@ -28,7 +28,7 @@ function registerFXComponents(Alpine) {
         const cacheBuster = force ? `?t=${new Date().getTime()}` : "";
         // Load historical data
         const historicalResponse = await fetch(
-          `/js/fx_data.json${cacheBuster}`
+          `/js/fx_data.json${cacheBuster}`,
         );
         if (!historicalResponse.ok) {
           throw new Error(`HTTP error! status: ${historicalResponse.status}`);
@@ -37,7 +37,7 @@ function registerFXComponents(Alpine) {
 
         // Load current data with dates
         const currentResponse = await fetch(
-          `/js/fx_current.json${cacheBuster}`
+          `/js/fx_current.json${cacheBuster}`,
         );
         if (!currentResponse.ok) {
           throw new Error(`HTTP error! status: ${currentResponse.status}`);
@@ -262,7 +262,7 @@ function registerFXComponents(Alpine) {
       if (this.orientationHandler) {
         window.removeEventListener(
           "orientationchange",
-          this.orientationHandler
+          this.orientationHandler,
         );
       }
 
@@ -367,7 +367,7 @@ function registerFXComponents(Alpine) {
               borderColor: this.getCurrencyColor(this.selectedCurrency),
               backgroundColor: this.getCurrencyColor(
                 this.selectedCurrency,
-                0.1
+                0.1,
               ),
               borderWidth: 2,
               fill: true,
@@ -376,7 +376,7 @@ function registerFXComponents(Alpine) {
               pointHoverRadius: window.innerWidth < 768 ? 8 : 5,
               pointHitRadius: window.innerWidth < 768 ? 15 : 10,
               pointBackgroundColor: this.getCurrencyColor(
-                this.selectedCurrency
+                this.selectedCurrency,
               ),
               pointBorderColor: isDarkMode ? "#fff" : "#000",
               pointBorderWidth: 1,
@@ -436,10 +436,10 @@ function registerFXComponents(Alpine) {
                     dataPoint.period_type === "daily"
                       ? " (daily)"
                       : dataPoint.period_type === "monthly"
-                      ? " (monthly avg)"
-                      : "";
+                        ? " (monthly avg)"
+                        : "";
                   return `${this.selectedCurrency}: ${value.toFixed(
-                    3
+                    3,
                   )} ZMW${normalized}${dataType}`;
                 },
               },

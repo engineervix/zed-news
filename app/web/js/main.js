@@ -14,10 +14,10 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 /* ***** https://getbootstrap.com/docs/5.3/components/tooltips/#enable-tooltips
 /* ***** ----------------------------------------------- ***** */
 const tooltipTriggerList = document.querySelectorAll(
-  '[data-bs-toggle="tooltip"]'
+  '[data-bs-toggle="tooltip"]',
 );
 const tooltipList = [...tooltipTriggerList].map(
-  (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+  (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
 );
 
 /* ***** ----------------------------------------------- ***** **
@@ -164,7 +164,7 @@ function updateButtonState(isPlaying) {
 
 function initThemeToggle() {
   const themeToggles = document.querySelectorAll(
-    "#dark-mode-toggle, #dark-mode-toggle-lg"
+    "#dark-mode-toggle, #dark-mode-toggle-lg",
   );
 
   function setTheme(theme) {

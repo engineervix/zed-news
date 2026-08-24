@@ -81,7 +81,7 @@ export default function (eleventyConfig) {
 
   // Markdown filter
   eleventyConfig.addNunjucksFilter("markdownify", (markdownString) =>
-    md.render(markdownString)
+    md.render(markdownString),
   );
 
   // Add Shortcodes

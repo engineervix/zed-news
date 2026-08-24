@@ -48,4 +48,4 @@ repos:
               ^.+\.min\.(js|css)$
           )$
         additional_dependencies:
-          - prettier@2.8.8
+          - prettier@3.9.6
