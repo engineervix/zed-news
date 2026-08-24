@@ -6,10 +6,13 @@
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/engineervix/f4b1128b188c4e29722bc879e4ab6574/raw/covbadge.json)](https://github.com/engineervix/zed-news/actions?query=workflow%3A%22CI%2FCD%22)
 [![healthchecks.io](https://healthchecks.io/badge/24d88c7e-cc91-4dac-b9a5-d50e52/ewRXZ-TO/zed-news.svg)](https://healthchecks.io)
 
-[![python](https://img.shields.io/badge/python-3.12-brightgreen.svg)](https://www.python.org/downloads/)
-[![Node v18](https://img.shields.io/badge/Node-v18-teal.svg)](https://nodejs.org/en/blog/release/v18.0.0)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![code style: prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)](https://prettier.io/)
+[![Python](https://img.shields.io/badge/python-3.14-3670A0.svg?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/downloads/)
+[![Node.js v24](https://img.shields.io/badge/node.js-v24-6DA55F.svg?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/en/blog/release/v24.0.0)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge&logo=black&logoColor=white)](https://github.com/psf/black)
+[![Code style: prettier](https://img.shields.io/badge/code%20style-prettier-F7B93E.svg?style=for-the-badge&logo=prettier&logoColor=black)](https://prettier.io/)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![PostgreSQL](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Poetry](https://img.shields.io/badge/Poetry-%233B82F6.svg?style=for-the-badge&logo=poetry&logoColor=0B3D8D)](https://python-poetry.org/)
 
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Conventional Changelog](https://img.shields.io/badge/changelog-conventional-brightgreen.svg)](http://conventional-changelog.github.io)
@@ -107,7 +110,7 @@ The project uses [pgweb](https://github.com/sosedoff/pgweb) to visualize databas
 
 ### Web
 
-This project uses Node.js [v18](https://nodejs.org/en/blog/release/v18.0.0). We recommend using [fnm](https://github.com/Schniz/fnm) or [volta](https://volta.sh/) to manage Node.js versions.
+This project uses Node.js [v24](https://nodejs.org/en/blog/release/v24.0.0). We recommend using [fnm](https://github.com/Schniz/fnm) or [volta](https://volta.sh/) to manage Node.js versions.
 
 - Install frontend dependencies:
   ```bash
