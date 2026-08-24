@@ -90,6 +90,9 @@
     "extends": [
       "stylelint-config-standard-scss"
     ],
+    "rules": {
+      "scss/dollar-variable-colon-space-after": null
+    },
     "ignoreFiles": [
       "**/public/**/*.*"
     ]
