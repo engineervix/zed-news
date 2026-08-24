@@ -110,6 +110,7 @@ def get_image_prompt_concept(content: str) -> str:
             ],
             temperature=IMAGE_CONCEPT_TEMP,
             max_tokens=150,
+            reasoning={"enabled": False},
         )
         concept = remove_think_tags(completion.choices[0].message.content or "").strip()
         logger.info(f"Generated image prompt concept: {concept}")
@@ -251,6 +252,7 @@ def create_facebook_post_text(content: str) -> str:
             ],
             temperature=FACEBOOK_POST_TEMP,
             max_tokens=1800,
+            reasoning={"enabled": False},
         )
         post_text = remove_think_tags(completion.choices[0].message.content or "").strip()
         logger.info(f"Generated Facebook post text:\n{post_text}")
