@@ -4,6 +4,55 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.3](https://github.com/engineervix/zed-news/compare/v1.2.2...v1.2.3) (2026-08-24)
+
+
+### 🐛 Bug Fixes
+
+* **ci:** bust venv cache on python patch bump ([6fb64ee](https://github.com/engineervix/zed-news/commit/6fb64ee1f4f82d03dd6eca88b059035e0e4afde3))
+* disable reasoning on DeepSeek social post calls ([f453d1b](https://github.com/engineervix/zed-news/commit/f453d1b8d0726c5a740a5dbd2e832e6799bcbb44))
+* repair broken digest description generation ([bbaf0d4](https://github.com/engineervix/zed-news/commit/bbaf0d482297eb908b4893d58b7a9c4887640983))
+* skip fx-update commit when BoZ rates haven't actually changed ([5eb6ce3](https://github.com/engineervix/zed-news/commit/5eb6ce366c95a17023721b519d9b9f908786fc05))
+* stop false-positive strip of digest description ([b43994e](https://github.com/engineervix/zed-news/commit/b43994e53e7aac55645313cfa302554ebe90bdc1))
+* **style:** disable scss/dollar-variable-colon-space-after ([9a2b295](https://github.com/engineervix/zed-news/commit/9a2b2956fda38184ca53d8eff91e31f13c06115d))
+* switch news digest model from Kimi K2.6 to DeepSeek V4 Flash ([6856257](https://github.com/engineervix/zed-news/commit/68562578b21d642b50c8c0637820126230b8ba42))
+* switch promotional image model off blocked passthrough ([3f9b5ca](https://github.com/engineervix/zed-news/commit/3f9b5ca213d7c6342a2d23e282f93c78ed70bd34))
+* switch social post model to DeepSeek V4 Flash, cut cost ([7d4f0ce](https://github.com/engineervix/zed-news/commit/7d4f0ce290d2c5e3c060d02b04928989b83d3162))
+* update BOZ exchange rates link on FX page ([#245](https://github.com/engineervix/zed-news/issues/245)) ([3d1c9ef](https://github.com/engineervix/zed-news/commit/3d1c9ef3924838013645e523a25052da273f94b9))
+* update Mwebantu content selector and stop one source's failure from dropping all others ([25c7d94](https://github.com/engineervix/zed-news/commit/25c7d94c7af9d9d44d95be8968f3fd18f37a4d9a))
+
+
+### ♻️ Code Refactoring
+
+* make 11ty config ESM, because new @11ty/eleventy-plugin-rss is ESM-only ([828df4a](https://github.com/engineervix/zed-news/commit/828df4a4eb0c6a54f49398546d989f632e26f10a))
+
+
+### ⚙️ Build System
+
+* bump node from v18 -> v20 ([b66efc2](https://github.com/engineervix/zed-news/commit/b66efc2c16f2da5f6d87094d55313dc32243761b))
+* bump to Python 3.14 ([2f4c430](https://github.com/engineervix/zed-news/commit/2f4c430a9ce308eac3dab3e28eb66b2f6ea8a284))
+* **deps:** bump eslint to v10, migrate to flat config ([2d895ee](https://github.com/engineervix/zed-news/commit/2d895eea9f4759d7320d84bdf82fa037f01d4702))
+* **deps:** bump Node.js to v24 ([263ab81](https://github.com/engineervix/zed-news/commit/263ab819115db6cf95ae19144c560cd8a15b6fba))
+* **deps:** bump prettier to v3, restore eslint-plugin-prettier ([110171f](https://github.com/engineervix/zed-news/commit/110171fbf247a1eb00b8db711ca6e04bc937504c))
+* **deps:** npm audit fix ([9ccbeaf](https://github.com/engineervix/zed-news/commit/9ccbeaff4bbe466402ab98915657cdfd34918605))
+* **deps:** poetry update ([7d540e5](https://github.com/engineervix/zed-news/commit/7d540e51924dd1d32aee4da3f829c1ebf47f4ece))
+* **deps:** update babel monorepo to v7.29.7 ([#250](https://github.com/engineervix/zed-news/issues/250)) ([be87edf](https://github.com/engineervix/zed-news/commit/be87edfe3cdc881e383d8b1ae50e503d9494037b))
+* **deps:** update dependency @11ty/eleventy to v3.1.6 ([#243](https://github.com/engineervix/zed-news/issues/243)) ([20e8bb9](https://github.com/engineervix/zed-news/commit/20e8bb9077c623d904864239fa0c891965e2dd14))
+* **deps:** update dependency @babel/core to v7.29.6 [security] ([#246](https://github.com/engineervix/zed-news/issues/246)) ([51b3f6f](https://github.com/engineervix/zed-news/commit/51b3f6f528d2b2e59901bd4ec63142dececc52f6))
+* **deps:** update dependency apprise to v1.13.0 ([#251](https://github.com/engineervix/zed-news/issues/251)) ([335adc0](https://github.com/engineervix/zed-news/commit/335adc0d2bba216ffe3fad3ee5dfb64c95879291))
+* **deps:** update dependency beautifulsoup4 to v4.15.0 ([#252](https://github.com/engineervix/zed-news/issues/252)) ([a14cb93](https://github.com/engineervix/zed-news/commit/a14cb9317164b33c1efd8d5b153a45d727d295aa))
+* **deps:** update dependency black to v26.5.1 ([#253](https://github.com/engineervix/zed-news/issues/253)) ([b9050c9](https://github.com/engineervix/zed-news/commit/b9050c9b00b9434dc4c35c1fa4a0f6d5f5950660))
+* **deps:** update dependency commit-and-tag-version to v12.7.3 ([#233](https://github.com/engineervix/zed-news/issues/233)) ([f6926cf](https://github.com/engineervix/zed-news/commit/f6926cf013a0e42ec93e97f669c9a652d03cd5b2))
+* **deps:** update dependency commitizen ([#238](https://github.com/engineervix/zed-news/issues/238)) ([2454838](https://github.com/engineervix/zed-news/commit/2454838bb78e5360c62387098ee8e4f5eaf8c75f))
+* **deps:** update dependency coverage to v7.14.1 ([#239](https://github.com/engineervix/zed-news/issues/239)) ([036c7fc](https://github.com/engineervix/zed-news/commit/036c7fc5822e26914ea1a7ac988f4bef80e5188d))
+* **deps:** update dependency google-genai to v1.75.0 ([#240](https://github.com/engineervix/zed-news/issues/240)) ([5bb89fc](https://github.com/engineervix/zed-news/commit/5bb89fc6b15ffaed5d3ebe1b6b1eb619b50d925c))
+* **deps:** update dependency langchain-community to v0.4.2 ([#248](https://github.com/engineervix/zed-news/issues/248)) ([e3131f5](https://github.com/engineervix/zed-news/commit/e3131f541bf6e1b77ff346787391569c39bd1966))
+* **deps:** update dependency numpy to v2.4.6 ([#234](https://github.com/engineervix/zed-news/issues/234)) ([ee7c08b](https://github.com/engineervix/zed-news/commit/ee7c08b512cb7a9e11f72a1772960adc2b9e1b01))
+* **deps:** update dependency pandas to v3.0.3 ([#235](https://github.com/engineervix/zed-news/issues/235)) ([b7975fd](https://github.com/engineervix/zed-news/commit/b7975fd449365171cc6556999c7278708a58d24e))
+* **deps:** update dependency postcss to v8.5.15 ([#236](https://github.com/engineervix/zed-news/issues/236)) ([7710583](https://github.com/engineervix/zed-news/commit/77105830f3167ca343cb6190363d283c9ed21c85))
+* **deps:** update dependency postcss to v8.5.23 [security] ([#257](https://github.com/engineervix/zed-news/issues/257)) ([dcd1e39](https://github.com/engineervix/zed-news/commit/dcd1e397c0ecd84823e32951e3bf2e5fe6ab4de1))
+* **deps:** update dependency ruff to v0.15.17 ([#237](https://github.com/engineervix/zed-news/issues/237)) ([99e3594](https://github.com/engineervix/zed-news/commit/99e3594f744f245f47cfb5bf4625f437dd7dc26e))
+
 ## [v1.2.2](https://github.com/engineervix/zed-news/compare/v1.2.1...v1.2.2) (2026-05-15)
 
 
