@@ -70,7 +70,7 @@ Digest Content:
         first_line = result.splitlines()[0].lower() if result.splitlines() else ""
         unwanted = ["description:", "here's", "here is", "sure"]
 
-        if any(string in first_line for string in unwanted):
+        if any(first_line.startswith(string) for string in unwanted):
             result = "\n".join(result.split("\n")[1:])
             if result.strip() == "":
                 logger.warning("Digest description is empty after removing unwanted text")
