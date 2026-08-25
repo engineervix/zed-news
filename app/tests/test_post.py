@@ -144,6 +144,41 @@ class TestSocialPost(unittest.TestCase):
         mock_get_image.assert_called_once()
         mock_post_text_only.assert_called_once_with("post text")
 
+    @patch("sys.exit")
+    @patch("app.core.social.post.post_to_facebook", return_value=False)
+    @patch("app.core.social.post.get_daily_image", return_value="image.jpg")
+    @patch("app.core.social.post.generate_promotional_image", return_value="")
+    @patch("app.core.social.post.create_facebook_post_text", return_value="post text")
+    @patch("app.core.social.post.get_digest_content", return_value='{"content":"digest"}')
+    def test_main_exits_nonzero_when_facebook_post_fails(
+        self, mock_get_digest, mock_create_text, mock_generate_image, mock_get_image, mock_post_fb, mock_exit
+    ):
+        # Regression test: an expired/invalid Facebook token (or any post failure)
+        # must cause main() to exit non-zero, so `inv facebook-post` and cron.sh
+        # correctly detect the failure instead of reporting success.
+        post.main()
+        mock_post_fb.assert_called_once_with("post text", "image.jpg")
+        mock_exit.assert_called_once_with(1)
+
+    @patch("sys.exit")
+    @patch("app.core.social.post.post_text_only_to_facebook", return_value=False)
+    @patch("app.core.social.post.get_daily_image", return_value="")
+    @patch("app.core.social.post.generate_promotional_image", return_value="")
+    @patch("app.core.social.post.create_facebook_post_text", return_value="post text")
+    @patch("app.core.social.post.get_digest_content", return_value='{"content":"digest"}')
+    def test_main_exits_nonzero_when_text_only_post_fails(
+        self,
+        mock_get_digest,
+        mock_create_text,
+        mock_generate_image,
+        mock_get_image,
+        mock_post_text_only,
+        mock_exit,
+    ):
+        post.main()
+        mock_post_text_only.assert_called_once_with("post text")
+        mock_exit.assert_called_once_with(1)
+
 
 if __name__ == "__main__":
     unittest.main()

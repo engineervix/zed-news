@@ -290,13 +290,16 @@ def get_daily_image(path: str) -> str:
         return ""
 
 
-def post_to_facebook(text: str, image_path: str):
-    """Post a photo with a caption to Facebook."""
+def post_to_facebook(text: str, image_path: str) -> bool:
+    """Post a photo with a caption to Facebook.
+
+    Returns True on success, False on failure.
+    """
     if not all([graph, FACEBOOK_PAGE_ID, text, image_path]):
         logger.error("Missing necessary data for Facebook post. Aborting.")
         if HEALTHCHECKS_PING_URL:
             requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
-        return
+        return False
 
     logger.info(f"Posting to Facebook page {FACEBOOK_PAGE_ID}...")
     try:
@@ -305,23 +308,29 @@ def post_to_facebook(text: str, image_path: str):
         logger.info("Successfully posted to Facebook.")
         if HEALTHCHECKS_PING_URL:
             requests.get(HEALTHCHECKS_PING_URL, timeout=10)
+        return True
     except facebook.GraphAPIError as e:
         logger.error(f"Facebook API Error: {e}")
         if HEALTHCHECKS_PING_URL:
             requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
+        return False
     except Exception as e:
         logger.error(f"An unexpected error occurred: {e}")
         if HEALTHCHECKS_PING_URL:
             requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
+        return False
 
 
-def post_text_only_to_facebook(text: str):
-    """Post a text-only update to Facebook when no image is available."""
+def post_text_only_to_facebook(text: str) -> bool:
+    """Post a text-only update to Facebook when no image is available.
+
+    Returns True on success, False on failure.
+    """
     if not all([graph, FACEBOOK_PAGE_ID, text]):
         logger.error("Missing necessary data for Facebook text-only post. Aborting.")
         if HEALTHCHECKS_PING_URL:
             requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
-        return
+        return False
 
     logger.info(f"Posting text-only update to Facebook page {FACEBOOK_PAGE_ID}...")
     try:
@@ -330,14 +339,17 @@ def post_text_only_to_facebook(text: str):
         logger.info("Successfully posted text-only update to Facebook.")
         if HEALTHCHECKS_PING_URL:
             requests.get(HEALTHCHECKS_PING_URL, timeout=10)
+        return True
     except facebook.GraphAPIError as e:
         logger.error(f"Facebook API Error (text-only): {e}")
         if HEALTHCHECKS_PING_URL:
             requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
+        return False
     except Exception as e:
         logger.error(f"An unexpected error occurred (text-only): {e}")
         if HEALTHCHECKS_PING_URL:
             requests.get(f"{HEALTHCHECKS_PING_URL}/fail", timeout=10)
+        return False
 
 
 def generate_image_only(content: str) -> str:
@@ -462,10 +474,12 @@ def main():
     image_to_post = generate_promotional_image(digest_content) or get_daily_image(IMAGES_DIR)
     if not image_to_post:
         logger.warning("No promotional image available. Proceeding with text-only Facebook post.")
-        post_text_only_to_facebook(post_text)
+        if not post_text_only_to_facebook(post_text):
+            sys.exit(1)
         return
 
-    post_to_facebook(post_text, image_to_post)
+    if not post_to_facebook(post_text, image_to_post):
+        sys.exit(1)
 
 
 if __name__ == "__main__":
