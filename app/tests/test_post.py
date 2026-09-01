@@ -3,7 +3,9 @@ import os
 import shutil
 import tempfile
 import unittest
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import mock_open, patch
+
+from dspy.utils.dummies import DummyLM
 
 from app.core.social import post
 from app.core.utilities import today_iso_fmt
@@ -40,23 +42,46 @@ class TestSocialPost(unittest.TestCase):
         self.assertEqual(content, "")
         mock_logger.error.assert_called_with(f"Digest file not found at {post.digest_file_path}")
 
-    @patch("app.core.social.post.client")
-    def test_create_facebook_post_text_success(self, mock_together_client):
-        mock_completion = MagicMock()
-        mock_completion.choices[0].message.content = "Generated Facebook Post"
-        mock_together_client.chat.completions.create.return_value = mock_completion
-
+    @patch("app.core.social.post.FACEBOOK_POST_LM", DummyLM([{"post": "Generated Facebook Post"}]))
+    def test_create_facebook_post_text_success(self):
         text = post.create_facebook_post_text("Some digest content.")
         self.assertEqual(text, "Generated Facebook Post")
-        mock_together_client.chat.completions.create.assert_called_once()
 
-    @patch("app.core.social.post.client")
+    @patch("app.core.social.post.generate_facebook_post")
     @patch("app.core.social.post.logger")
-    def test_create_facebook_post_text_failure(self, mock_logger, mock_together_client):
-        mock_together_client.chat.completions.create.side_effect = Exception("API Error")
+    def test_create_facebook_post_text_failure(self, mock_logger, mock_generate):
+        mock_generate.side_effect = Exception("API Error")
         text = post.create_facebook_post_text("Some digest content.")
         self.assertEqual(text, "")
         mock_logger.error.assert_called_with("Failed to generate Facebook post text: API Error")
+
+    @patch("app.core.social.post.TOGETHER_API_KEY", "test_key")
+    @patch("app.core.social.post.IMAGE_CONCEPT_LM", DummyLM([{"concept": "A generated image concept."}]))
+    def test_get_image_prompt_concept_success(self):
+        concept = post.get_image_prompt_concept("Some digest content.")
+        self.assertEqual(concept, "A generated image concept.")
+
+    @patch("app.core.social.post.TOGETHER_API_KEY", "test_key")
+    @patch("app.core.social.post.generate_image_concept")
+    @patch("app.core.social.post.logger")
+    def test_get_image_prompt_concept_failure(self, mock_logger, mock_generate):
+        mock_generate.side_effect = Exception("API Error")
+        concept = post.get_image_prompt_concept("Some digest content.")
+        self.assertEqual(concept, "")
+        mock_logger.error.assert_called_with("Failed to generate image prompt concept: API Error")
+
+    @patch("app.core.social.post.TOGETHER_API_KEY", "")
+    @patch("app.core.social.post.logger")
+    def test_get_image_prompt_concept_no_api_key(self, mock_logger):
+        concept = post.get_image_prompt_concept("Some digest content.")
+        self.assertEqual(concept, "")
+        mock_logger.warning.assert_called_with("TOGETHER_API_KEY not set, skipping image prompt concept generation.")
+
+    @patch("app.core.social.post.logger")
+    def test_get_image_prompt_concept_no_content(self, mock_logger):
+        concept = post.get_image_prompt_concept("")
+        self.assertEqual(concept, "")
+        mock_logger.warning.assert_called_with("No content provided to generate image prompt concept.")
 
     @patch("app.core.social.post.datetime")
     def test_get_daily_image_success(self, mock_datetime):

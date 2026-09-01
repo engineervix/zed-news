@@ -16,11 +16,13 @@ import random
 import sys
 from datetime import datetime
 
+import dspy
 import facebook
 import requests
 from dotenv import load_dotenv
 from together import Together
 
+from app.core.summarization.backends.dspy_social_backend import generate_facebook_post, generate_image_concept
 from app.core.utilities import (
     ASSETS_DIR,  # noqa: F401
     DATA_DIR,
@@ -50,6 +52,20 @@ FACEBOOK_POST_TEMP = 0.7
 
 # --- Initialize Clients ---
 client = Together(api_key=TOGETHER_API_KEY)
+FACEBOOK_POST_LM = dspy.LM(
+    f"together_ai/{TEXT_MODEL}",
+    api_key=TOGETHER_API_KEY,
+    temperature=FACEBOOK_POST_TEMP,
+    max_tokens=1800,
+    reasoning={"enabled": False},
+)
+IMAGE_CONCEPT_LM = dspy.LM(
+    f"together_ai/{TEXT_MODEL}",
+    api_key=TOGETHER_API_KEY,
+    temperature=IMAGE_CONCEPT_TEMP,
+    max_tokens=150,
+    reasoning={"enabled": False},
+)
 try:
     graph = facebook.GraphAPI(access_token=FACEBOOK_ACCESS_TOKEN)
 except Exception as e:
@@ -73,7 +89,7 @@ def get_digest_content() -> str:
 
 
 def get_image_prompt_concept(content: str) -> str:
-    """Generate a creative image prompt concept from the digest content using an LLM."""
+    """Generate a creative image prompt concept from the digest content using a DSPy module."""
     if not content:
         logger.warning("No content provided to generate image prompt concept.")
         return ""
@@ -82,37 +98,9 @@ def get_image_prompt_concept(content: str) -> str:
         logger.warning("TOGETHER_API_KEY not set, skipping image prompt concept generation.")
         return ""
 
-    system_prompt = (
-        "You are a Creative Director for Zed News, a Zambian news outlet. "
-        "Your goal is to create a concept for a promotional image that captures the essence of today's news digest. "
-        "The image should be symbolic, professional, and optimistic, reflecting themes of innovation, development, "
-        "community, and national pride in Zambia. Read the provided news digest, identify the most visually "
-        "compelling or impactful story, and describe a single, clear photographic scene.\n\n"
-        "GUIDELINES:\n"
-        "- Read the entire digest to understand the key stories.\n"
-        "- Select the ONE story that is most visually interesting or emotionally resonant.\n"
-        "- Describe a photograph that represents this story symbolically. Do NOT be literal.\n"
-        "- Depict Zambians as professionals, innovators, community members, and families.\n"
-        "- The tone must be professional, hopeful, and forward-looking.\n"
-        "- AVOID: Clichés, poverty imagery, political figures, direct depictions of negative events (e.g., accidents, crime). "
-        "If the news is negative, find a positive or neutral angle (e.g., for a cholera outbreak, show a scientist in a lab).\n"
-        "- OUTPUT FORMAT: Respond with ONLY the concise, one-sentence description of the photographic scene. Do not add any other text."
-    )
-
-    user_prompt = f"Here is today's news digest for Zambia. Generate a creative photo concept based on it:\n\n{content}"
-
     try:
-        completion = client.chat.completions.create(
-            model=TEXT_MODEL,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            temperature=IMAGE_CONCEPT_TEMP,
-            max_tokens=150,
-            reasoning={"enabled": False},
-        )
-        concept = remove_think_tags(completion.choices[0].message.content or "").strip()
+        with dspy.context(lm=IMAGE_CONCEPT_LM):
+            concept = remove_think_tags(generate_image_concept(content)).strip()
         logger.info(f"Generated image prompt concept: {concept}")
         return concept
     except Exception as e:
@@ -189,7 +177,7 @@ def generate_promotional_image(content: str) -> str:
 
 
 def create_facebook_post_text(content: str) -> str:
-    """Create a Facebook post using Together AI's Inference API."""
+    """Create a Facebook post using a DSPy module."""
     now = datetime.now(timezone)
     hour = now.hour
 
@@ -203,57 +191,11 @@ def create_facebook_post_text(content: str) -> str:
     else:
         time_context = "night"
 
-    system_prompt = (
-        f"You are a patriotic Zambian social media editor for Zed News. Your tone is passionate and engaging. "
-        f"It's {time_context} and you're bringing Zambians the day's most important stories. "
-        "Adapt your tone naturally to match the content - celebratory for good news, respectful for serious matters, "
-        "informative for policy changes, and balanced for mixed content. "
-        f"NEVER mention specific times (like 5:45PM) in your post. "
-        "CRITICAL: Most readers will NEVER click the link - make this post completely valuable on its own. "
-        "FORMATTING RULES - STRICTLY ENFORCE:\n"
-        "- Use ONLY plain text with line breaks and emojis\n"
-        "- NEVER use markdown syntax (**, *, _, `, #, -, etc.)\n"
-        "- NEVER use bullet points (•, -, *, 1., 2., etc.)\n"
-        "- NEVER use asterisks for emphasis\n"
-        "- NEVER use underscores for emphasis\n"
-        "- NEVER use hashtags as headers\n"
-        "- Use natural paragraph breaks and emojis for visual structure\n\n"
-        "Craft an engaging Facebook post that:\n"
-        f"- Starts with a creative, context-aware greeting suitable for the {time_context}\n"
-        "- Presents 4-5 key stories in conversational paragraphs (NOT lists or bullet points)\n"
-        "- Each story should be 1-2 short sentences explaining WHAT happened and WHY it matters to us as Zambians\n"
-        "- Use patriotic and inclusive language (e.g., 'our nation', 'we', 'our fellow citizens')\n"
-        "- Use emojis strategically (1 per story max) for visual breaks and emotion\n"
-        "- Use line breaks between stories for mobile readability\n"
-        "- Include specific numbers/facts that people want to share in WhatsApp groups\n"
-        "- Make each story relatable to daily life (jobs, money, safety, family)\n"
-        "- End with a creative, engaging call-to-action to spark conversation\n"
-        "- Weave in a few relevant hashtags like #Zambia, #ZambianNews, or story-specific ones, but do NOT just list them at the end\n"
-        "- Include the link at the very end\n\n"
-        "Write for mobile users scrolling fast - make it instantly valuable and shareable. "
-        "Vary your language and avoid repetitive phrases. "
-        "Remember: NO markdown formatting whatsoever - only plain text, line breaks, and emojis."
-    )
-
-    user_prompt = (
-        f"Create a Facebook post for {today_human_readable} based on this news digest. "
-        "Remember: NO markdown, NO bullet points, NO specific times mentioned - use plain text with line breaks and emojis.\n\n"
-        f"DIGEST:\n{content}\n\n"
-        f"End with this link: {digest_url}"
-    )
-
     try:
-        completion = client.chat.completions.create(
-            model=TEXT_MODEL,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            temperature=FACEBOOK_POST_TEMP,
-            max_tokens=1800,
-            reasoning={"enabled": False},
-        )
-        post_text = remove_think_tags(completion.choices[0].message.content or "").strip()
+        with dspy.context(lm=FACEBOOK_POST_LM):
+            post_text = remove_think_tags(
+                generate_facebook_post(content, today_human_readable, time_context, digest_url)
+            ).strip()
         logger.info(f"Generated Facebook post text:\n{post_text}")
         return post_text
     except Exception as e:
