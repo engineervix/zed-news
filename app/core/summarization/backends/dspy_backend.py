@@ -1,9 +1,12 @@
+import json
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 import dspy
 
 CANONICAL_SECTIONS = ("## Main Stories", "## Other Notable Stories", "## Key Takeaways & Watchpoints")
+EVAL_ARTICLES_PATH = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "eval_articles.json"
 
 
 @dataclass
@@ -99,3 +102,14 @@ def digest_compliance_score(example, pred, trace=None) -> float:
         not has_title_heading(text),
     ]
     return sum(checks) / len(checks)
+
+
+def load_eval_articles() -> list[dict[str, str]]:
+    """Load the real articles fetched for building the optimizer eval set."""
+    return json.loads(EVAL_ARTICLES_PATH.read_text())
+
+
+def build_eval_set(articles: list[dict[str, str]], batch_size: int = 6) -> list[dspy.Example]:
+    """Split articles into batches, each a DSPy example for optimization/eval."""
+    batches = [articles[i : i + batch_size] for i in range(0, len(articles), batch_size)]
+    return [dspy.Example(articles=_format_articles(batch)).with_inputs("articles") for batch in batches]

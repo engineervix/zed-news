@@ -332,6 +332,12 @@ def digest(c):
 
 
 @task
+def fetch_eval_articles(c):
+    """Fetch real articles for the local DSPy eval fixture (not committed to git)"""
+    c.run("python app/core/summarization/backends/fetch_eval_articles.py", pty=True)
+
+
+@task
 def test(c):
     """run tests"""
     c.run("coverage run -m unittest discover app/tests", pty=True)

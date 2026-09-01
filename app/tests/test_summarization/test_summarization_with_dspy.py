@@ -4,6 +4,8 @@ import dspy
 from dspy.utils.dummies import DummyLM
 
 from app.core.summarization.backends.dspy_backend import (
+    EVAL_ARTICLES_PATH,
+    build_eval_set,
     digest_compliance_score,
     generate_digest,
     has_canonical_sections,
@@ -12,6 +14,7 @@ from app.core.summarization.backends.dspy_backend import (
     has_markdown_links,
     has_title_heading,
     has_why_this_matters_label,
+    load_eval_articles,
 )
 
 COMPLIANT_DIGEST = """Zambia saw major developments in energy and governance today.
@@ -132,6 +135,44 @@ class TestDigestComplianceScore(unittest.TestCase):
         score = digest_compliance_score(None, pred)
 
         self.assertAlmostEqual(score, 4 / 6)
+
+
+class TestEvalSet(unittest.TestCase):
+    """Test cases for building the DSPy optimizer eval set"""
+
+    def setUp(self):
+        self.articles = [
+            {"source": "Source", "url": f"http://example.com/{i}", "title": f"Title {i}", "content": f"Content {i}"}
+            for i in range(7)
+        ]
+
+    def test_build_eval_set_splits_articles_into_batches(self):
+        examples = build_eval_set(self.articles, batch_size=3)
+
+        self.assertEqual(len(examples), 3)
+
+    def test_build_eval_set_examples_have_articles_as_input(self):
+        examples = build_eval_set(self.articles, batch_size=3)
+
+        self.assertEqual(list(examples[0].inputs().keys()), ["articles"])
+        self.assertIn("Title 0", examples[0].articles)
+        self.assertIn("Title 2", examples[0].articles)
+        self.assertNotIn("Title 3", examples[0].articles)
+
+    def test_build_eval_set_last_batch_has_remainder(self):
+        examples = build_eval_set(self.articles, batch_size=3)
+
+        self.assertIn("Title 6", examples[-1].articles)
+
+    @unittest.skipUnless(EVAL_ARTICLES_PATH.exists(), "eval fixture not present locally; run the fetch script first")
+    def test_load_eval_articles_returns_real_fetched_articles(self):
+        articles = load_eval_articles()
+
+        self.assertGreater(len(articles), 0)
+        for article in articles:
+            self.assertIn("source", article)
+            self.assertIn("title", article)
+            self.assertIn("content", article)
 
 
 if __name__ == "__main__":
