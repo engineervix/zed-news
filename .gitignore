@@ -478,4 +478,5 @@ data/
 # DSPy eval fixtures: real scraped article snapshots, regenerate locally
 # rather than freezing stale/copyrighted content into git history
 app/tests/fixtures/eval_articles.json
+app/tests/fixtures/eval_digests.json
 

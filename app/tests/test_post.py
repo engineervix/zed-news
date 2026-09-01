@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import mock_open, patch
 
 from dspy.utils.dummies import DummyLM
@@ -22,7 +23,21 @@ class TestSocialPost(unittest.TestCase):
         os.makedirs(self.digest_dir, exist_ok=True)
         post.digest_file_path = os.path.join(self.digest_dir, f"{today_iso_fmt}_digest.json")
 
+        # Force the raw module path regardless of whether this machine has
+        # locally-generated compiled programs - keeps tests deterministic.
+        no_program = Path(self.temp_dir) / "no_compiled_program_here.json"
+        self.patcher_facebook_post_program = patch(
+            "app.core.summarization.backends.dspy_social_backend.FACEBOOK_POST_COMPILED_PROGRAM_PATH", no_program
+        )
+        self.patcher_image_concept_program = patch(
+            "app.core.summarization.backends.dspy_social_backend.IMAGE_CONCEPT_COMPILED_PROGRAM_PATH", no_program
+        )
+        self.patcher_facebook_post_program.start()
+        self.patcher_image_concept_program.start()
+
     def tearDown(self):
+        self.patcher_facebook_post_program.stop()
+        self.patcher_image_concept_program.stop()
         shutil.rmtree(self.temp_dir)
 
     def test_get_digest_content_success(self):

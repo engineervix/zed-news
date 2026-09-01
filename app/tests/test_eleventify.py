@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from dspy.utils.dummies import DummyLM
@@ -23,7 +24,16 @@ class TestEleventify(unittest.TestCase):
         self.digest_metadata_file = os.path.join(self.mock_data_dir, f"{today_iso_fmt}/{today_iso_fmt}_digest.json")
         os.makedirs(os.path.dirname(self.digest_metadata_file), exist_ok=True)
 
+        # Force the raw module path regardless of whether this machine has
+        # locally-generated compiled programs - keeps tests deterministic.
+        no_program = Path(self.temp_dir) / "no_compiled_program_here.json"
+        self.patcher_description_program = patch(
+            "app.core.summarization.backends.dspy_eleventify_backend.DESCRIPTION_COMPILED_PROGRAM_PATH", no_program
+        )
+        self.patcher_description_program.start()
+
     def tearDown(self):
+        self.patcher_description_program.stop()
         self.patcher_data_dir.stop()
         self.patcher_dist_file.stop()
         shutil.rmtree(self.temp_dir)
