@@ -9,6 +9,7 @@ import dspy
 from dspy.teleprompt import BootstrapFewShot
 
 from app.core.summarization.backends.dspy_backend import (
+    COMPILED_PROGRAM_PATH,
     COMPLIANCE_RULES,
     DigestGenerator,
     build_eval_set,
@@ -16,8 +17,6 @@ from app.core.summarization.backends.dspy_backend import (
     load_eval_articles,
 )
 from app.core.utilities import DATA_DIR, TOGETHER_API_KEY
-
-COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_program.json"
 
 
 def evaluate(module: dspy.Module, eval_set: list[dspy.Example]) -> tuple[float, dict[str, int]]:

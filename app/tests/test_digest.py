@@ -2,7 +2,11 @@ import os
 import shutil
 import tempfile
 import unittest
-from unittest.mock import MagicMock, mock_open, patch
+from pathlib import Path
+from unittest.mock import mock_open, patch
+
+import dspy
+from dspy.utils.dummies import DummyLM
 
 from app.core.news.digest import (
     create_news_digest,
@@ -17,15 +21,23 @@ class TestDigest(unittest.TestCase):
         self.patcher_data_dir = patch("app.core.news.digest.DATA_DIR", self.temp_dir)
         self.mock_data_dir = self.patcher_data_dir.start()
 
+        # Force the raw module path regardless of whether this machine has a
+        # locally-generated compiled program - keeps tests deterministic.
+        self.patcher_compiled_program = patch(
+            "app.core.summarization.backends.dspy_backend.COMPILED_PROGRAM_PATH",
+            Path(self.temp_dir) / "no_compiled_program_here.json",
+        )
+        self.patcher_compiled_program.start()
+
     def tearDown(self):
+        self.patcher_compiled_program.stop()
         self.patcher_data_dir.stop()
         shutil.rmtree(self.temp_dir)
 
     @patch("sys.exit")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("app.core.news.digest.client")
     @patch("app.core.news.digest.logger")
-    def test_create_news_digest_success(self, mock_logger, mock_client, mock_open_file, mock_exit):
+    def test_create_news_digest_success(self, mock_logger, mock_open_file, mock_exit):
         news = [
             {
                 "source": "ZNBC",
@@ -44,14 +56,9 @@ class TestDigest(unittest.TestCase):
         ]
         dest = os.path.join(self.temp_dir, "digest.md")
 
-        mock_chunk = MagicMock()
-        mock_chunk.choices = [MagicMock()]
-        mock_chunk.choices[0].delta.content = "Generated Digest"
-        mock_client.chat.completions.create.return_value = [mock_chunk]
+        with dspy.context(lm=DummyLM([{"digest": "Generated Digest"}])):
+            result = create_news_digest(news, dest)
 
-        result = create_news_digest(news, dest)
-
-        mock_client.chat.completions.create.assert_called_once()
         mock_logger.info.assert_any_call(f"News digest created successfully: {dest}")
         self.assertIsNotNone(result)
         self.assertEqual(result["total_articles"], 2)
@@ -61,31 +68,27 @@ class TestDigest(unittest.TestCase):
 
     @patch("sys.exit")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("app.core.news.digest.client")
     @patch("app.core.news.digest.logger")
-    def test_create_news_digest_empty_generation(self, mock_logger, mock_client, mock_open_file, mock_exit):
+    def test_create_news_digest_empty_generation(self, mock_logger, mock_open_file, mock_exit):
         news = [
             {"source": "ZNBC", "title": "Title 1", "content": "Content 1", "url": "url1"},
         ]
         dest = os.path.join(self.temp_dir, "digest.md")
 
-        mock_client.chat.completions.create.return_value = []  # Empty stream
-
-        create_news_digest(news, dest)
+        with dspy.context(lm=DummyLM([{"digest": ""}])):
+            create_news_digest(news, dest)
 
         mock_exit.assert_called_once_with(1)
         mock_logger.error.assert_called_with("Generated digest is empty")
 
-    @patch("app.core.news.digest.client")
     @patch("app.core.news.digest.logger")
-    def test_create_news_digest_no_news(self, mock_logger, mock_client):
+    def test_create_news_digest_no_news(self, mock_logger):
         news = []
         dest = os.path.join(self.temp_dir, "digest.md")
 
         result = create_news_digest(news, dest)
 
         self.assertIsNone(result)
-        mock_client.chat.completions.create.assert_not_called()
         mock_logger.info.assert_called_with("No news to create digest from.")
 
     def test_fix_markdown_headings_no_space(self):
@@ -150,9 +153,8 @@ class TestDigest(unittest.TestCase):
 
     @patch("sys.exit")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("app.core.news.digest.client")
     @patch("app.core.news.digest.logger")
-    def test_create_news_digest_with_markdown_fix(self, mock_logger, mock_client, mock_open_file, mock_exit):
+    def test_create_news_digest_with_markdown_fix(self, mock_logger, mock_open_file, mock_exit):
         """Test that create_news_digest properly fixes markdown headings in the generated content"""
         news = [
             {
@@ -165,13 +167,10 @@ class TestDigest(unittest.TestCase):
         ]
         dest = os.path.join(self.temp_dir, "digest.md")
 
-        # Mock Together AI to return content with improperly formatted headings
-        mock_chunk = MagicMock()
-        mock_chunk.choices = [MagicMock()]
-        mock_chunk.choices[0].delta.content = "##Main Stories\nSome content\n###Brief Updates\nMore content"
-        mock_client.chat.completions.create.return_value = [mock_chunk]
-
-        result = create_news_digest(news, dest)
+        # Generate content with improperly formatted headings
+        generated = "##Main Stories\nSome content\n###Brief Updates\nMore content"
+        with dspy.context(lm=DummyLM([{"digest": generated}])):
+            result = create_news_digest(news, dest)
 
         # Check that the markdown headings were fixed in the result
         expected_content = "## Main Stories\nSome content\n### Brief Updates\nMore content"

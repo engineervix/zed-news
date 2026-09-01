@@ -6,8 +6,11 @@ from pathlib import Path
 
 import dspy
 
+from app.core.utilities import DATA_DIR
+
 CANONICAL_SECTIONS = ("## Main Stories", "## Other Notable Stories", "## Key Takeaways & Watchpoints")
 EVAL_ARTICLES_PATH = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "eval_articles.json"
+COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_program.json"
 
 
 @dataclass
@@ -133,3 +136,30 @@ def build_eval_set(articles: list[dict[str, str]], batch_size: int = 6) -> list[
     """Split articles into batches, each a DSPy example for optimization/eval."""
     batches = [articles[i : i + batch_size] for i in range(0, len(articles), batch_size)]
     return [dspy.Example(articles=_format_articles(batch)).with_inputs("articles") for batch in batches]
+
+
+def load_compiled_digest_generator() -> DigestGenerator:
+    """Load the optimizer-compiled digest generator, if one has been synced to this machine.
+
+    Falls back to the raw, unoptimized module when `COMPILED_PROGRAM_PATH` does not
+    exist - the compiled program embeds real article content in its few-shot demos, so
+    it is not committed to git. Deploys that want the optimized version must sync the
+    file there themselves (see PLAN.md).
+    """
+    module = DigestGenerator()
+    if COMPILED_PROGRAM_PATH.exists():
+        module.load(str(COMPILED_PROGRAM_PATH))
+    return module
+
+
+def generate_digest_markdown(formatted_articles: str) -> str:
+    """Generate digest Markdown from already-formatted article text.
+
+    Args:
+        formatted_articles: Article text as built by `_format_articles`, or an
+            equivalent caller-built numbered list (see `create_news_digest`).
+
+    Returns:
+        The generated Markdown digest.
+    """
+    return load_compiled_digest_generator()(articles=formatted_articles).digest
