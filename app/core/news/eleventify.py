@@ -25,7 +25,7 @@ client = Together(api_key=TOGETHER_API_KEY)
 DESCRIPTION_LM = dspy.LM(
     f"together_ai/{DESCRIPTION_MODEL}",
     api_key=TOGETHER_API_KEY,
-    max_tokens=300,
+    max_tokens=400,
     reasoning={"enabled": False},
 )
 
@@ -61,17 +61,7 @@ def create_digest_description(content: str, date: str) -> str:
             logger.error("Digest description is empty")
             return fallback
 
-        result = result.replace("```", "")
-        first_line = result.splitlines()[0].lower() if result.splitlines() else ""
-        unwanted = ["description:", "here's", "here is", "sure"]
-
-        if any(first_line.startswith(string) for string in unwanted):
-            result = "\n".join(result.split("\n")[1:])
-            if result.strip() == "":
-                logger.warning("Digest description is empty after removing unwanted text")
-                return fallback
-
-        return result.replace("\n", " ")
+        return result
 
     except Exception as e:
         error_type = type(e).__name__
