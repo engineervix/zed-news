@@ -19,13 +19,13 @@ base_template = env.get_template("digest.njk.jinja")
 dist_file = f"app/web/_pages/news/{today_iso_fmt}.njk"
 
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-DESCRIPTION_MODEL = "google/gemma-3n-E4B-it"
+DESCRIPTION_MODEL = "Qwen/Qwen3.5-9B"
 
 client = Together(api_key=TOGETHER_API_KEY)
 DESCRIPTION_LM = dspy.LM(
     f"together_ai/{DESCRIPTION_MODEL}",
     api_key=TOGETHER_API_KEY,
-    max_tokens=150,
+    max_tokens=300,
     reasoning={"enabled": False},
 )
 
