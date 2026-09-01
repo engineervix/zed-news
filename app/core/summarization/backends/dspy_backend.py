@@ -1,5 +1,6 @@
 import json
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -11,6 +12,8 @@ EVAL_ARTICLES_PATH = Path(__file__).resolve().parents[3] / "tests" / "fixtures" 
 
 @dataclass
 class Digest:
+    """A generated news digest, along with the source articles it covers."""
+
     content: str
     total_articles: int
     sources: list[str]
@@ -21,12 +24,17 @@ class DigestSignature(dspy.Signature):
 
     articles: str = dspy.InputField(desc="Numbered list of articles with title, source, and content")
     digest: str = dspy.OutputField(
-        desc="Markdown digest with Main Stories, Other Notable Stories, and Key Takeaways & Watchpoints sections"
+        desc=(
+            "Markdown digest with Main Stories, Other Notable Stories, and Key Takeaways & "
+            "Watchpoints sections. Start directly with the intro paragraph, with no title heading."
+        )
     )
 
 
 class DigestGenerator(dspy.Module):
-    def __init__(self):
+    """DSPy module that generates a digest from formatted article text."""
+
+    def __init__(self) -> None:
         super().__init__()
         self.generate = dspy.Predict(DigestSignature)
 
@@ -90,17 +98,29 @@ def has_title_heading(text: str) -> bool:
     return bool(re.search(r"^#(?!#)\s", text, re.MULTILINE))
 
 
+COMPLIANCE_RULES: dict[str, Callable[[str], bool]] = {
+    "canonical_sections": has_canonical_sections,
+    "intro_paragraph": has_intro_paragraph,
+    "no_markdown_links": lambda text: not has_markdown_links(text),
+    "no_html": lambda text: not has_html(text),
+    "no_why_this_matters": lambda text: not has_why_this_matters_label(text),
+    "no_title_heading": lambda text: not has_title_heading(text),
+}
+
+
 def digest_compliance_score(example, pred, trace=None) -> float:
-    """Score a generated digest against the hard formatting rules, as a fraction in [0, 1]."""
+    """Score a generated digest against the hard formatting rules, as a fraction in [0, 1].
+
+    Args:
+        example: Unused. Accepted for compatibility with DSPy's metric signature.
+        pred: A prediction with a `digest` field holding the generated Markdown.
+        trace: Unused. Accepted for compatibility with DSPy's metric signature.
+
+    Returns:
+        The fraction of `COMPLIANCE_RULES` the digest passes, from 0.0 to 1.0.
+    """
     text = pred.digest
-    checks = [
-        has_canonical_sections(text),
-        has_intro_paragraph(text),
-        not has_markdown_links(text),
-        not has_html(text),
-        not has_why_this_matters_label(text),
-        not has_title_heading(text),
-    ]
+    checks = [check(text) for check in COMPLIANCE_RULES.values()]
     return sum(checks) / len(checks)
 
 

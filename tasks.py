@@ -334,7 +334,13 @@ def digest(c):
 @task
 def fetch_eval_articles(c):
     """Fetch real articles for the local DSPy eval fixture (not committed to git)"""
-    c.run("python app/core/summarization/backends/fetch_eval_articles.py", pty=True)
+    c.run("python -m app.core.summarization.backends.fetch_eval_articles", pty=True)
+
+
+@task
+def optimize_digest(c):
+    """Run BootstrapFewShot against the DSPy eval set (hits the real model, costs API calls)"""
+    c.run("python -m app.core.summarization.backends.optimize_digest", pty=True)
 
 
 @task
