@@ -26,36 +26,21 @@ def fix_markdown_headings(text: str) -> str:
     return re.sub(r"^(#{1,6})([^\s#])", r"\1 \2", text, flags=re.MULTILINE)
 
 
-def remove_title_headings(text: str) -> str:
-    """Remove title-level headings (single # at start of line) from text"""
-    return re.sub(r"^# .*\n?", "", text, flags=re.MULTILINE)
-
-
 def clean_digest_output(text: str) -> str:
-    """Clean and standardize the digest output"""
-    # Remove think tags
+    """Clean and standardize the digest output.
+
+    The DSPy module (`generate_digest_markdown`) is now responsible for
+    canonical section headings, no title heading, no markdown links, no
+    HTML, and no "Why this matters" labels - `digest_compliance_score`
+    checks all of these directly, so cleanup here would be redundant.
+    What's left are defensive fixes for things the compliance metric does
+    not check: reasoning leakage from the model, and cosmetic formatting.
+    """
+    # Remove think tags some models (e.g. DeepSeek) may leak despite reasoning being disabled
     text = remove_think_tags(text)
 
-    # Remove title-level headings
-    text = remove_title_headings(text)
-
-    # Fix markdown headings
+    # Fix markdown headings missing a space after the hash characters
     text = fix_markdown_headings(text)
-
-    # Strip markdown-style links to keep titles/content plain: [Title](url) -> Title
-    text = strip_markdown_links(text)
-
-    # Normalize section headings to canonical set
-    text = normalize_section_headings(text)
-
-    # Remove any literal HTML line breaks inserted by the model
-    text = remove_html_breaks(text)
-
-    # Remove any occurrences of "Why this matters:" lines
-    text = remove_why_this_matters(text)
-
-    # Drop any Overview section if present
-    text = remove_overview_section(text)
 
     # Remove excessive newlines
     text = re.sub(r"\n{3,}", "\n\n", text)
@@ -64,56 +49,6 @@ def clean_digest_output(text: str) -> str:
     text = re.sub(r"^[\*\-]\s+", "* ", text, flags=re.MULTILINE)
 
     return text.strip()
-
-
-def normalize_section_headings(text: str) -> str:
-    """Normalize headings to a canonical set used by the front-end."""
-    replacements: dict[str, str] = {
-        r"^#+\s*Overview.*$": "## Overview",
-        # Map variants of the main stories heading to a single canonical label
-        r"^#+\s*(Key Stories.*|Today'?s Top 8 Stories.*|Main Stories.*)$": "## Main Stories",
-        r"^#+\s*(Other Notable.*)$": "## Other Notable Stories",
-        r"^#+\s*(Key Takeaways.*|Takeaways.*|Watch.*)$": "## Key Takeaways & Watchpoints",
-    }
-    for pattern, replacement in replacements.items():
-        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE | re.MULTILINE)
-    return text
-
-
-def strip_markdown_links(text: str) -> str:
-    """Convert [text](url) or [text](#) to plain text."""
-    return re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", text)
-
-
-def standardize_key_story_title_breaks(text: str) -> str:
-    """Previously enforced Title + <br> + content format; now deprecated.
-
-    Preserve input as-is (no-op) to avoid inserting HTML tags in Markdown.
-    """
-    return text
-
-
-def remove_html_breaks(text: str) -> str:
-    """Remove literal HTML line breaks that would render as text in Markdown parser with html=False."""
-    # Remove common variants of <br>
-    text = re.sub(r"\s*<\s*br\s*/?\s*>\s*", "\n", text, flags=re.IGNORECASE)
-    if "&lt;br" in text:
-        text = text.replace("&lt;br&gt;", "\n").replace("&lt;br/&gt;", "\n")
-    return text
-
-
-def remove_why_this_matters(text: str) -> str:
-    """Remove the leading 'Why this matters:' label if present on lines."""
-    # Remove bolded or plain variants
-    text = re.sub(r"^\*\*?\s*Why this matters:\s*\*\*?\s*", "", text, flags=re.IGNORECASE | re.MULTILINE)
-    text = re.sub(r"^Why this matters:\s*", "", text, flags=re.IGNORECASE | re.MULTILINE)
-    return text
-
-
-def remove_overview_section(text: str) -> str:
-    """Remove the '## Overview' section entirely (until the next heading)."""
-    pattern = r"^##\s*Overview\s*\n(?:.*?)(?=^##\s|\Z)"
-    return re.sub(pattern, "", text, flags=re.MULTILINE | re.DOTALL)
 
 
 def create_news_digest(news: list[dict[str, str]], dest: str):

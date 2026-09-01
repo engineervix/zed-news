@@ -8,11 +8,7 @@ from unittest.mock import mock_open, patch
 import dspy
 from dspy.utils.dummies import DummyLM
 
-from app.core.news.digest import (
-    create_news_digest,
-    fix_markdown_headings,
-    remove_title_headings,
-)
+from app.core.news.digest import create_news_digest, fix_markdown_headings
 
 
 class TestDigest(unittest.TestCase):
@@ -184,47 +180,3 @@ class TestDigest(unittest.TestCase):
             # The last write should be the digest content
             last_write_content = write_calls[-1][0][0]
             self.assertEqual(last_write_content, expected_content)
-
-    def test_title_heading_removal(self):
-        """Test that entire title-level heading lines (single #) are removed"""
-
-        test_cases = [
-            {
-                "input": "# Main Title\n## Section\nSome text with # symbol\nIssue # 123",
-                "expected": "## Section\nSome text with # symbol\nIssue # 123",
-                "description": "Remove entire title heading line but preserve other content",
-            },
-            {
-                "input": "## Section Only\nNo title here",
-                "expected": "## Section Only\nNo title here",
-                "description": "No title to remove",
-            },
-            {
-                "input": "# Title\n# Another Title\n## Section",
-                "expected": "## Section",
-                "description": "Multiple title heading lines removed",
-            },
-            {
-                "input": "Regular text\n# Title in middle\nMore text",
-                "expected": "Regular text\nMore text",
-                "description": "Title heading line in middle of content removed",
-            },
-            {
-                "input": "# Title without newline",
-                "expected": "",
-                "description": "Title heading without trailing newline removed",
-            },
-        ]
-
-        for test_case in test_cases:
-            with self.subTest(description=test_case["description"]):
-                # Use the helper function from digest.py
-                result = remove_title_headings(test_case["input"])
-                self.assertEqual(
-                    result,
-                    test_case["expected"],
-                    f"Failed for case: {test_case['description']}\n"
-                    f"Input: {repr(test_case['input'])}\n"
-                    f"Expected: {repr(test_case['expected'])}\n"
-                    f"Got: {repr(result)}",
-                )
