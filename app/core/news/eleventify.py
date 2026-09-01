@@ -3,10 +3,12 @@ import logging
 import os
 from datetime import datetime, timedelta, timezone
 
+import dspy
 import pytz
 from jinja2 import Environment, PackageLoader, select_autoescape
 from together import Together
 
+from app.core.summarization.backends.dspy_eleventify_backend import generate_digest_description
 from app.core.utilities import DATA_DIR, today_human_readable, today_iso_fmt
 
 env = Environment(
@@ -20,6 +22,12 @@ TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 DESCRIPTION_MODEL = "google/gemma-3n-E4B-it"
 
 client = Together(api_key=TOGETHER_API_KEY)
+DESCRIPTION_LM = dspy.LM(
+    f"together_ai/{DESCRIPTION_MODEL}",
+    api_key=TOGETHER_API_KEY,
+    max_tokens=150,
+    reasoning={"enabled": False},
+)
 
 digest_metadata_file = f"{DATA_DIR}/{today_iso_fmt}/{today_iso_fmt}_digest.json"
 
@@ -28,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 def create_digest_description(content: str, date: str) -> str:
     """
-    Using Together AI's Gemma 3n, create a brief description for the news digest.
+    Using a DSPy module, create a brief description for the news digest.
 
     Args:
         content: The digest content to summarize
@@ -43,27 +51,14 @@ def create_digest_description(content: str, date: str) -> str:
         logger.warning("TOGETHER_API_KEY not set, using fallback description")
         return fallback
 
-    prompt = f"""Given the daily news digest below, write a very brief description (1-2 sentences) that captures the main themes and most significant stories of the day. Focus on what readers will find most valuable.
-
-Digest Content:
-{content}"""
-
     try:
-        completion = client.chat.completions.create(
-            model=DESCRIPTION_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=150,
-            reasoning={"enabled": False},
-        )
+        with dspy.context(lm=DESCRIPTION_LM):
+            result = generate_digest_description(content).strip()
 
-        choice = completion.choices[0]
-        finish_reason = choice.finish_reason
-        result = (choice.message.content or "").strip()
-
-        logger.info(f"finish_reason={finish_reason} result={result!r}")
+        logger.info(f"result={result!r}")
 
         if not result:
-            logger.error(f"Digest description is empty (finish_reason={finish_reason})")
+            logger.error("Digest description is empty")
             return fallback
 
         result = result.replace("```", "")

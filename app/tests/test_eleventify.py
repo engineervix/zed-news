@@ -3,7 +3,9 @@ import os
 import shutil
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
+
+from dspy.utils.dummies import DummyLM
 
 from app.core.news.eleventify import create_digest_description, get_digest_metadata, render_jinja_template
 from app.core.utilities import today_human_readable, today_iso_fmt
@@ -75,14 +77,29 @@ class TestEleventify(unittest.TestCase):
                 mock_logger.error.assert_called_with("Digest metadata file not found: non_existent_file.json")
 
     @patch("app.core.news.eleventify.TOGETHER_API_KEY", "test_key")
-    @patch("app.core.news.eleventify.client")
-    def test_create_digest_description_success(self, mock_client):
-        mock_completion = MagicMock()
-        mock_completion.choices[0].message.content = "This is a generated description."
-        mock_client.chat.completions.create.return_value = mock_completion
-
+    @patch(
+        "app.core.news.eleventify.DESCRIPTION_LM",
+        DummyLM([{"description": "This is a generated description."}]),
+    )
+    def test_create_digest_description_success(self):
         description = create_digest_description("content", "date")
         self.assertIn("This is a generated description.", description)
+
+    @patch("app.core.news.eleventify.TOGETHER_API_KEY", "test_key")
+    @patch("app.core.news.eleventify.generate_digest_description")
+    @patch("app.core.news.eleventify.logger")
+    def test_create_digest_description_failure_returns_fallback(self, mock_logger, mock_generate):
+        mock_generate.side_effect = Exception("API Error")
+        description = create_digest_description("content", "1 September 2026")
+        self.assertEqual(description, "News digest for 1 September 2026 covering the latest developments in Zambian news.")
+        mock_logger.error.assert_called_with("Error generating digest description (Exception): API Error")
+
+    @patch("app.core.news.eleventify.TOGETHER_API_KEY", "")
+    @patch("app.core.news.eleventify.logger")
+    def test_create_digest_description_no_api_key_returns_fallback(self, mock_logger):
+        description = create_digest_description("content", "1 September 2026")
+        self.assertEqual(description, "News digest for 1 September 2026 covering the latest developments in Zambian news.")
+        mock_logger.warning.assert_called_with("TOGETHER_API_KEY not set, using fallback description")
 
 
 if __name__ == "__main__":
