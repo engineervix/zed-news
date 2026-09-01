@@ -1,6 +1,9 @@
+import re
 from dataclasses import dataclass
 
 import dspy
+
+CANONICAL_SECTIONS = ("## Main Stories", "## Other Notable Stories", "## Key Takeaways & Watchpoints")
 
 
 @dataclass
@@ -50,3 +53,49 @@ def generate_digest(articles: list[dict[str, str]]) -> Digest | None:
         total_articles=len(articles),
         sources=[article["source"] for article in articles],
     )
+
+
+def has_canonical_sections(text: str) -> bool:
+    """Check that the three required section headings appear, in order, with no extras."""
+    headings = re.findall(r"^## .+$", text, re.MULTILINE)
+    return tuple(heading.rstrip() for heading in headings) == CANONICAL_SECTIONS
+
+
+def has_intro_paragraph(text: str) -> bool:
+    """Check that there is introductory text before the first section heading."""
+    before_first_heading = text.split("## ", 1)[0]
+    return bool(before_first_heading.strip())
+
+
+def has_markdown_links(text: str) -> bool:
+    """Check for markdown links, which the digest must not contain."""
+    return bool(re.search(r"\[[^\]]+\]\([^)]+\)", text))
+
+
+def has_html(text: str) -> bool:
+    """Check for HTML tags, which the digest must not contain."""
+    return bool(re.search(r"<[a-zA-Z][^>]*>", text))
+
+
+def has_why_this_matters_label(text: str) -> bool:
+    """Check for a 'Why this matters' label, which must stay woven into the prose instead."""
+    return bool(re.search(r"why this matters", text, re.IGNORECASE))
+
+
+def has_title_heading(text: str) -> bool:
+    """Check for a single-hash title heading, which the digest must not contain."""
+    return bool(re.search(r"^#(?!#)\s", text, re.MULTILINE))
+
+
+def digest_compliance_score(example, pred, trace=None) -> float:
+    """Score a generated digest against the hard formatting rules, as a fraction in [0, 1]."""
+    text = pred.digest
+    checks = [
+        has_canonical_sections(text),
+        has_intro_paragraph(text),
+        not has_markdown_links(text),
+        not has_html(text),
+        not has_why_this_matters_label(text),
+        not has_title_heading(text),
+    ]
+    return sum(checks) / len(checks)
