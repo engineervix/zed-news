@@ -9,9 +9,11 @@ from app.core.summarization.digest import (
     digest_compliance_score,
     generate_digest,
     has_canonical_sections,
+    has_category_grouped_other_stories,
     has_html,
     has_intro_paragraph,
     has_markdown_links,
+    has_numbered_main_stories,
     has_title_heading,
     has_why_this_matters_label,
     load_eval_articles,
@@ -117,6 +119,20 @@ class TestComplianceRules(unittest.TestCase):
     def test_has_title_heading_false_when_absent(self):
         self.assertFalse(has_title_heading(COMPLIANT_DIGEST))
 
+    def test_has_numbered_main_stories_true_for_compliant_digest(self):
+        self.assertTrue(has_numbered_main_stories(COMPLIANT_DIGEST))
+
+    def test_has_numbered_main_stories_false_when_unnumbered(self):
+        text = COMPLIANT_DIGEST.replace("1. Title 1", "**Title 1**")
+        self.assertFalse(has_numbered_main_stories(text))
+
+    def test_has_category_grouped_other_stories_true_for_compliant_digest(self):
+        self.assertTrue(has_category_grouped_other_stories(COMPLIANT_DIGEST))
+
+    def test_has_category_grouped_other_stories_false_when_flat(self):
+        text = COMPLIANT_DIGEST.replace("**Governance & Justice:**\n", "")
+        self.assertFalse(has_category_grouped_other_stories(text))
+
 
 class TestDigestComplianceScore(unittest.TestCase):
     """Test cases for the combined compliance metric"""
@@ -134,7 +150,7 @@ class TestDigestComplianceScore(unittest.TestCase):
 
         score = digest_compliance_score(None, pred)
 
-        self.assertAlmostEqual(score, 4 / 6)
+        self.assertAlmostEqual(score, 6 / 8)
 
 
 class TestEvalSet(unittest.TestCase):

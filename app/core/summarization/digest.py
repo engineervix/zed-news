@@ -31,13 +31,27 @@ class Digest:
 
 
 class DigestSignature(dspy.Signature):
-    """Write a Zambian news digest in Markdown from the given articles."""
+    """Write a Zambian news digest in Markdown from the given articles.
+
+    Adopt the voice of a patriotic Zambian news editor with a watchdog streak: professional
+    and engaging, but with sharp critical scrutiny. Question motives, and call out spin, gaps,
+    or contradictions in the reporting itself, pressing on accountability wherever officials or
+    institutions are involved. Where appropriate, and only for less serious topics, use dry,
+    subtle Zambian wit - never on crime, accidents, or political tensions. Stay grounded in what
+    the input actually says; critical framing must never invent suspicion beyond the facts given.
+    """
 
     articles: str = dspy.InputField(desc="Numbered list of articles with title, source, and content")
     digest: str = dspy.OutputField(
         desc=(
             "Markdown digest with Main Stories, Other Notable Stories, and Key Takeaways & "
-            "Watchpoints sections. Start directly with the intro paragraph, with no title heading."
+            "Watchpoints sections. Start directly with the intro paragraph, with no title heading. "
+            "Main Stories: a numbered list - `1. **Title**` followed by 1-2 sentences per item, "
+            "flagging any unverified claims, missing timelines, or gaps in the reporting. Other "
+            "Notable Stories: grouped under bold category labels (e.g. `**Sports:**`) with `*` "
+            "bullets beneath each. Key Takeaways & Watchpoints: 2-3 forward-looking, fact-based "
+            "bullets naming what to watch for accountability (a deadline, a promised report, a "
+            "follow-up vote)."
         )
     )
 
@@ -109,6 +123,28 @@ def has_title_heading(text: str) -> bool:
     return bool(re.search(r"^#(?!#)\s", text, re.MULTILINE))
 
 
+def _extract_section(text: str, heading: str, next_heading: str | None) -> str:
+    """Return the text between `heading` and `next_heading` (or end of text if None/absent)."""
+    if heading not in text:
+        return ""
+    remainder = text[text.index(heading) + len(heading) :]
+    if next_heading and next_heading in remainder:
+        return remainder[: remainder.index(next_heading)]
+    return remainder
+
+
+def has_numbered_main_stories(text: str) -> bool:
+    """Check that Main Stories items use a numbered list layout (e.g. '1. **Title**')."""
+    section = _extract_section(text, "## Main Stories", "## Other Notable Stories")
+    return bool(re.search(r"^\d+\.\s", section, re.MULTILINE))
+
+
+def has_category_grouped_other_stories(text: str) -> bool:
+    """Check that Other Notable Stories groups items under bold category labels."""
+    section = _extract_section(text, "## Other Notable Stories", "## Key Takeaways & Watchpoints")
+    return bool(re.search(r"^\*\*[^*\n]+:\*\*", section, re.MULTILINE))
+
+
 COMPLIANCE_RULES: dict[str, Callable[[str], bool]] = {
     "canonical_sections": has_canonical_sections,
     "intro_paragraph": has_intro_paragraph,
@@ -116,6 +152,8 @@ COMPLIANCE_RULES: dict[str, Callable[[str], bool]] = {
     "no_html": lambda text: not has_html(text),
     "no_why_this_matters": lambda text: not has_why_this_matters_label(text),
     "no_title_heading": lambda text: not has_title_heading(text),
+    "numbered_main_stories": has_numbered_main_stories,
+    "category_grouped_other_stories": has_category_grouped_other_stories,
 }
 
 
