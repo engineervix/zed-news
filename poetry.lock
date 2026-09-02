@@ -3970,14 +3970,14 @@ files = [
 
 [[package]]
 name = "together"
-version = "2.31.0"
+version = "2.32.0"
 description = "The official Python library for the together API"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "together-2.31.0-py3-none-any.whl", hash = "sha256:732c5e4fe332abd1e9fcde7810835fc8d07af67af02dda34bbde8572ff747c1e"},
-    {file = "together-2.31.0.tar.gz", hash = "sha256:e9c941caf055eb1a97fc560819a19fbb95d626722b712a4ec7cc1ea2bb0ecd27"},
+    {file = "together-2.32.0-py3-none-any.whl", hash = "sha256:a4e33cd66aa5bcbd046d84ae4914b6b1418759590235115ce20c69ab9e0966f3"},
+    {file = "together-2.32.0.tar.gz", hash = "sha256:3be2fcdc06f0f410b88defc1065ea49f75f40f82a4c209bb6e415e4650f9e7d1"},
 ]
 
 [package.dependencies]
@@ -3990,9 +3990,7 @@ httpx = ">=0.23.0,<1"
 pydantic = ">=1.9.0,<3"
 rich = ">=13.7.1"
 sniffio = "*"
-tqdm = ">=4.67.1"
 types-pyyaml = ">=6.0.12.20250915"
-types-tqdm = ">=4.67.0.20250516"
 typing-extensions = ">=4.14,<5"
 
 [package.extras]
@@ -4138,23 +4136,6 @@ files = [
     {file = "types_pyyaml-6.0.12.20260815-py3-none-any.whl", hash = "sha256:6f332212b7e191f3afd5016a713c510b6340593b7ebec573c7d5d20aa5386d3b"},
     {file = "types_pyyaml-6.0.12.20260815.tar.gz", hash = "sha256:28764110c9cf35846e733da32d8d734df7473c5dde9ef67c3b7332ec0e819858"},
 ]
-
-[[package]]
-name = "types-tqdm"
-version = "4.70.0.20260805"
-description = "Typing stubs for tqdm"
-optional = false
-python-versions = ">=3.10"
-groups = ["main"]
-files = [
-    {file = "types_tqdm-4.70.0.20260805-py3-none-any.whl", hash = "sha256:c83113470a46caee2d045428554714f3c314be94eb4ed4030aaa8a8ab21b830c"},
-    {file = "types_tqdm-4.70.0.20260805.tar.gz", hash = "sha256:569efd0fd8b2a460e6e6548634ec253c1362ed8907f8b0daacf0a07eab204a26"},
-]
-
-[package.extras]
-all = ["types-requests", "types-tensorflow"]
-requests = ["types-requests"]
-tensorflow = ["types-tensorflow"]
 
 [[package]]
 name = "typing-extensions"
