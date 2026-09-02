@@ -18,7 +18,7 @@ ua = UserAgent(
     fallback="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
 )
 
-URLs = [
+URLs: list[str] = [
     "http://www.daily-mail.co.zm/feed/",
     "https://diggers.news/rss/",
     "https://www.muvitv.com/rss/",
@@ -27,7 +27,7 @@ URLs = [
 ]
 
 
-def get_daily_mail_article_detail(url):
+def get_daily_mail_article_detail(url: str) -> str | None:
     """
     Fetches the article detail from a Zambia Daily Mail URL
     """
@@ -71,7 +71,7 @@ def get_daily_mail_article_detail(url):
         return None
 
 
-def get_times_of_zambia_article_detail(url):
+def get_times_of_zambia_article_detail(url: str) -> str | None:
     """
     Fetches the article detail from a Times of Zambia URL
     """
@@ -103,7 +103,7 @@ def get_times_of_zambia_article_detail(url):
         return text_content.strip()
 
 
-def get_mwebantu_article_detail(url):
+def get_mwebantu_article_detail(url: str) -> str | None:
     """
     Fetches the article detail from a Mwebantu URL
     """
@@ -135,7 +135,7 @@ def get_mwebantu_article_detail(url):
         return content
 
 
-def get_muvitv_article_detail(url):
+def get_muvitv_article_detail(url: str) -> str | None:
     """
     Fetches the article detail from a Muvi TV URL
     """
@@ -165,7 +165,7 @@ def get_muvitv_article_detail(url):
         return content
 
 
-def get_diggers_article_detail(url):
+def get_diggers_article_detail(url: str) -> str | None:
     """
     Fetches the article detail from a Diggers News URL
     """
@@ -196,7 +196,7 @@ def get_diggers_article_detail(url):
         return content
 
 
-def get_description(url):
+def get_description(url: str) -> str | None:
     """
     Fetches the article detail from a URL
     """
@@ -214,7 +214,7 @@ def get_description(url):
         return None
 
 
-def get_feed_title(url):
+def get_feed_title(url: str) -> str | None:
     """
     Fetches the feed title from a URL
     """
@@ -232,7 +232,7 @@ def get_feed_title(url):
         return None
 
 
-def get_rss_feed_entries():
+def get_rss_feed_entries() -> list[dict[str, str]]:
     """
     Parses URLs and fetches today's feeds
 

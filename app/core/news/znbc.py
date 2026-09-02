@@ -8,7 +8,7 @@ import logging
 import dateutil.parser
 import requests
 import urllib3
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from fake_useragent import UserAgent
 
 from app.core.utilities import today_iso_fmt
@@ -20,7 +20,7 @@ ua = UserAgent(
 )
 
 
-def get_article_detail(url):
+def get_article_detail(url: str) -> str | None:
     """
     Fetches the article detail from the URL
     """
@@ -41,7 +41,7 @@ def get_article_detail(url):
     return content
 
 
-def _parse_article(article, encountered_titles):
+def _parse_article(article: Tag, encountered_titles: set[str]) -> dict[str, str] | None:
     """
     Extracts a news item from an article element, or returns None if it
     doesn't belong to today or can't be parsed.
@@ -80,7 +80,7 @@ def _parse_article(article, encountered_titles):
     }
 
 
-def get_news():
+def get_news() -> list[dict[str, str]]:
     """
     Fetches today's news from https://znbc.co.zm/?page_id=4187
     """
