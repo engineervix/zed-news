@@ -5,7 +5,7 @@ from itertools import cycle
 
 import dspy
 
-from app.core.summarization.backends.dspy_backend import EVAL_DIGESTS_PATH
+from app.core.summarization.backends.dspy_backend import EVAL_DIGESTS_PATH, compliance_score, load_compiled
 from app.core.utilities import DATA_DIR
 
 FACEBOOK_POST_COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_facebook_post_program.json"
@@ -175,9 +175,7 @@ FACEBOOK_POST_COMPLIANCE_RULES: dict[str, Callable[[str], bool]] = {
 
 def facebook_post_compliance_score(example, pred, trace=None) -> float:
     """Score a generated Facebook post against the hard formatting rules, as a fraction in [0, 1]."""
-    text = pred.post
-    checks = [check(text) for check in FACEBOOK_POST_COMPLIANCE_RULES.values()]
-    return sum(checks) / len(checks)
+    return compliance_score(FACEBOOK_POST_COMPLIANCE_RULES, pred.post)
 
 
 def has_multiple_sentences(text: str) -> bool:
@@ -206,29 +204,21 @@ IMAGE_CONCEPT_COMPLIANCE_RULES: dict[str, Callable[[str], bool]] = {
 
 def image_concept_compliance_score(example, pred, trace=None) -> float:
     """Score a generated image concept against the hard formatting rules, as a fraction in [0, 1]."""
-    text = pred.concept
-    checks = [check(text) for check in IMAGE_CONCEPT_COMPLIANCE_RULES.values()]
-    return sum(checks) / len(checks)
+    return compliance_score(IMAGE_CONCEPT_COMPLIANCE_RULES, pred.concept)
 
 
 def load_compiled_facebook_post_generator() -> FacebookPostGenerator:
     """Load the optimizer-compiled Facebook post generator, if one has been synced to this machine.
 
     Falls back to the raw, unoptimized module when `FACEBOOK_POST_COMPILED_PROGRAM_PATH`
-    does not exist - see `load_compiled_digest_generator` in `dspy_backend.py` for why.
+    does not exist - see `load_compiled` in `dspy_backend.py` for why.
     """
-    module = FacebookPostGenerator()
-    if FACEBOOK_POST_COMPILED_PROGRAM_PATH.exists():
-        module.load(str(FACEBOOK_POST_COMPILED_PROGRAM_PATH))
-    return module
+    return load_compiled(FacebookPostGenerator, FACEBOOK_POST_COMPILED_PROGRAM_PATH)
 
 
 def load_compiled_image_concept_generator() -> ImageConceptGenerator:
     """Load the optimizer-compiled image concept generator, if one has been synced to this machine."""
-    module = ImageConceptGenerator()
-    if IMAGE_CONCEPT_COMPILED_PROGRAM_PATH.exists():
-        module.load(str(IMAGE_CONCEPT_COMPILED_PROGRAM_PATH))
-    return module
+    return load_compiled(ImageConceptGenerator, IMAGE_CONCEPT_COMPILED_PROGRAM_PATH)
 
 
 def generate_facebook_post(digest: str, date: str, time_context: str, link: str) -> str:

@@ -3,6 +3,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TypeVar
 
 import dspy
 
@@ -16,6 +17,8 @@ COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_program.json"
 # all take a generated digest (not raw articles) as input, so they build their eval
 # sets from real digests generated here rather than duplicating this path per module.
 EVAL_DIGESTS_PATH = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "eval_digests.json"
+
+ModuleT = TypeVar("ModuleT", bound=dspy.Module)
 
 
 @dataclass
@@ -116,6 +119,17 @@ COMPLIANCE_RULES: dict[str, Callable[[str], bool]] = {
 }
 
 
+def compliance_score(rules: dict[str, Callable[[str], bool]], text: str) -> float:
+    """Score text against a dict of compliance rules, as a fraction in [0, 1].
+
+    Shared by every `*_compliance_score` metric in this package (digest, Facebook
+    post, image concept, digest description) - they differ only in which rules
+    dict and which prediction field they check.
+    """
+    checks = [check(text) for check in rules.values()]
+    return sum(checks) / len(checks)
+
+
 def digest_compliance_score(example, pred, trace=None) -> float:
     """Score a generated digest against the hard formatting rules, as a fraction in [0, 1].
 
@@ -127,9 +141,7 @@ def digest_compliance_score(example, pred, trace=None) -> float:
     Returns:
         The fraction of `COMPLIANCE_RULES` the digest passes, from 0.0 to 1.0.
     """
-    text = pred.digest
-    checks = [check(text) for check in COMPLIANCE_RULES.values()]
-    return sum(checks) / len(checks)
+    return compliance_score(COMPLIANCE_RULES, pred.digest)
 
 
 def load_eval_articles() -> list[dict[str, str]]:
@@ -143,6 +155,21 @@ def build_eval_set(articles: list[dict[str, str]], batch_size: int = 6) -> list[
     return [dspy.Example(articles=_format_articles(batch)).with_inputs("articles") for batch in batches]
 
 
+def load_compiled(module_cls: type[ModuleT], path: Path) -> ModuleT:
+    """Load a module class's optimizer-compiled program, if one has been synced to this machine.
+
+    Falls back to the raw, unoptimized module when `path` does not exist - compiled
+    programs embed real generated content in their few-shot demos, so none of them
+    are committed to git. Deploys that want the optimized version must sync the file
+    there themselves (see PLAN.md). Shared by every `load_compiled_*_generator` in
+    this package.
+    """
+    module = module_cls()
+    if path.exists():
+        module.load(str(path))
+    return module
+
+
 def load_compiled_digest_generator() -> DigestGenerator:
     """Load the optimizer-compiled digest generator, if one has been synced to this machine.
 
@@ -151,10 +178,7 @@ def load_compiled_digest_generator() -> DigestGenerator:
     it is not committed to git. Deploys that want the optimized version must sync the
     file there themselves (see PLAN.md).
     """
-    module = DigestGenerator()
-    if COMPILED_PROGRAM_PATH.exists():
-        module.load(str(COMPILED_PROGRAM_PATH))
-    return module
+    return load_compiled(DigestGenerator, COMPILED_PROGRAM_PATH)
 
 
 def generate_digest_markdown(formatted_articles: str) -> str:

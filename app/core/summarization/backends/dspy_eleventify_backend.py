@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 import dspy
 
-from app.core.summarization.backends.dspy_backend import EVAL_DIGESTS_PATH
+from app.core.summarization.backends.dspy_backend import EVAL_DIGESTS_PATH, compliance_score, load_compiled
 from app.core.utilities import DATA_DIR
 
 DESCRIPTION_COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_description_program.json"
@@ -75,21 +75,16 @@ DIGEST_DESCRIPTION_COMPLIANCE_RULES: dict[str, Callable[[str], bool]] = {
 
 def digest_description_compliance_score(example, pred, trace=None) -> float:
     """Score a generated digest description against the hard formatting rules, as a fraction in [0, 1]."""
-    text = pred.description
-    checks = [check(text) for check in DIGEST_DESCRIPTION_COMPLIANCE_RULES.values()]
-    return sum(checks) / len(checks)
+    return compliance_score(DIGEST_DESCRIPTION_COMPLIANCE_RULES, pred.description)
 
 
 def load_compiled_digest_description_generator() -> DigestDescriptionGenerator:
     """Load the optimizer-compiled digest description generator, if one has been synced to this machine.
 
     Falls back to the raw, unoptimized module when `DESCRIPTION_COMPILED_PROGRAM_PATH`
-    does not exist - see `load_compiled_digest_generator` in `dspy_backend.py` for why.
+    does not exist - see `load_compiled` in `dspy_backend.py` for why.
     """
-    module = DigestDescriptionGenerator()
-    if DESCRIPTION_COMPILED_PROGRAM_PATH.exists():
-        module.load(str(DESCRIPTION_COMPILED_PROGRAM_PATH))
-    return module
+    return load_compiled(DigestDescriptionGenerator, DESCRIPTION_COMPILED_PROGRAM_PATH)
 
 
 def generate_digest_description(digest: str) -> str:
