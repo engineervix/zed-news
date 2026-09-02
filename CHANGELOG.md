@@ -4,48 +4,6 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v1.3.0](https://github.com/engineervix/zed-news/compare/v1.2.3...v1.3.0) (2026-09-02)
-
-
-### 🚀 Features
-
-* add digest compliance metric for DSPy backend ([9298309](https://github.com/engineervix/zed-news/commit/9298309e9e0d4022b57467ca3f13a82e2b2bc755))
-* add dspy eval set builder ([869a919](https://github.com/engineervix/zed-news/commit/869a9199e4dc86aeeb48cd5dfa4c37a80a615154))
-* add eval sets and compliance metrics for post.py/eleventify.py ([ff97de6](https://github.com/engineervix/zed-news/commit/ff97de6b9df313402fb4ac329f1163d9e5b8652e))
-* add historical article backlog for the eval set ([6f07564](https://github.com/engineervix/zed-news/commit/6f075642587ee3a02f43178687940ad140425e69))
-* add standalone DSPy digest generator ([1f4f93b](https://github.com/engineervix/zed-news/commit/1f4f93b466a3a477d3ecb07999354bcbcf5920e5))
-* restore numbered/grouped digest formatting and watchdog tone ([3bf6105](https://github.com/engineervix/zed-news/commit/3bf6105a37c4a16d14998846d68fe8e80b01837d))
-* run BootstrapFewShot against the eval set ([69028a9](https://github.com/engineervix/zed-news/commit/69028a93b3109d9895a7373d0455315e54b9753a))
-* run BootstrapFewShot for post.py/eleventify.py signatures ([faab0ed](https://github.com/engineervix/zed-news/commit/faab0ed44d7f4f8b50eeb3ffe8eed3853de591d5))
-* wire eleventify.py's digest description prompt into DSPy ([e9aaa13](https://github.com/engineervix/zed-news/commit/e9aaa13c6bd1c5eb12e3660eb42bb1b96b1a2133))
-* wire post.py's Facebook post and image prompts into DSPy ([c433526](https://github.com/engineervix/zed-news/commit/c43352684f0e40a9b20db3725a1ae5a1b257ef2b))
-* wire the DSPy module into digest.py ([a564cc0](https://github.com/engineervix/zed-news/commit/a564cc0daf349da747e64ade0edb3495a1a5f252))
-
-
-### 🐛 Bug Fixes
-
-* propagate Facebook post failures as a non-zero exit code ([ea15170](https://github.com/engineervix/zed-news/commit/ea15170856933f046808f21931bb234ca5990eff))
-* replace unreachable model in eleventify's digest description ([9484a7d](https://github.com/engineervix/zed-news/commit/9484a7d1a8c947fda3ef82f0afc64201e0c18998))
-
-
-### 📝 Docs
-
-* mention DSPy in the README's core-component list ([fc18358](https://github.com/engineervix/zed-news/commit/fc18358c1fa72c3a57d164384a93725c2d3ab545))
-
-
-### ♻️ Code Refactoring
-
-* add type hints to rss_sources.py and znbc.py ([59b968c](https://github.com/engineervix/zed-news/commit/59b968c329bdcf23f8f21a9b73e7bf493624ba80))
-* dedupe compiled-program loading and compliance scoring ([b9054d3](https://github.com/engineervix/zed-news/commit/b9054d3ecf5691fc66db28450a41d429df51aa25))
-* flatten summarization/backends/, rename DSPy and RSS modules ([4dc230c](https://github.com/engineervix/zed-news/commit/4dc230cf82dbfcdef23a07c35f6cacb6794d4a59))
-* remove regex cleanup that DSPy makes redundant ([fad2b13](https://github.com/engineervix/zed-news/commit/fad2b13e677fd71cbccb2ab8476419b6f6246072))
-* trim eleventify's cleanup now proven redundant ([c2522d9](https://github.com/engineervix/zed-news/commit/c2522d9c45240a1f3956fb49593a149eea4891a3))
-
-
-### ⚙️ Build System
-
-* tighten python constraint and add DSPy dependency ([32e78ac](https://github.com/engineervix/zed-news/commit/32e78ac3fa9fbef2fddb15da84e4383cddc5491d))
-
 ## [v1.2.3](https://github.com/engineervix/zed-news/compare/v1.2.2...v1.2.3) (2026-08-24)
 
 
