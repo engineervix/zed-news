@@ -101,14 +101,18 @@ class TestEleventify(unittest.TestCase):
     def test_create_digest_description_failure_returns_fallback(self, mock_logger, mock_generate):
         mock_generate.side_effect = Exception("API Error")
         description = create_digest_description("content", "1 September 2026")
-        self.assertEqual(description, "News digest for 1 September 2026 covering the latest developments in Zambian news.")
+        self.assertEqual(
+            description, "News digest for 1 September 2026 covering the latest developments in Zambian news."
+        )
         mock_logger.error.assert_called_with("Error generating digest description (Exception): API Error")
 
     @patch("app.core.news.eleventify.TOGETHER_API_KEY", "")
     @patch("app.core.news.eleventify.logger")
     def test_create_digest_description_no_api_key_returns_fallback(self, mock_logger):
         description = create_digest_description("content", "1 September 2026")
-        self.assertEqual(description, "News digest for 1 September 2026 covering the latest developments in Zambian news.")
+        self.assertEqual(
+            description, "News digest for 1 September 2026 covering the latest developments in Zambian news."
+        )
         mock_logger.warning.assert_called_with("TOGETHER_API_KEY not set, using fallback description")
 
 

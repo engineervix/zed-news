@@ -23,9 +23,7 @@ def evaluate(module: dspy.Module, eval_set: list[dspy.Example]) -> tuple[float, 
     """Score a module's generations against the eval set, rule by rule."""
     texts = [module(digest=example.digest).description for example in eval_set]
     scores = [digest_description_compliance_score(None, dspy.Prediction(description=text)) for text in texts]
-    passes = {
-        rule: sum(check(text) for text in texts) for rule, check in DIGEST_DESCRIPTION_COMPLIANCE_RULES.items()
-    }
+    passes = {rule: sum(check(text) for text in texts) for rule, check in DIGEST_DESCRIPTION_COMPLIANCE_RULES.items()}
     return sum(scores) / len(scores), passes
 
 

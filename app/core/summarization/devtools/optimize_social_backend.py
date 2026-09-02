@@ -28,9 +28,7 @@ def evaluate(module: dspy.Module, eval_set: list[dspy.Example], score, rules: di
     """Score a module's generations against the eval set, rule by rule."""
     preds = [module(**example.inputs()) for example in eval_set]
     scores = [score(None, pred) for pred in preds]
-    passes = {
-        name: sum(check(getattr(pred, output_field)) for pred in preds) for name, check in rules.items()
-    }
+    passes = {name: sum(check(getattr(pred, output_field)) for pred in preds) for name, check in rules.items()}
     return sum(scores) / len(scores), passes
 
 
