@@ -8,7 +8,7 @@ policy as the eval fixtures: real generated content, not committed).
 import dspy
 from dspy.teleprompt import BootstrapFewShot
 
-from app.core.summarization.backends.dspy_social_backend import (
+from app.core.summarization.post import (
     FACEBOOK_POST_COMPILED_PROGRAM_PATH,
     FACEBOOK_POST_COMPLIANCE_RULES,
     IMAGE_CONCEPT_COMPILED_PROGRAM_PATH,

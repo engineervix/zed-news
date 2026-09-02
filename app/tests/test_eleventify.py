@@ -28,7 +28,7 @@ class TestEleventify(unittest.TestCase):
         # locally-generated compiled programs - keeps tests deterministic.
         no_program = Path(self.temp_dir) / "no_compiled_program_here.json"
         self.patcher_description_program = patch(
-            "app.core.summarization.backends.dspy_eleventify_backend.DESCRIPTION_COMPILED_PROGRAM_PATH", no_program
+            "app.core.summarization.eleventify.DESCRIPTION_COMPILED_PROGRAM_PATH", no_program
         )
         self.patcher_description_program.start()
 

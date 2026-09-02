@@ -10,13 +10,13 @@ import dspy
 from app.core.utilities import DATA_DIR
 
 CANONICAL_SECTIONS = ("## Main Stories", "## Other Notable Stories", "## Key Takeaways & Watchpoints")
-EVAL_ARTICLES_PATH = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "eval_articles.json"
+EVAL_ARTICLES_PATH = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "eval_articles.json"
 COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_program.json"
 
-# Shared with dspy_social_backend.py and dspy_eleventify_backend.py: their signatures
+# Shared with post.py and eleventify.py: their signatures
 # all take a generated digest (not raw articles) as input, so they build their eval
 # sets from real digests generated here rather than duplicating this path per module.
-EVAL_DIGESTS_PATH = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "eval_digests.json"
+EVAL_DIGESTS_PATH = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "eval_digests.json"
 
 ModuleT = TypeVar("ModuleT", bound=dspy.Module)
 

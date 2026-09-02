@@ -8,7 +8,7 @@ policy as the eval fixture: real generated content, not committed).
 import dspy
 from dspy.teleprompt import BootstrapFewShot
 
-from app.core.summarization.backends.dspy_backend import (
+from app.core.summarization.digest import (
     COMPILED_PROGRAM_PATH,
     COMPLIANCE_RULES,
     DigestGenerator,

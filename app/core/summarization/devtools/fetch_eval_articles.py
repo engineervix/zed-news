@@ -17,9 +17,9 @@ from datetime import datetime, timedelta
 import feedparser
 
 from app.core.news.fetch import get_latest_news
-from app.core.news.other import URLs, get_description, get_feed_title, ua
-from app.core.summarization.backends.dspy_backend import EVAL_ARTICLES_PATH
-from app.core.summarization.backends.fetch_historical_articles import fetch_all
+from app.core.news.rss_sources import URLs, get_description, get_feed_title, ua
+from app.core.summarization.devtools.fetch_historical_articles import fetch_all
+from app.core.summarization.digest import EVAL_ARTICLES_PATH
 
 logger = logging.getLogger(__name__)
 

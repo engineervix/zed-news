@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 import dspy
 
-from app.core.summarization.backends.dspy_backend import EVAL_DIGESTS_PATH, compliance_score, load_compiled
+from app.core.summarization.digest import EVAL_DIGESTS_PATH, compliance_score, load_compiled
 from app.core.utilities import DATA_DIR
 
 DESCRIPTION_COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_description_program.json"
@@ -82,7 +82,7 @@ def load_compiled_digest_description_generator() -> DigestDescriptionGenerator:
     """Load the optimizer-compiled digest description generator, if one has been synced to this machine.
 
     Falls back to the raw, unoptimized module when `DESCRIPTION_COMPILED_PROGRAM_PATH`
-    does not exist - see `load_compiled` in `dspy_backend.py` for why.
+    does not exist - see `load_compiled` in `digest.py` for why.
     """
     return load_compiled(DigestDescriptionGenerator, DESCRIPTION_COMPILED_PROGRAM_PATH)
 

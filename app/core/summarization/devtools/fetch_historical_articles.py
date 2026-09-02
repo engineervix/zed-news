@@ -19,7 +19,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
-from app.core.news.other import get_mwebantu_article_detail, ua
+from app.core.news.rss_sources import get_mwebantu_article_detail, ua
 
 logger = logging.getLogger(__name__)
 

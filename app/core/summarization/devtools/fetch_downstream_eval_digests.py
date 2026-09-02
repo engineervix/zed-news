@@ -10,7 +10,7 @@ import json
 
 import dspy
 
-from app.core.summarization.backends.dspy_backend import EVAL_DIGESTS_PATH, build_eval_set, generate_digest_markdown, load_eval_articles
+from app.core.summarization.digest import EVAL_DIGESTS_PATH, build_eval_set, generate_digest_markdown, load_eval_articles
 from app.core.utilities import TOGETHER_API_KEY
 
 

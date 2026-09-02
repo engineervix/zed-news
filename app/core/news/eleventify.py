@@ -8,7 +8,7 @@ import pytz
 from jinja2 import Environment, PackageLoader, select_autoescape
 from together import Together
 
-from app.core.summarization.backends.dspy_eleventify_backend import generate_digest_description
+from app.core.summarization.eleventify import generate_digest_description
 from app.core.utilities import DATA_DIR, today_human_readable, today_iso_fmt
 
 env = Environment(

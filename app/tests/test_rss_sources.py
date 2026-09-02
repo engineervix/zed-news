@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 
 from feedparser.util import FeedParserDict
 
-from app.core.news.other import (
+from app.core.news.rss_sources import (
     URLs,
     get_daily_mail_article_detail,
     get_description,
@@ -15,7 +15,7 @@ from app.core.news.other import (
     get_mwebantu_article_detail,
 )
 
-# from app.core.news.other import get_rss_feed_entries,
+# from app.core.news.rss_sources import get_rss_feed_entries,
 
 
 def mock_parse(url, *args, **kwargs):
@@ -76,7 +76,7 @@ def mock_parse(url, *args, **kwargs):
         )
 
 
-class TestOtherNews(unittest.TestCase):
+class TestRssSources(unittest.TestCase):
     def setUp(self):
         self.daily_mail_url = "http://www.daily-mail.co.zm/article"
         self.mwebantu_url = "https://www.mwebantu.com/article"
@@ -84,7 +84,7 @@ class TestOtherNews(unittest.TestCase):
         self.diggers_url = "https://diggers.news/article"
         self.invalid_url = "http://www.example.com/invalid"
 
-    @patch("app.core.news.other.requests.get")
+    @patch("app.core.news.rss_sources.requests.get")
     def test_get_daily_mail_article_detail(self, mock_get):
         mock_response = MagicMock()
         mock_response.text = """
@@ -105,7 +105,7 @@ class TestOtherNews(unittest.TestCase):
         article_detail = get_daily_mail_article_detail(self.daily_mail_url)
         self.assertEqual(article_detail, "Paragraph 1.\nParagraph 2.")
 
-    @patch("app.core.news.other.requests.get")
+    @patch("app.core.news.rss_sources.requests.get")
     def test_get_mwebantu_article_detail(self, mock_get):
         mock_response = MagicMock()
         mock_response.text = """
@@ -125,7 +125,7 @@ class TestOtherNews(unittest.TestCase):
         article_detail = get_mwebantu_article_detail(self.mwebantu_url)
         self.assertEqual(article_detail, "Paragraph 1.\nParagraph 2.")
 
-    @patch("app.core.news.other.requests.get")
+    @patch("app.core.news.rss_sources.requests.get")
     def test_get_muvitv_article_detail(self, mock_get):
         mock_response = MagicMock()
         mock_response.text = """
@@ -146,7 +146,7 @@ class TestOtherNews(unittest.TestCase):
         article_detail = get_muvitv_article_detail(self.muvitv_url)
         self.assertEqual(article_detail, "Paragraph 0.\nParagraph 1.")
 
-    @patch("app.core.news.other.cloudscraper.create_scraper")
+    @patch("app.core.news.rss_sources.cloudscraper.create_scraper")
     def test_get_diggers_article_detail(self, mock_create_scraper):
         mock_response = MagicMock()
         mock_response.text = """
@@ -167,11 +167,11 @@ class TestOtherNews(unittest.TestCase):
         article_detail = get_diggers_article_detail(self.diggers_url)
         self.assertEqual(article_detail, "Paragraph 0.\nParagraph 1.")
 
-    @patch("app.core.news.other.get_daily_mail_article_detail")
-    @patch("app.core.news.other.get_mwebantu_article_detail")
-    @patch("app.core.news.other.get_muvitv_article_detail")
-    @patch("app.core.news.other.get_diggers_article_detail")
-    @patch("app.core.news.other.requests.get")
+    @patch("app.core.news.rss_sources.get_daily_mail_article_detail")
+    @patch("app.core.news.rss_sources.get_mwebantu_article_detail")
+    @patch("app.core.news.rss_sources.get_muvitv_article_detail")
+    @patch("app.core.news.rss_sources.get_diggers_article_detail")
+    @patch("app.core.news.rss_sources.requests.get")
     def test_get_description(self, mock_get, mock_diggers, mock_muvitv, mock_mwebantu, mock_daily_mail):
         mock_daily_mail.return_value = "Daily Mail Article content"
         mock_mwebantu.return_value = "Mwebantu Article content"
@@ -223,8 +223,8 @@ class TestOtherNews(unittest.TestCase):
         feed_title = get_feed_title(self.invalid_url)
         self.assertIsNone(feed_title)
 
-    # @patch("app.core.news.other.get_description")
-    # @patch("app.core.news.other.feedparser.parse", return_value=MagicMock())
+    # @patch("app.core.news.rss_sources.get_description")
+    # @patch("app.core.news.rss_sources.feedparser.parse", return_value=MagicMock())
     # def test_get_rss_feed_entries(self, mock_feedparser_parse, mock_get_description):
     #     mock_feedparser_parse.side_effect = [mock_parse(url) for url in URLs]
     #     mock_get_description.return_value = "Article content"

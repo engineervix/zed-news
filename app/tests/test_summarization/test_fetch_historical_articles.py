@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from app.core.summarization.backends.fetch_historical_articles import (
+from app.core.summarization.devtools.fetch_historical_articles import (
     _plain_text,
     fetch_mwebantu_backlog,
     fetch_wp_rest_posts,
@@ -29,7 +29,7 @@ class TestPlainText(unittest.TestCase):
 class TestFetchWpRestPosts(unittest.TestCase):
     """Test cases for fetching historical articles via the WordPress REST API"""
 
-    @patch("app.core.summarization.backends.fetch_historical_articles.requests.get")
+    @patch("app.core.summarization.devtools.fetch_historical_articles.requests.get")
     def test_filters_by_date_and_builds_articles(self, mock_get):
         response = MagicMock()
         response.status_code = 200
@@ -58,7 +58,7 @@ class TestFetchWpRestPosts(unittest.TestCase):
         self.assertEqual(articles[0]["source"], "Example News")
         self.assertEqual(articles[0]["url"], "https://example.com/recent")
 
-    @patch("app.core.summarization.backends.fetch_historical_articles.requests.get")
+    @patch("app.core.summarization.devtools.fetch_historical_articles.requests.get")
     def test_stops_when_no_posts_returned(self, mock_get):
         response = MagicMock()
         response.status_code = 200
@@ -71,7 +71,7 @@ class TestFetchWpRestPosts(unittest.TestCase):
         self.assertEqual(articles, [])
         mock_get.assert_called_once()
 
-    @patch("app.core.summarization.backends.fetch_historical_articles.requests.get")
+    @patch("app.core.summarization.devtools.fetch_historical_articles.requests.get")
     def test_stops_paginating_once_a_post_is_older_than_the_cutoff(self, mock_get):
         response = MagicMock()
         response.status_code = 200
@@ -95,9 +95,9 @@ class TestFetchWpRestPosts(unittest.TestCase):
 class TestFetchMwebantuBacklog(unittest.TestCase):
     """Test cases for fetching historical Mwebantu articles via listing-page scraping"""
 
-    @patch("app.core.summarization.backends.fetch_historical_articles.time.sleep")
-    @patch("app.core.summarization.backends.fetch_historical_articles.get_mwebantu_article_detail")
-    @patch("app.core.summarization.backends.fetch_historical_articles.requests.get")
+    @patch("app.core.summarization.devtools.fetch_historical_articles.time.sleep")
+    @patch("app.core.summarization.devtools.fetch_historical_articles.get_mwebantu_article_detail")
+    @patch("app.core.summarization.devtools.fetch_historical_articles.requests.get")
     def test_uses_real_listing_structure(self, mock_get, mock_get_detail, mock_sleep):
         listing_html = (FIXTURES_DIR / "mwebantu_listing_snippet.html").read_text()
         listing_response = MagicMock(status_code=200, text=listing_html)

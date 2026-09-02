@@ -5,7 +5,7 @@ from itertools import cycle
 
 import dspy
 
-from app.core.summarization.backends.dspy_backend import EVAL_DIGESTS_PATH, compliance_score, load_compiled
+from app.core.summarization.digest import EVAL_DIGESTS_PATH, compliance_score, load_compiled
 from app.core.utilities import DATA_DIR
 
 FACEBOOK_POST_COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_facebook_post_program.json"
@@ -211,7 +211,7 @@ def load_compiled_facebook_post_generator() -> FacebookPostGenerator:
     """Load the optimizer-compiled Facebook post generator, if one has been synced to this machine.
 
     Falls back to the raw, unoptimized module when `FACEBOOK_POST_COMPILED_PROGRAM_PATH`
-    does not exist - see `load_compiled` in `dspy_backend.py` for why.
+    does not exist - see `load_compiled` in `digest.py` for why.
     """
     return load_compiled(FacebookPostGenerator, FACEBOOK_POST_COMPILED_PROGRAM_PATH)
 

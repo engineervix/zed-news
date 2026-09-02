@@ -3,7 +3,7 @@ import unittest
 import dspy
 from dspy.utils.dummies import DummyLM
 
-from app.core.summarization.backends.dspy_eleventify_backend import (
+from app.core.summarization.eleventify import (
     DIGEST_DESCRIPTION_COMPLIANCE_RULES,
     build_digest_description_eval_set,
     digest_description_compliance_score,

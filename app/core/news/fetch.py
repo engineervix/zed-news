@@ -2,7 +2,7 @@ import json
 import logging
 
 from app.core.db.models import Article
-from app.core.news.other import get_rss_feed_entries
+from app.core.news.rss_sources import get_rss_feed_entries
 from app.core.news.znbc import get_news
 
 

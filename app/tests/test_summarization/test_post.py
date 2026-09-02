@@ -3,7 +3,7 @@ import unittest
 import dspy
 from dspy.utils.dummies import DummyLM
 
-from app.core.summarization.backends.dspy_social_backend import (
+from app.core.summarization.post import (
     FACEBOOK_POST_COMPLIANCE_RULES,
     IMAGE_CONCEPT_COMPLIANCE_RULES,
     build_facebook_post_eval_set,

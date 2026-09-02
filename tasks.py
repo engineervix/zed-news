@@ -334,31 +334,31 @@ def digest(c):
 @task
 def fetch_eval_articles(c):
     """Fetch real articles for the local DSPy eval fixture (not committed to git)"""
-    c.run("python -m app.core.summarization.backends.fetch_eval_articles", pty=True)
+    c.run("python -m app.core.summarization.devtools.fetch_eval_articles", pty=True)
 
 
 @task
 def optimize_digest(c):
     """Run BootstrapFewShot against the DSPy eval set (hits the real model, costs API calls)"""
-    c.run("python -m app.core.summarization.backends.optimize_digest", pty=True)
+    c.run("python -m app.core.summarization.devtools.optimize_digest", pty=True)
 
 
 @task
 def fetch_downstream_eval_digests(c):
     """Generate real digests from the eval articles fixture, for post.py/eleventify.py's eval sets"""
-    c.run("python -m app.core.summarization.backends.fetch_downstream_eval_digests", pty=True)
+    c.run("python -m app.core.summarization.devtools.fetch_downstream_eval_digests", pty=True)
 
 
 @task
 def optimize_social(c):
     """Run BootstrapFewShot for post.py's Facebook post and image concept signatures"""
-    c.run("python -m app.core.summarization.backends.optimize_social_backend", pty=True)
+    c.run("python -m app.core.summarization.devtools.optimize_social_backend", pty=True)
 
 
 @task
 def optimize_eleventify(c):
     """Run BootstrapFewShot for eleventify.py's digest description signature"""
-    c.run("python -m app.core.summarization.backends.optimize_eleventify_backend", pty=True)
+    c.run("python -m app.core.summarization.devtools.optimize_eleventify_backend", pty=True)
 
 
 @task

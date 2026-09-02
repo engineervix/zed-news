@@ -27,10 +27,10 @@ class TestSocialPost(unittest.TestCase):
         # locally-generated compiled programs - keeps tests deterministic.
         no_program = Path(self.temp_dir) / "no_compiled_program_here.json"
         self.patcher_facebook_post_program = patch(
-            "app.core.summarization.backends.dspy_social_backend.FACEBOOK_POST_COMPILED_PROGRAM_PATH", no_program
+            "app.core.summarization.post.FACEBOOK_POST_COMPILED_PROGRAM_PATH", no_program
         )
         self.patcher_image_concept_program = patch(
-            "app.core.summarization.backends.dspy_social_backend.IMAGE_CONCEPT_COMPILED_PROGRAM_PATH", no_program
+            "app.core.summarization.post.IMAGE_CONCEPT_COMPILED_PROGRAM_PATH", no_program
         )
         self.patcher_facebook_post_program.start()
         self.patcher_image_concept_program.start()

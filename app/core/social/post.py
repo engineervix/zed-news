@@ -22,7 +22,7 @@ import requests
 from dotenv import load_dotenv
 from together import Together
 
-from app.core.summarization.backends.dspy_social_backend import generate_facebook_post, generate_image_concept
+from app.core.summarization.post import generate_facebook_post, generate_image_concept
 from app.core.utilities import (
     ASSETS_DIR,  # noqa: F401
     DATA_DIR,

@@ -20,7 +20,7 @@ class TestDigest(unittest.TestCase):
         # Force the raw module path regardless of whether this machine has a
         # locally-generated compiled program - keeps tests deterministic.
         self.patcher_compiled_program = patch(
-            "app.core.summarization.backends.dspy_backend.COMPILED_PROGRAM_PATH",
+            "app.core.summarization.digest.COMPILED_PROGRAM_PATH",
             Path(self.temp_dir) / "no_compiled_program_here.json",
         )
         self.patcher_compiled_program.start()

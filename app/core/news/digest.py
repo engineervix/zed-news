@@ -4,7 +4,7 @@ import sys
 
 import dspy
 
-from app.core.summarization.backends.dspy_backend import generate_digest_markdown
+from app.core.summarization.digest import generate_digest_markdown
 from app.core.utilities import DATA_DIR, TOGETHER_API_KEY, remove_think_tags, today_human_readable, today_iso_fmt
 
 logger = logging.getLogger(__name__)
