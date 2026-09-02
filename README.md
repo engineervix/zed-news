@@ -48,7 +48,7 @@ The project has two main components:
 - **core** -- A Python application that handles:
 
   - Gathering news from RSS feeds using [requests](https://pypi.org/project/requests/), [feedparser](https://pypi.org/project/feedparser/), and [beautifulsoup4](https://pypi.org/project/beautifulsoup4/).
-  - Processing the news articles using Large Language Models (LLMs).
+  - Turning articles into a digest with [DSPy](https://dspy.ai/). Prompts are typed **signatures**, not hand-written text, and an optimizer tunes them against real examples.
   - Generating structured data for the static website.
 
 - **web** -- An [11ty](httpss://www.11ty.dev/) static site that presents the news digests.
