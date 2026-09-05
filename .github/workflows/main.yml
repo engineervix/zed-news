@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Python
         id: setup-python
@@ -64,7 +64,7 @@ jobs:
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Python
         id: setup-python
@@ -105,7 +105,7 @@ jobs:
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - uses: actions/setup-node@v6
         with:
@@ -135,7 +135,7 @@ jobs:
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Dependencies
         shell: bash
@@ -155,7 +155,7 @@ jobs:
 
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Python
         id: setup-python
@@ -222,7 +222,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Python
         id: setup-python
@@ -292,7 +292,7 @@ jobs:
 
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Python
         id: setup-python
