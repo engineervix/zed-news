@@ -29,14 +29,14 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
   && apt-get clean
 
 # Set timezone to Africa/Lusaka
-RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
+RUN sed -i '/en_GB.UTF-8/s/^# //g' /etc/locale.gen \
   && locale-gen \
   && ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime \
   && dpkg-reconfigure tzdata
 
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+ENV LANG en_GB.UTF-8
+ENV LANGUAGE en_GB:en
+ENV LC_ALL en_GB.UTF-8
 
 # Use user "zednews" to run the build commands below
 USER zednews
