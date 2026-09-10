@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
@@ -69,6 +70,33 @@ class TestEleventify(unittest.TestCase):
         self.assertIn("Article A", content)
         mock_logger.info.assert_any_call("Rendering Jinja template for daily digest...")
         mock_logger.info.assert_any_call(f"Daily digest template rendered successfully: {dist_file_path}")
+
+    @patch("app.core.news.eleventify.today", date(2026, 9, 9))
+    @patch("app.core.news.eleventify.is_backfill", True)
+    @patch("app.core.news.eleventify.create_digest_description")
+    @patch("app.core.news.eleventify.get_digest_metadata")
+    def test_render_jinja_template_backfill_uses_target_date_not_today(
+        self, mock_get_digest_metadata, mock_create_digest_description
+    ):
+        """A backfilled digest's date/permalink must match the target date, not the
+        real run date - otherwise it collides with that day's real digest page."""
+        mock_get_digest_metadata.return_value = {
+            "content": "Backfilled content.",
+            "sources": ["Source A"],
+            "articles": [{"source": "Source A", "url": "http://example.com/a", "title": "Article A"}],
+            "total_articles": 1,
+            "generated_at": "2026-09-10T18:32:15Z",
+        }
+        mock_create_digest_description.return_value = "A backfilled news digest."
+
+        render_jinja_template()
+
+        dist_file_path = f"{self.temp_dir}/{today_iso_fmt}.njk"
+        with open(dist_file_path, "r") as f:
+            content = f.read()
+
+        self.assertIn("date: 2026-09-09T00:00:00", content)
+        self.assertIn("permalink: /news/2026-09-09/", content)
 
     def test_get_digest_metadata(self):
         mock_data = {"key": "value"}

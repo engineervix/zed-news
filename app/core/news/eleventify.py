@@ -9,7 +9,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from together import Together
 
 from app.core.summarization.eleventify import generate_digest_description
-from app.core.utilities import DATA_DIR, today_human_readable, today_iso_fmt
+from app.core.utilities import DATA_DIR, is_backfill, today, today_human_readable, today_iso_fmt
 
 env = Environment(
     loader=PackageLoader("app", "core/news/template"),
@@ -82,8 +82,12 @@ def get_digest_metadata() -> dict:
         return {}
 
 
-def render_jinja_template():
-    """Render the Jinja template for a daily digest"""
+def render_jinja_template() -> None:
+    """Render the Jinja template for a daily digest.
+
+    Uses today's real date, unless backfilling a past date (is_backfill),
+    in which case the page's date/permalink are keyed to that target date.
+    """
     logger.info("Rendering Jinja template for daily digest...")
 
     # Load digest metadata
@@ -101,8 +105,13 @@ def render_jinja_template():
     digest_articles = digest_data.get("articles", [])
 
     # Setup timezone
-    utc_dt = datetime.now(timezone.utc) + timedelta(minutes=5)
     LSK = pytz.timezone("Africa/Lusaka")
+    if is_backfill:
+        # Use the target date at midnight rather than the real run time, so the
+        # rendered page's date/permalink match the backfilled day, not today.
+        digest_dt = LSK.localize(datetime(today.year, today.month, today.day))
+    else:
+        digest_dt = (datetime.now(timezone.utc) + timedelta(minutes=5)).astimezone(LSK)
 
     # Ensure output directory exists
     os.makedirs(os.path.dirname(dist_file), exist_ok=True)
@@ -114,7 +123,7 @@ def render_jinja_template():
                 {
                     "title": today_human_readable,
                     "description": digest_description,
-                    "date": utc_dt.astimezone(LSK).isoformat(),
+                    "date": digest_dt.isoformat(),
                     "digest_content": digest_data.get("content", ""),
                     "total_articles": digest_data.get("total_articles", len(digest_articles)),
                     "num_sources": len(sources),
