@@ -7,7 +7,10 @@
 # version:      1.3.0
 # license:      BSD-3-Clause
 #
-# Usage: ./cron.sh [digest|facebook-post|fx-update]
+# Usage: ./cron.sh [digest|facebook-post|fx-update] [YYYY-MM-DD]
+#
+# The optional YYYY-MM-DD argument applies only to 'digest': it backfills the
+# digest for that past date instead of today (see `inv digest --help`).
 #
 # Logical steps
 # 1. cd to project directory
@@ -21,8 +24,9 @@ set -e  # Exit immediately if any command fails
 
 # Check for required argument
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 [digest|facebook-post|fx-update]"
+    echo "Usage: $0 [digest|facebook-post|fx-update] [YYYY-MM-DD]"
     echo "  digest        - Generate news digest using Docker"
+    echo "                  optionally followed by YYYY-MM-DD to backfill a past date"
     echo "  facebook-post - Post to Facebook (runs natively, no Docker)"
     echo "  fx-update     - Update foreign exchange rates (runs natively, no Docker)"
     exit 1
@@ -68,11 +72,22 @@ source "${HOME}/Env/zed-news/bin/activate" || { echo "Failed to activate virtual
 
 # 3. Run specified task
 if [[ "$TASK" == "digest" ]]; then
+    DIGEST_DATE="$2"
+    digest_args=()
+    if [[ -n "$DIGEST_DATE" ]]; then
+        date -d "$DIGEST_DATE" > /dev/null 2>&1 || {
+            echo "Error: '${DIGEST_DATE}' is not a valid date (expected YYYY-MM-DD)."
+            send_healthcheck_failure
+            exit 1
+        }
+        digest_args+=(--date="$DIGEST_DATE")
+    fi
+
     git pull || { echo "Failed to pull changes from Git."; send_healthcheck_failure; exit 1; }
     echo "Running digest task in Docker..."
     # Build and run digest in docker container
     inv up --build || { echo "Failed to build Docker container."; send_healthcheck_failure; exit 1; }
-    docker compose run --rm app invoke digest || {
+    docker compose run --rm app invoke digest "${digest_args[@]}" || {
         echo "Failed to run digest script inside Docker container."
         send_healthcheck_failure
         exit 1
@@ -80,7 +95,7 @@ if [[ "$TASK" == "digest" ]]; then
     inv down || { echo "Failed to stop Docker container."; send_healthcheck_failure; exit 1; }
 
     # 5. commit changes (only for digest)
-    today_iso=$(date --iso)
+    today_iso="${DIGEST_DATE:-$(date --iso)}"
     git add app/web/_pages/news || { echo "Failed to stage changes for commit."; send_healthcheck_failure; exit 1; }
     git commit --no-verify -m "chore: 📰 news digest » ${today_iso}" || { echo "Failed to commit changes."; send_healthcheck_failure; exit 1; }
 
@@ -94,7 +109,7 @@ if [[ "$TASK" == "digest" ]]; then
     sleep 300
 
     # Notify Admin via Apprise + ntfy.sh
-    today_human_readable=$(date +"%a %d %b %Y")
+    today_human_readable=$(date -d "$today_iso" +"%a %d %b %Y")
     apprise -vv -t "📰 News Digest » ${today_human_readable}" \
       -b "📖 Read today's news at ${BASE_URL}/news/${today_iso}/" \
       "${APPRISE_NTFY_URL}"
