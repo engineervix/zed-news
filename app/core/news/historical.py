@@ -1,14 +1,14 @@
-"""Historical article backlog for the DSPy eval fixture.
+"""Fetches articles from a source's own archive rather than its live feed/listing.
 
-Three of the four sites expose the standard WordPress REST API, which
+Three of the four RSS sites expose the standard WordPress REST API, which
 gives real publish dates and full content directly - no per-site HTML
 guessing needed. Mwebantu blocks its REST API (403), so it falls back to
 scraping its story-row listing and reusing get_mwebantu_article_detail
 for content, checking each candidate's own page for its published-date
 meta tag since the listing itself carries no usable date.
 
-Dev-only, matches fetch_eval_articles.py's fixture path and gitignore
-policy: real news, not committed, regenerate locally when needed.
+ZNBC has no reliable archive to walk: its listing pagination isn't
+consistently sorted by date, so it stays live-feed-only.
 """
 
 import html
@@ -37,13 +37,16 @@ def _plain_text(content_html: str) -> str:
     return "\n".join(p.get_text(strip=True) for p in soup.find_all("p"))
 
 
-def fetch_wp_rest_posts(source: str, base_url: str, since: datetime, max_pages: int = 5) -> list[dict[str, str]]:
-    """Fetch WordPress posts published since a cutoff, via the site's own REST API.
+def fetch_wp_rest_posts(
+    source: str, base_url: str, since: datetime, until: datetime | None = None, max_pages: int = 5
+) -> list[dict[str, str]]:
+    """Fetch WordPress posts published in [since, until), via the site's own REST API.
 
     Args:
         source: The article dict's `source` value, e.g. "News Diggers!".
         base_url: The site's root URL, with no trailing slash, e.g. "https://diggers.news".
         since: Stop once a page's newest-first posts reach one older than this.
+        until: Skip posts published on or after this (open backlog when None).
         max_pages: Upper bound on how many pages of 100 posts to walk back through.
 
     Returns:
@@ -77,6 +80,8 @@ def fetch_wp_rest_posts(source: str, base_url: str, since: datetime, max_pages: 
                 # after this point (this page or later ones) is in range
                 reached_cutoff = True
                 break
+            if until is not None and published >= until:
+                continue
             content = _plain_text(post["content"]["rendered"])
             if not content:
                 continue
@@ -99,30 +104,41 @@ def fetch_wp_rest_posts(source: str, base_url: str, since: datetime, max_pages: 
     return articles
 
 
-def _fetch_recent_mwebantu_article(title: str, link: str, since: datetime) -> dict[str, str] | None:
-    """Fetch one Mwebantu article if its published-date meta tag is within the cutoff."""
+def _classify_mwebantu_article(
+    title: str, link: str, since: datetime, until: datetime | None
+) -> tuple[dict[str, str] | None, bool]:
+    """Fetch one Mwebantu article and classify it against [since, until).
+
+    Returns (article dict or None, reached_cutoff). reached_cutoff is True
+    only when this article is older than `since`, the signal that a page's
+    walk has gone far enough back regardless of how many articles on the
+    page actually landed in the window.
+    """
     try:
         detail = requests.get(link, headers={"User-Agent": ua.chrome}, timeout=20)
     except requests.exceptions.RequestException:
         logger.error(f"Failed to fetch Mwebantu article {link}", exc_info=True)
-        return None
+        return None, False
 
     detail_soup = BeautifulSoup(detail.text, "html.parser")
     meta = detail_soup.find("meta", property="article:published_time")
     if not meta or not meta.get("content"):
-        return None
+        return None, False
     published = datetime.fromisoformat(meta["content"]).replace(tzinfo=None)
+
     if published < since:
-        return None
+        return None, True
+    if until is not None and published >= until:
+        return None, False
 
     content = get_mwebantu_article_detail(link)
     if not content:
-        return None
-    return {"source": "Mwebantu", "url": link, "title": title, "content": content, "category": ""}
+        return None, False
+    return {"source": "Mwebantu", "url": link, "title": title, "content": content, "category": ""}, False
 
 
-def fetch_mwebantu_backlog(since: datetime, max_pages: int = 6) -> list[dict[str, str]]:
-    """Fetch Mwebantu posts published since a cutoff.
+def fetch_mwebantu_backlog(since: datetime, until: datetime | None = None, max_pages: int = 6) -> list[dict[str, str]]:
+    """Fetch Mwebantu posts published in [since, until).
 
     Mwebantu blocks its REST API, so this walks its listing pages instead
     and checks each candidate article's own page for a published-date tag,
@@ -130,6 +146,7 @@ def fetch_mwebantu_backlog(since: datetime, max_pages: int = 6) -> list[dict[str
 
     Args:
         since: Skip any article whose published-date tag is older than this.
+        until: Skip articles published on or after this (open backlog when None).
         max_pages: Upper bound on how many listing pages to walk back through.
 
     Returns:
@@ -152,23 +169,25 @@ def fetch_mwebantu_backlog(since: datetime, max_pages: int = 6) -> list[dict[str
             break
 
         page_articles = []
+        reached_cutoff = False
         for title, link in candidates:
             time.sleep(1.5)
-            article = _fetch_recent_mwebantu_article(title, link, since)
+            article, is_cutoff = _classify_mwebantu_article(title, link, since, until)
             if article:
                 page_articles.append(article)
+            reached_cutoff = reached_cutoff or is_cutoff
 
-        if not page_articles:
-            break
         articles += page_articles
+        if reached_cutoff:
+            break
 
     return articles
 
 
-def fetch_all(since: datetime) -> list[dict[str, str]]:
-    """Fetch the historical backlog across all four sites, since a cutoff date."""
+def fetch_all(since: datetime, until: datetime | None = None) -> list[dict[str, str]]:
+    """Fetch the historical backlog across the archivable sites, for [since, until)."""
     articles = []
     for source, base_url in REST_SOURCES.items():
-        articles += fetch_wp_rest_posts(source, base_url, since)
-    articles += fetch_mwebantu_backlog(since)
+        articles += fetch_wp_rest_posts(source, base_url, since, until=until)
+    articles += fetch_mwebantu_backlog(since, until=until)
     return articles

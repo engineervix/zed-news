@@ -83,8 +83,16 @@ def custom_strftime(format, t):
     return t.strftime(format).replace("{S}", str(t.day) + suffix(t.day))
 
 
+def resolve_target_date(override: str | None, tz: pytz.BaseTzInfo) -> datetime.date:
+    """The digest's target date: ZED_NEWS_DATE (ISO format, e.g. 2026-09-09) if set, else today in tz."""
+    if override:
+        return datetime.date.fromisoformat(override)
+    return datetime.datetime.now(tz).date()
+
+
 timezone = pytz.timezone("Africa/Lusaka")
-today = datetime.datetime.now(timezone).date()
+today = resolve_target_date(os.getenv("ZED_NEWS_DATE"), timezone)
+is_backfill = today != resolve_target_date(None, timezone)
 
 today_iso_fmt = today.isoformat()
 today_human_readable = custom_strftime("%A, %B {S}, %Y", today)

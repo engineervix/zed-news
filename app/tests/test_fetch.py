@@ -1,10 +1,11 @@
 import unittest
+from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 from peewee import SqliteDatabase
 
 from app.core.db.models import Article
-from app.core.news.fetch import save_news_to_db, save_news_to_file
+from app.core.news.fetch import get_latest_news, save_news_to_db, save_news_to_file
 
 MODELS = [Article]
 test_db = SqliteDatabase(":memory:")
@@ -76,6 +77,36 @@ class TestSaveToFile(unittest.TestCase):
 
         mock_open.assert_called_once_with(dest, "w")
         mock_json_dump.assert_called_once_with(news, mock_open().__enter__(), indent=2, ensure_ascii=False)
+
+
+class TestGetLatestNews(unittest.TestCase):
+    @patch("app.core.news.fetch.today", datetime(2026, 9, 9).date())
+    @patch("app.core.news.fetch.is_backfill", True)
+    @patch("app.core.news.fetch.fetch_all")
+    @patch("app.core.news.fetch.get_rss_feed_entries")
+    @patch("app.core.news.fetch.get_news")
+    def test_backfill_bounds_fetch_to_the_target_day(self, mock_get_news, mock_get_rss, mock_fetch_all):
+        mock_fetch_all.return_value = [{"source": "News Diggers!", "url": "https://diggers.news/x", "title": "t"}]
+
+        news = get_latest_news()
+
+        mock_fetch_all.assert_called_once_with(datetime(2026, 9, 9), until=datetime(2026, 9, 10))
+        mock_get_news.assert_not_called()
+        mock_get_rss.assert_not_called()
+        self.assertEqual(news, mock_fetch_all.return_value)
+
+    @patch("app.core.news.fetch.is_backfill", False)
+    @patch("app.core.news.fetch.fetch_all")
+    @patch("app.core.news.fetch.get_rss_feed_entries")
+    @patch("app.core.news.fetch.get_news")
+    def test_live_day_uses_live_sources_not_historical_archive(self, mock_get_news, mock_get_rss, mock_fetch_all):
+        mock_get_news.return_value = [{"source": "ZNBC", "url": "https://znbc.co.zm/x", "title": "z"}]
+        mock_get_rss.return_value = [{"source": "News Diggers!", "url": "https://diggers.news/x", "title": "t"}]
+
+        news = get_latest_news()
+
+        mock_fetch_all.assert_not_called()
+        self.assertEqual(news, mock_get_rss.return_value + mock_get_news.return_value)
 
 
 if __name__ == "__main__":

@@ -326,9 +326,19 @@ def get_release_notes(c):
 
 
 @task
-def digest(c):
-    """Generate news digest from latest Zambian news sources"""
-    c.run("python app/core/run.py", pty=True)
+def digest(c, date=None):
+    """Generate news digest from latest Zambian news sources
+
+    Pass --date=YYYY-MM-DD to (re)generate the digest for a past date instead
+    of today. Articles are then pulled from each source's own archive (where
+    available) rather than the live feed, since live feeds only carry a
+    rolling window of recent items.
+    """
+    env = {}
+    if date:
+        datetime.date.fromisoformat(date)  # fail fast on a malformed date
+        env["ZED_NEWS_DATE"] = date
+    c.run("python app/core/run.py", pty=True, env=env)
 
 
 @task

@@ -1,9 +1,11 @@
 import os
 import unittest
-from datetime import datetime
+from datetime import date, datetime
 from unittest.mock import patch
 
-from app.core.utilities import custom_strftime, suffix
+import pytz
+
+from app.core.utilities import custom_strftime, resolve_target_date, suffix
 
 
 class TestUtilities(unittest.TestCase):
@@ -50,6 +52,21 @@ class TestUtilities(unittest.TestCase):
             # Test with day 4
             formatted_date = custom_strftime("%Y-%m-{S}", datetime(2023, 6, 4))
             self.assertEqual(formatted_date, "2023-06-4th")
+
+
+class TestResolveTargetDate(unittest.TestCase):
+    def setUp(self):
+        self.tz = pytz.timezone("Africa/Lusaka")
+
+    def test_no_override_returns_actual_today(self):
+        self.assertEqual(resolve_target_date(None, self.tz), datetime.now(self.tz).date())
+
+    def test_override_returns_that_date(self):
+        self.assertEqual(resolve_target_date("2026-09-09", self.tz), date(2026, 9, 9))
+
+    def test_malformed_override_raises(self):
+        with self.assertRaises(ValueError):
+            resolve_target_date("09-09-2026", self.tz)
 
 
 if __name__ == "__main__":
