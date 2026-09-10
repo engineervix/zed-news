@@ -13,9 +13,8 @@ from app.core.news.rss_sources import (
     get_feed_title,
     get_muvitv_article_detail,
     get_mwebantu_article_detail,
+    get_rss_feed_entries,
 )
-
-# from app.core.news.rss_sources import get_rss_feed_entries,
 
 
 def mock_parse(url, *args, **kwargs):
@@ -223,24 +222,38 @@ class TestRssSources(unittest.TestCase):
         feed_title = get_feed_title(self.invalid_url)
         self.assertIsNone(feed_title)
 
-    # @patch("app.core.news.rss_sources.get_description")
-    # @patch("app.core.news.rss_sources.feedparser.parse", return_value=MagicMock())
-    # def test_get_rss_feed_entries(self, mock_feedparser_parse, mock_get_description):
-    #     mock_feedparser_parse.side_effect = [mock_parse(url) for url in URLs]
-    #     mock_get_description.return_value = "Article content"
+    @patch("app.core.news.rss_sources.get_description")
+    @patch("app.core.news.rss_sources.feedparser.parse")
+    def test_get_rss_feed_entries_happy_path(self, mock_feedparser_parse, mock_get_description):
+        mock_feedparser_parse.side_effect = lambda url, **_kwargs: mock_parse(url)
+        mock_get_description.return_value = "Article content"
 
-    #     result = get_rss_feed_entries()
+        result = get_rss_feed_entries()
 
-    #     self.assertEqual(len(result), 4)
+        self.assertEqual(len(result), len(URLs) * 2)
+        for item in result:
+            self.assertIn(item["title"], ("Article 1", "Article 2"))
+            self.assertEqual(item["content"], "Article content")
+            self.assertEqual(item["category"], "")
 
-    #     for item, url in zip(result, URLs, strict=True):
-    #         parsed_url = urlparse(url)
-    #         base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    #         self.assertEqual(item["source"], get_feed_title(url))
-    #         self.assertEqual(item["url"], f"{base_url}/article1")
-    #         self.assertEqual(item["title"], "Article 1")
-    #         self.assertEqual(item["content"], "Article content")
-    #         self.assertEqual(item["category"], "")
+    @patch("app.core.news.rss_sources.get_description")
+    @patch("app.core.news.rss_sources.feedparser.parse")
+    def test_get_rss_feed_entries_survives_a_single_feed_failure(self, mock_feedparser_parse, mock_get_description):
+        """A connection error on one feed (e.g. RemoteDisconnected) must not discard
+        articles already fetched from the other feeds."""
+        broken_url = URLs[0]
+
+        def parse_with_one_broken_feed(url, **_kwargs):
+            if url == broken_url:
+                raise ConnectionResetError("Remote end closed connection without response")
+            return mock_parse(url)
+
+        mock_feedparser_parse.side_effect = parse_with_one_broken_feed
+        mock_get_description.return_value = "Article content"
+
+        result = get_rss_feed_entries()
+
+        self.assertEqual(len(result), (len(URLs) - 1) * 2)
 
 
 if __name__ == "__main__":

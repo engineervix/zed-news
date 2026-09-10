@@ -241,18 +241,16 @@ def get_rss_feed_entries() -> list[dict[str, str]]:
     other sources.
     """
 
-    try:
-        feeds = [
-            feedparser.parse(
+    feed = []
+    for url in URLs:
+        try:
+            parsed = feedparser.parse(
                 url,
                 request_headers={"User-Agent": ua.chrome, "Cache-Control": "max-age=0"},
             )
-            for url in URLs
-        ]
-        feed = [item for feed in feeds for item in feed.entries]
-    except Exception:
-        logger.error(traceback.format_exc())
-        return []
+            feed.extend(parsed.entries)
+        except Exception:
+            logger.error(f"Failed to fetch RSS feed {url}\n{traceback.format_exc()}")
 
     entries = []
     for i in feed:
