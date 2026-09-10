@@ -28,6 +28,7 @@ DATABASE_HOST = os.getenv("DATABASE_HOST")
 DATABASE_USER = os.getenv("DATABASE_USER")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 
 class ColourFormatter(logging.Formatter):

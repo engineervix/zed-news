@@ -32,10 +32,12 @@ class TestSaveToDB(unittest.TestCase):
         # If we wanted, we could re-bind the models to their original
         # database here. But for tests this is probably not necessary.
 
+    @patch("app.core.news.fetch.embed_text")
     @patch("app.core.news.fetch.logging")
-    def test_save_news_to_db(self, mock_logging):
+    def test_save_news_to_db(self, mock_logging, mock_embed_text):
         mock_create = MagicMock()
         Article.create = mock_create
+        mock_embed_text.return_value = [0.1, 0.2, 0.3]
 
         news = [
             {
@@ -57,11 +59,13 @@ class TestSaveToDB(unittest.TestCase):
                     url=article["url"],
                     title=article["title"],
                     content=article["content"],
+                    embedding=[0.1, 0.2, 0.3],
                 ),
             )
         mock_create.assert_has_calls(expected_calls)
 
         self.assertEqual(mock_create.call_count, len(news))
+        mock_embed_text.assert_any_call(news[0]["content"])
 
         mock_logging.info.assert_called_once_with("Saving news to the database ...")
 

@@ -151,6 +151,19 @@ def upgrade(c):
     c.run("aerich upgrade", pty=True)
 
 
+@task
+def add_embedding_column(c):
+    """One-off: add article.embedding + its HNSW index (see STORY_CONTINUITY_PLAN.md)"""
+    c.run("python -m app.core.db.devtools.add_embedding_column", pty=True)
+
+
+@task(help={"limit": "Only embed this many articles (for a small test run before the full backfill)"})
+def backfill_embeddings(c, limit=None):
+    """One-off: embed existing articles missing `embedding` (hits real OpenRouter API)"""
+    cmd = "python -m app.core.summarization.devtools.backfill_embeddings"
+    c.run(f"{cmd} {limit}" if limit else cmd, pty=True)
+
+
 @task(help={"fix": "let black and ruff format your files"})
 def lint(c, fix=False):
     """ruff and black"""

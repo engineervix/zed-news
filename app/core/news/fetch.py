@@ -6,6 +6,7 @@ from app.core.db.models import Article
 from app.core.news.historical import fetch_all
 from app.core.news.rss_sources import get_rss_feed_entries
 from app.core.news.znbc import get_news
+from app.core.summarization.embeddings import embed_text
 from app.core.utilities import is_backfill, today
 
 
@@ -38,7 +39,7 @@ def save_news_to_db(news: list[dict[str, str]]):
     logging.info("Saving news to the database ...")
 
     for item in news:
-        Article.create(**item)
+        Article.create(**item, embedding=embed_text(item["content"]))
 
 
 def save_news_to_file(news: list[dict[str, str]], dest: str):
