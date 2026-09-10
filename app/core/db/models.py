@@ -1,4 +1,5 @@
 from peewee import AutoField, BooleanField, CharField, DateField, ForeignKeyField, IntegerField, Model, TextField
+from pgvector.peewee import VectorField
 
 from app.core.db.config import database
 from app.core.utilities import today
@@ -59,6 +60,8 @@ class Article(BaseModel):
     date = DateField(default=today)
     summary = TextField(null=True)
     episode = ForeignKeyField(column_name="episode_id", field="number", model=Episode, null=True, backref="articles")
+    # 1024 dims to match OpenRouter's baai/bge-m3 embedding output (see STORY_CONTINUITY_PLAN.md)
+    embedding = VectorField(dimensions=1024, null=True)
 
     class Meta:
         table_name = "article"

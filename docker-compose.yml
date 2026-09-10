@@ -13,7 +13,9 @@ services:
       - db
 
   db:
-    image: postgres:15
+    # pgvector/pgvector:0.8.1-pg15 = postgres:15 + the `vector` extension compiled in.
+    # Neon (prod) already ships pgvector; local dev needs the extension in the image.
+    image: pgvector/pgvector:0.8.1-pg15
     expose:
       - 5432
     environment:
