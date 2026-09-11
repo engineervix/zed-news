@@ -2,14 +2,18 @@ import json
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 from typing import TypeVar
 
 import dspy
 
-from app.core.utilities import DATA_DIR
+from app.core.utilities import DATA_DIR, truncate
 
 CANONICAL_SECTIONS = ("## Main Stories", "## Other Notable Stories", "## Key Takeaways & Watchpoints")
+# Shorter than news/digest.py's 2200-char main-article clip - this is supplementary
+# framing context, not primary content, and may include several matches per article.
+RELATED_CONTEXT_EXCERPT_LENGTH = 500
 EVAL_ARTICLES_PATH = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "eval_articles.json"
 COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_program.json"
 
@@ -42,6 +46,16 @@ class DigestSignature(dspy.Signature):
     """
 
     articles: str = dspy.InputField(desc="Numbered list of articles with title, source, and content")
+    related_context: str = dspy.InputField(
+        desc=(
+            "Past coverage of a similar or recurring story, if any, each prefixed with how long "
+            "ago it ran (e.g. '12 days ago', '6 months ago'). Empty when there is none - do not "
+            "invent continuity that isn't given here. Tie framing language to the actual gap "
+            "stated: only call something a recent follow-up (e.g. 'as flagged last week...') when "
+            "the gap given is genuinely short; for an old match, frame it as a recurring pattern "
+            "(e.g. 'the fourth time this year...') rather than implying it just happened."
+        )
+    )
     digest: str = dspy.OutputField(
         desc=(
             "Markdown digest with Main Stories, Other Notable Stories, and Key Takeaways & "
@@ -63,8 +77,8 @@ class DigestGenerator(dspy.Module):
         super().__init__()
         self.generate = dspy.Predict(DigestSignature)
 
-    def forward(self, articles: str) -> dspy.Prediction:
-        return self.generate(articles=articles)
+    def forward(self, articles: str, related_context: str = "") -> dspy.Prediction:
+        return self.generate(articles=articles, related_context=related_context)
 
 
 def _format_articles(articles: list[dict[str, str]]) -> str:
@@ -76,13 +90,54 @@ def _format_articles(articles: list[dict[str, str]]) -> str:
     return "\n".join(lines)
 
 
-def generate_digest(articles: list[dict[str, str]]) -> Digest | None:
+def format_elapsed(article_date: date, reference_date: date) -> str:
+    """Describe the gap between `article_date` and `reference_date` in human terms.
+
+    Deliberately approximate (30-day months, 365-day years) - this feeds a framing
+    instruction to the LLM, not an accounting calculation.
+    """
+    days = max((reference_date - article_date).days, 0)
+    if days == 0:
+        return "today"
+    if days == 1:
+        return "yesterday"
+    if days < 7:
+        return f"{days} days ago"
+    if days < 30:
+        weeks = days // 7
+        return f"{weeks} week{'s' if weeks != 1 else ''} ago"
+    if days < 365:
+        months = days // 30
+        return f"{months} month{'s' if months != 1 else ''} ago"
+    years = days // 365
+    return f"{years} year{'s' if years != 1 else ''} ago"
+
+
+def format_related_context(matches: list[dict], reference_date: date) -> str:
+    """Format `find_related_articles` matches into `DigestSignature`'s `related_context` input.
+
+    Each match is prefixed with its elapsed time relative to `reference_date`, per
+    STORY_CONTINUITY_PLAN.md's Phase 4 guard against misframing an old match as recent
+    - the model is told the real gap and must frame accordingly, not just given the content.
+    """
+    if not matches:
+        return ""
+
+    lines = []
+    for match in matches:
+        excerpt = truncate(match["content"].strip(), RELATED_CONTEXT_EXCERPT_LENGTH)
+        elapsed = format_elapsed(match["date"], reference_date)
+        lines.append(f"- {elapsed}: {match['title']}\n  {excerpt}")
+    return "\n".join(lines)
+
+
+def generate_digest(articles: list[dict[str, str]], related_context: str = "") -> Digest | None:
     """Generate a news digest from articles using a DSPy module."""
 
     if not articles:
         return None
 
-    prediction = DigestGenerator()(articles=_format_articles(articles))
+    prediction = DigestGenerator()(articles=_format_articles(articles), related_context=related_context)
 
     return Digest(
         content=prediction.digest,
@@ -219,14 +274,16 @@ def load_compiled_digest_generator() -> DigestGenerator:
     return load_compiled(DigestGenerator, COMPILED_PROGRAM_PATH)
 
 
-def generate_digest_markdown(formatted_articles: str) -> str:
+def generate_digest_markdown(formatted_articles: str, related_context: str = "") -> str:
     """Generate digest Markdown from already-formatted article text.
 
     Args:
         formatted_articles: Article text as built by `_format_articles`, or an
             equivalent caller-built numbered list (see `create_news_digest`).
+        related_context: Past coverage of a similar/recurring story, as built by
+            `format_related_context`. Empty string when there is none.
 
     Returns:
         The generated Markdown digest.
     """
-    return load_compiled_digest_generator()(articles=formatted_articles).digest
+    return load_compiled_digest_generator()(articles=formatted_articles, related_context=related_context).digest

@@ -1,12 +1,16 @@
 import unittest
+from datetime import date
 
 import dspy
 from dspy.utils.dummies import DummyLM
 
 from app.core.summarization.digest import (
     EVAL_ARTICLES_PATH,
+    DigestGenerator,
     build_eval_set,
     digest_compliance_score,
+    format_elapsed,
+    format_related_context,
     generate_digest,
     has_canonical_sections,
     has_category_grouped_other_stories,
@@ -61,6 +65,25 @@ class TestDSPyDigestBackend(unittest.TestCase):
         self.assertEqual(result.content, generated_markdown)
         self.assertEqual(result.total_articles, 1)
         self.assertEqual(result.sources, ["ZNBC"])
+
+    def test_generate_digest_passes_related_context_to_the_model(self):
+        articles = [{"source": "ZNBC", "url": "http://znbc.co.zm/news/1", "title": "Title 1", "content": "Content 1"}]
+        dummy_lm = DummyLM([{"digest": "generated"}])
+
+        with dspy.context(lm=dummy_lm):
+            generate_digest(articles, related_context="12 days ago: Old story\n  Old content")
+
+        prompt = dummy_lm.history[-1]["messages"][-1]["content"]
+        self.assertIn("12 days ago: Old story", prompt)
+
+    def test_digest_generator_forward_passes_related_context_through(self):
+        dummy_lm = DummyLM([{"digest": "generated"}])
+
+        with dspy.context(lm=dummy_lm):
+            DigestGenerator()(articles="1. Title (source: X)\nContent", related_context="6 months ago: Old story")
+
+        prompt = dummy_lm.history[-1]["messages"][-1]["content"]
+        self.assertIn("6 months ago: Old story", prompt)
 
 
 class TestComplianceRules(unittest.TestCase):
@@ -151,6 +174,82 @@ class TestDigestComplianceScore(unittest.TestCase):
         score = digest_compliance_score(None, pred)
 
         self.assertAlmostEqual(score, 6 / 8)
+
+
+class TestFormatElapsed(unittest.TestCase):
+    """Test cases for the human-readable elapsed-time phrasing fed to the model."""
+
+    def setUp(self):
+        self.reference = date(2026, 9, 11)
+
+    def test_same_day_is_today(self):
+        self.assertEqual(format_elapsed(self.reference, self.reference), "today")
+
+    def test_one_day_is_yesterday(self):
+        self.assertEqual(format_elapsed(date(2026, 9, 10), self.reference), "yesterday")
+
+    def test_a_few_days_uses_days(self):
+        self.assertEqual(format_elapsed(date(2026, 9, 6), self.reference), "5 days ago")
+
+    def test_a_week_uses_singular_week(self):
+        self.assertEqual(format_elapsed(date(2026, 9, 4), self.reference), "1 week ago")
+
+    def test_multiple_weeks_uses_plural_weeks(self):
+        self.assertEqual(format_elapsed(date(2026, 8, 28), self.reference), "2 weeks ago")
+
+    def test_a_month_uses_singular_month(self):
+        self.assertEqual(format_elapsed(date(2026, 8, 12), self.reference), "1 month ago")
+
+    def test_multiple_months_uses_plural_months(self):
+        self.assertEqual(format_elapsed(date(2026, 3, 11), self.reference), "6 months ago")
+
+    def test_a_year_uses_singular_year(self):
+        self.assertEqual(format_elapsed(date(2025, 9, 11), self.reference), "1 year ago")
+
+    def test_multiple_years_uses_plural_years(self):
+        self.assertEqual(format_elapsed(date(2023, 9, 11), self.reference), "3 years ago")
+
+    def test_future_date_clamps_to_today(self):
+        self.assertEqual(format_elapsed(date(2026, 9, 12), self.reference), "today")
+
+
+class TestFormatRelatedContext(unittest.TestCase):
+    """Test cases for formatting `find_related_articles` matches into signature input."""
+
+    def setUp(self):
+        self.reference = date(2026, 9, 11)
+
+    def test_empty_matches_returns_empty_string(self):
+        self.assertEqual(format_related_context([], self.reference), "")
+
+    def test_single_match_includes_elapsed_time_and_title(self):
+        matches = [{"title": "Old Story", "content": "Some content.", "date": date(2026, 8, 30)}]
+
+        result = format_related_context(matches, self.reference)
+
+        self.assertIn("1 week ago", result)
+        self.assertIn("Old Story", result)
+        self.assertIn("Some content.", result)
+
+    def test_multiple_matches_are_all_included(self):
+        matches = [
+            {"title": "Recent Story", "content": "Recent content.", "date": date(2026, 9, 9)},
+            {"title": "Old Story", "content": "Old content.", "date": date(2026, 3, 11)},
+        ]
+
+        result = format_related_context(matches, self.reference)
+
+        self.assertIn("Recent Story", result)
+        self.assertIn("Old Story", result)
+        self.assertIn("6 months ago", result)
+
+    def test_long_content_is_truncated(self):
+        matches = [{"title": "Old Story", "content": "x" * 600, "date": date(2026, 8, 30)}]
+
+        result = format_related_context(matches, self.reference)
+
+        self.assertIn("…", result)
+        self.assertNotIn("x" * 600, result)
 
 
 class TestEvalSet(unittest.TestCase):
