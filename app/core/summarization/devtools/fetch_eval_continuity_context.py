@@ -9,6 +9,7 @@ fetch-eval-continuity-context` after `invoke fetch-eval-articles`. Not committed
 
 import json
 import logging
+from datetime import date
 
 from app.core.db.config import close_database, initialize_database
 from app.core.db.models import Article
@@ -36,7 +37,7 @@ def main() -> None:
     for article, embedding in zip(articles, embeddings, strict=True):
         if embedding is None:
             continue
-        matches = find_related_articles(Article(embedding=embedding), top_k=3)
+        matches = find_related_articles(Article(embedding=embedding), top_k=3, reference_date=date.today())
         # An eval article can already sit in the live DB from a real production run that
         # scraped the same story - matching by title (retrieval doesn't expose url) drops
         # that self-match so it isn't mistaken for genuine continuity.
