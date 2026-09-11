@@ -33,6 +33,8 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      # fresh volume only - see docker/pg-init/init.sql
+      - ./docker/pg-init:/docker-entrypoint-initdb.d
 
   pgweb:
     container_name: zednews-pgweb

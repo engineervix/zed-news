@@ -153,19 +153,10 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [ruff, black, js-lint, shellcheck]
 
-    # Same image as docker-compose.yml's `db` service - postgres:15 + pgvector
-    # compiled in. Story-continuity's retrieval tests hit a real Postgres
-    # connection (pgvector's cosine-distance operator is Postgres-only, no
-    # SQLite fallback), unlike every other test in this suite which mocks
-    # `initialize_database`/`database` instead of connecting for real.
-    # POSTGRES_DB is named zednews_test_db (not docker-compose.yml's
-    # zednews_dev_db) to match what `invoke test` always targets locally too
-    # (tasks.py) - this container is thrown away every run regardless, so the
-    # name itself is arbitrary here, but matching it means `invoke test`
-    # needs no CI-specific env override. Defined once at job level, not
-    # repeated per step - `env` context is available in both
-    # `services.<id>.env` and every step's env
-    # (https://docs.github.com/en/actions/reference/workflows-and-actions/contexts).
+    # This job uses real Postgres, not a mock. Story-continuity's retrieval
+    # tests need pgvector's cosine-distance operator. This operator works
+    # only in Postgres. The database name matches `invoke test`'s local
+    # target, so CI needs no extra override.
     env:
       POSTGRES_USER: zednews_dev_user
       POSTGRES_PASSWORD: zednews_dev_password

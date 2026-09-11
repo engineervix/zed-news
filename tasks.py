@@ -143,6 +143,15 @@ def import_db_dump(c, dump_file):
 
 
 @task
+def bootstrap_pgvector(c):
+    """Enable pgvector + create the test db, for a `db` volume from before docker/pg-init existed (`inv up --build` only runs it against a fresh volume)"""
+    c.run(
+        'inv exec app "psql -h db -U zednews_dev_user -d zednews_dev_db -f docker/pg-init/init.sql"',
+        pty=True,
+    )
+
+
+@task
 def init_db(c):
     """use aerich to generate schema and generate app migrate location"""
     c.run("aerich init-db", pty=True)

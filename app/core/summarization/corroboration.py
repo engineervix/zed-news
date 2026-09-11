@@ -4,7 +4,7 @@ import requests
 
 from app.core.utilities import EXA_API_KEY
 
-# Verified live against a real key: Exa's real news index does cover Zambian outlets
+# Exa's real news index does cover Zambian outlets
 # (znbc.co.zm, times.co.zm, daily-mail.co.zm all returned real, dated results), and
 # date-only ISO strings ("YYYY-MM-DD") are accepted for startPublishedDate/endPublishedDate.
 EXA_SEARCH_URL = "https://api.exa.ai/search"
