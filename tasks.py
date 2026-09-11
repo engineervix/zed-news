@@ -1,7 +1,9 @@
 import datetime
 import os
+import shlex
 import shutil
 import subprocess
+import sys
 import tomllib
 
 from colorama import Fore, init
@@ -57,8 +59,21 @@ def up(c, build=False):
 @task
 def exec(c, container, command):
     """docker-compose exec [container] [command(s)]"""
-    docker_compose = get_docker_compose_command()
-    c.run(f"{docker_compose} exec {container} {command}", pty=True)
+    # os.execvp replaces this process with docker compose exec directly, instead
+    # of c.run(..., pty=True) forking a second pty around it - invoke's own pty
+    # plus docker compose exec's own `-t` pty otherwise nest, each doing its own
+    # newline/echo translation, which corrupts interactive sessions (e.g. output
+    # from a command like `date` never visibly appearing). No pty, no relay loop,
+    # no corruption - this process just becomes docker compose exec, inheriting
+    # the real terminal directly.
+    argv = [*get_docker_compose_command().split(), "exec", container, *shlex.split(command)]
+    try:
+        os.execvp(argv[0], argv)
+    except FileNotFoundError:
+        # os.execvp's own FileNotFoundError carries no filename (unlike most
+        # OSErrors) - "No such file or directory" alone gives no clue what
+        # wasn't found, unlike get_docker_compose_command()'s own error above.
+        sys.exit(f"'{argv[0]}' not found on PATH")
 
 
 @task(help={"follow": "Follow log output"})
@@ -153,7 +168,7 @@ def upgrade(c):
 
 @task
 def add_embedding_column(c):
-    """One-off: add article.embedding + its HNSW index (see STORY_CONTINUITY_PLAN.md)"""
+    """One-off: add article.embedding + its HNSW index"""
     c.run("python -m app.core.db.devtools.add_embedding_column", pty=True)
 
 
@@ -386,8 +401,20 @@ def optimize_eleventify(c):
 
 @task
 def test(c):
-    """run tests"""
-    c.run("coverage run -m unittest discover app/tests", pty=True)
+    """run tests
+
+    Always uses zednews_test_db, not the real zednews_dev_db. test_retrieval.py needs
+    a real Postgres connection - pgvector has no SQLite fallback. A crashed local run
+    against the real dev database can leave fake rows in real data. The CI postgres
+    service already uses this same database name, so it needs no special case.
+
+    One-time local setup, on a fresh Postgres container:
+        docker exec zednews-db-1 psql -U zednews_dev_user -d zednews_dev_db \\
+            -c "CREATE DATABASE zednews_test_db TEMPLATE template0;"
+        docker exec zednews-db-1 psql -U zednews_dev_user -d zednews_test_db \\
+            -c "CREATE EXTENSION IF NOT EXISTS vector"
+    """
+    c.run("coverage run -m unittest discover app/tests", pty=True, env={"DATABASE_NAME": "zednews_test_db"})
     c.run("coverage json", pty=True)
     c.run("coverage report -m", pty=True)
 

@@ -92,6 +92,14 @@ The original podcast episodes have been archived, and the project now focuses on
   ```bash
   inv exec app bash
   ```
+- One-time setup, inside the container. The `db` image ships the `pgvector` extension, but each database must still enable it. Without this, even basic table creation fails.
+
+  Enable the extension, then create a separate database for tests so `inv test` never touches real dev data:
+  ```bash
+  psql -h db -U zednews_dev_user -d zednews_dev_db -c "CREATE EXTENSION IF NOT EXISTS vector"
+  psql -h db -U zednews_dev_user -d zednews_dev_db -c "CREATE DATABASE zednews_test_db TEMPLATE template0;"
+  psql -h db -U zednews_dev_user -d zednews_test_db -c "CREATE EXTENSION IF NOT EXISTS vector"
+  ```
 
 Inside the container, you can run the following commands:
 

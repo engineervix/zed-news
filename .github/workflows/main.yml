@@ -153,6 +153,46 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [ruff, black, js-lint, shellcheck]
 
+    # Same image as docker-compose.yml's `db` service - postgres:15 + pgvector
+    # compiled in. Story-continuity's retrieval tests hit a real Postgres
+    # connection (pgvector's cosine-distance operator is Postgres-only, no
+    # SQLite fallback), unlike every other test in this suite which mocks
+    # `initialize_database`/`database` instead of connecting for real.
+    # POSTGRES_DB is named zednews_test_db (not docker-compose.yml's
+    # zednews_dev_db) to match what `invoke test` always targets locally too
+    # (tasks.py) - this container is thrown away every run regardless, so the
+    # name itself is arbitrary here, but matching it means `invoke test`
+    # needs no CI-specific env override. Defined once at job level, not
+    # repeated per step - `env` context is available in both
+    # `services.<id>.env` and every step's env
+    # (https://docs.github.com/en/actions/reference/workflows-and-actions/contexts).
+    env:
+      POSTGRES_USER: zednews_dev_user
+      POSTGRES_PASSWORD: zednews_dev_password
+      POSTGRES_DB: zednews_test_db
+
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.1-pg15
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        # .github/pgvector-init/init.sql runs automatically on first startup -
+        # the postgres image's own entrypoint executes everything in
+        # /docker-entrypoint-initdb.d before the server opens for real
+        # connections, so CREATE EXTENSION is done before pg_isready below can
+        # ever succeed. No separate step/psql/postgresql-client needed.
+        volumes:
+          - ${{ github.workspace }}/.github/pgvector-init:/docker-entrypoint-initdb.d
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v7
@@ -206,6 +246,12 @@ jobs:
           GEMINI_API_KEY: "fake_key"
           COHERE_API_KEY: "another_fake_key"
           TOGETHER_API_KEY: "some_key"
+          DATABASE_HOST: "localhost"
+          # DATABASE_NAME is not set here - tasks.py's `test` task always
+          # overrides it to zednews_test_db itself, which is what POSTGRES_DB
+          # above is now named too.
+          DATABASE_USER: ${{ env.POSTGRES_USER }}
+          DATABASE_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         run: |
           source .venv/bin/activate
           invoke test
