@@ -5,7 +5,14 @@ import sys
 import dspy
 
 from app.core.summarization.digest import generate_digest_markdown
-from app.core.utilities import DATA_DIR, TOGETHER_API_KEY, remove_think_tags, today_human_readable, today_iso_fmt
+from app.core.utilities import (
+    DATA_DIR,
+    TOGETHER_API_KEY,
+    remove_think_tags,
+    today_human_readable,
+    today_iso_fmt,
+    truncate,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +58,15 @@ def clean_digest_output(text: str) -> str:
     return text.strip()
 
 
-def create_news_digest(news: list[dict[str, str]], dest: str):
-    """Create a news digest from the news articles using the provided summarization function"""
+def create_news_digest(news: list[dict[str, str]], dest: str, related_context: str = ""):
+    """Create a news digest from the news articles using the provided summarization function.
+
+    Args:
+        news: The fetched articles to digest.
+        dest: File path to write the generated digest Markdown to.
+        related_context: Past coverage of a similar/recurring story, as built by
+            `gather_related_context`. Empty string when there is none.
+    """
 
     if not news:
         logger.info("No news to create digest from.")
@@ -80,11 +94,8 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
             text = article["content"]
 
             # For the model input, prefer original article content to avoid layered summarization
-            original_excerpt = text.strip()
             # Clip very long articles to keep prompt within token limits
-            max_length = 2200
-            if len(original_excerpt) > max_length:
-                original_excerpt = original_excerpt[:max_length].rstrip() + "…"
+            original_excerpt = truncate(text.strip(), max_length=2200)
 
             counter += 1
 
@@ -106,7 +117,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + digest_content)
 
-    generated_digest = generate_digest_markdown(digest_content)
+    generated_digest = generate_digest_markdown(digest_content, related_context)
 
     if generated_digest := generated_digest.strip():
         # Clean the output

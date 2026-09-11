@@ -1,7 +1,9 @@
 import datetime
 import os
+import shlex
 import shutil
 import subprocess
+import sys
 import tomllib
 
 from colorama import Fore, init
@@ -57,8 +59,21 @@ def up(c, build=False):
 @task
 def exec(c, container, command):
     """docker-compose exec [container] [command(s)]"""
-    docker_compose = get_docker_compose_command()
-    c.run(f"{docker_compose} exec {container} {command}", pty=True)
+    # os.execvp replaces this process with docker compose exec directly, instead
+    # of c.run(..., pty=True) forking a second pty around it - invoke's own pty
+    # plus docker compose exec's own `-t` pty otherwise nest, each doing its own
+    # newline/echo translation, which corrupts interactive sessions (e.g. output
+    # from a command like `date` never visibly appearing). No pty, no relay loop,
+    # no corruption - this process just becomes docker compose exec, inheriting
+    # the real terminal directly.
+    argv = [*get_docker_compose_command().split(), "exec", container, *shlex.split(command)]
+    try:
+        os.execvp(argv[0], argv)
+    except FileNotFoundError:
+        # os.execvp's own FileNotFoundError carries no filename (unlike most
+        # OSErrors) - "No such file or directory" alone gives no clue what
+        # wasn't found, unlike get_docker_compose_command()'s own error above.
+        sys.exit(f"'{argv[0]}' not found on PATH")
 
 
 @task(help={"follow": "Follow log output"})
@@ -128,6 +143,15 @@ def import_db_dump(c, dump_file):
 
 
 @task
+def bootstrap_pgvector(c):
+    """Enable pgvector + create the test db, for a `db` volume from before docker/pg-init existed"""
+    c.run(
+        'inv exec app "psql -h db -U zednews_dev_user -d zednews_dev_db -f docker/pg-init/init.sql"',
+        pty=True,
+    )
+
+
+@task
 def init_db(c):
     """use aerich to generate schema and generate app migrate location"""
     c.run("aerich init-db", pty=True)
@@ -149,6 +173,19 @@ def upgrade(c):
     This is like django's migrate command
     """
     c.run("aerich upgrade", pty=True)
+
+
+@task
+def add_embedding_column(c):
+    """One-off: add article.embedding + its HNSW index"""
+    c.run("python -m app.core.db.devtools.add_embedding_column", pty=True)
+
+
+@task(help={"limit": "Only embed this many articles (for a small test run before the full backfill)"})
+def backfill_embeddings(c, limit=None):
+    """One-off: embed existing articles missing `embedding` (hits real OpenRouter API)"""
+    cmd = "python -m app.core.summarization.devtools.backfill_embeddings"
+    c.run(f"{cmd} {limit}" if limit else cmd, pty=True)
 
 
 @task(help={"fix": "let black and ruff format your files"})
@@ -348,6 +385,12 @@ def fetch_eval_articles(c):
 
 
 @task
+def fetch_eval_continuity_context(c):
+    """Find real find_related_articles matches for the eval fixture (not committed to git)"""
+    c.run("python -m app.core.summarization.devtools.fetch_eval_continuity_context", pty=True)
+
+
+@task
 def optimize_digest(c):
     """Run BootstrapFewShot against the DSPy eval set (hits the real model, costs API calls)"""
     c.run("python -m app.core.summarization.devtools.optimize_digest", pty=True)
@@ -373,8 +416,20 @@ def optimize_eleventify(c):
 
 @task
 def test(c):
-    """run tests"""
-    c.run("coverage run -m unittest discover app/tests", pty=True)
+    """run tests
+
+    Always uses zednews_test_db, not the real zednews_dev_db. test_retrieval.py needs
+    a real Postgres connection - pgvector has no SQLite fallback. A crashed local run
+    against the real dev database can leave fake rows in real data. The CI postgres
+    service already uses this same database name, so it needs no special case.
+
+    One-time local setup, on a fresh Postgres container:
+        docker exec zednews-db-1 psql -U zednews_dev_user -d zednews_dev_db \\
+            -c "CREATE DATABASE zednews_test_db TEMPLATE template0;"
+        docker exec zednews-db-1 psql -U zednews_dev_user -d zednews_test_db \\
+            -c "CREATE EXTENSION IF NOT EXISTS vector"
+    """
+    c.run("coverage run -m unittest discover app/tests", pty=True, env={"DATABASE_NAME": "zednews_test_db"})
     c.run("coverage json", pty=True)
     c.run("coverage report -m", pty=True)
 

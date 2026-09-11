@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytz
 
-from app.core.utilities import custom_strftime, resolve_target_date, suffix
+from app.core.utilities import custom_strftime, resolve_target_date, suffix, truncate
 
 
 class TestUtilities(unittest.TestCase):
@@ -52,6 +52,20 @@ class TestUtilities(unittest.TestCase):
             # Test with day 4
             formatted_date = custom_strftime("%Y-%m-{S}", datetime(2023, 6, 4))
             self.assertEqual(formatted_date, "2023-06-4th")
+
+
+class TestTruncate(unittest.TestCase):
+    def test_short_text_is_returned_unchanged(self):
+        self.assertEqual(truncate("hello", 10), "hello")
+
+    def test_text_at_exact_limit_is_unchanged(self):
+        self.assertEqual(truncate("hello", 5), "hello")
+
+    def test_long_text_is_clipped_with_ellipsis(self):
+        self.assertEqual(truncate("hello world", 5), "hello…")
+
+    def test_trailing_whitespace_before_cut_point_is_stripped(self):
+        self.assertEqual(truncate("hello   world", 8), "hello…")
 
 
 class TestResolveTargetDate(unittest.TestCase):

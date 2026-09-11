@@ -93,6 +93,15 @@ The original podcast episodes have been archived, and the project now focuses on
   inv exec app bash
   ```
 
+  `docker/pg-init/init.sql` runs the first time the `db` container starts
+  with a fresh volume. It enables `pgvector` on `zednews_dev_db`. It also
+  creates a separate `zednews_test_db` and enables `pgvector` there. As a
+  result, `inv test` never touches real dev data.
+
+  If you already have an older `db` volume, choose one:
+  - Drop the volume: run `inv down --volumes`. Then run `inv up --build`.
+  - Run the same script against the running container: run `inv bootstrap_pgvector`.
+
 Inside the container, you can run the following commands:
 
 - Run tests:

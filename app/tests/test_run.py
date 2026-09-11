@@ -20,6 +20,7 @@ class TestRun(unittest.TestCase):
     @patch("app.core.run.render_jinja_template")
     @patch("app.core.run.subprocess.run")
     @patch("app.core.run.create_news_digest")
+    @patch("app.core.run.gather_related_context")
     @patch("app.core.run.save_news_to_db")
     @patch("app.core.run.initialize_database")
     @patch("app.core.run.save_news_to_file")
@@ -36,6 +37,7 @@ class TestRun(unittest.TestCase):
         mock_save_file,
         mock_init_db,
         mock_save_db,
+        mock_gather_related_context,
         mock_create_digest,
         mock_subprocess,
         mock_render,
@@ -43,6 +45,8 @@ class TestRun(unittest.TestCase):
     ):
         # Mock return values
         mock_get_news.return_value = [{"title": "Test News"}]
+        mock_save_db.return_value = {}
+        mock_gather_related_context.return_value = "12 days ago: Old story"
         mock_create_digest.return_value = {"content": "Test Digest"}
 
         # Run the main function
@@ -56,7 +60,10 @@ class TestRun(unittest.TestCase):
         mock_save_file.assert_called_once()
         mock_init_db.assert_called_once()
         mock_save_db.assert_called_once()
-        mock_create_digest.assert_called_once()
+        mock_gather_related_context.assert_called_once()
+        mock_create_digest.assert_called_once_with(
+            mock_get_news.return_value, unittest.mock.ANY, "12 days ago: Old story"
+        )
 
         # Assert subprocess calls for moving files
         self.assertEqual(mock_subprocess.call_count, 4)

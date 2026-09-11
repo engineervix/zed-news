@@ -153,9 +153,45 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [ruff, black, js-lint, shellcheck]
 
+    # This job uses real Postgres, not a mock. Story-continuity's retrieval
+    # tests need pgvector's cosine-distance operator. This operator works
+    # only in Postgres. The database name matches `invoke test`'s local
+    # target, so CI needs no extra override.
+    env:
+      POSTGRES_USER: zednews_dev_user
+      POSTGRES_PASSWORD: zednews_dev_password
+      POSTGRES_DB: zednews_test_db
+
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.1-pg15
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v7
+
+      - name: Enable pgvector extension
+        # The postgres service container starts before this job's steps -
+        # including checkout - so a bind-mounted /docker-entrypoint-initdb.d
+        # sourced from this repo can't work: the source path doesn't exist yet
+        # when the container starts, and Docker just creates it empty. Run the
+        # extension setup as a real step instead, once the repo (and psql,
+        # preinstalled on this runner image) are actually available.
+        shell: bash
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "CREATE EXTENSION IF NOT EXISTS vector"
 
       - name: Set up Python
         id: setup-python
@@ -206,6 +242,12 @@ jobs:
           GEMINI_API_KEY: "fake_key"
           COHERE_API_KEY: "another_fake_key"
           TOGETHER_API_KEY: "some_key"
+          DATABASE_HOST: "localhost"
+          # DATABASE_NAME is not set here - tasks.py's `test` task always
+          # overrides it to zednews_test_db itself, which is what POSTGRES_DB
+          # above is now named too.
+          DATABASE_USER: ${{ env.POSTGRES_USER }}
+          DATABASE_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         run: |
           source .venv/bin/activate
           invoke test

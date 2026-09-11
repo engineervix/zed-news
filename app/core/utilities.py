@@ -28,6 +28,8 @@ DATABASE_HOST = os.getenv("DATABASE_HOST")
 DATABASE_USER = os.getenv("DATABASE_USER")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+EXA_API_KEY = os.getenv("EXA_API_KEY")
 
 
 class ColourFormatter(logging.Formatter):
@@ -73,6 +75,13 @@ def configure_logging():
 def remove_think_tags(text: str) -> str:
     """Strip <think>...</think> blocks some models (e.g. DeepSeek) may leak into content."""
     return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+
+
+def truncate(text: str, max_length: int) -> str:
+    """Clip `text` to `max_length` characters, appending an ellipsis if it was cut."""
+    if len(text) <= max_length:
+        return text
+    return text[:max_length].rstrip() + "…"
 
 
 def suffix(d):
