@@ -9,18 +9,17 @@ import sys
 
 from app.core.db.config import close_database, initialize_database
 from app.core.db.models import Article
-from app.core.summarization.embeddings import embed_text
+from app.core.summarization.embeddings import embed_texts
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+BATCH_SIZE = 50
 
 
 def main(limit: int | None = None) -> None:
     initialize_database()
 
-    # ponytail: one embed_text() call per article (sequential). OpenRouter's
-    # /v1/embeddings accepts a batch `input` array - switch to that if a
-    # 13k-row backfill run is too slow in practice.
     query = Article.select().where(Article.embedding.is_null(), Article.content != "")
     if limit:
         query = query.limit(limit)
@@ -28,14 +27,21 @@ def main(limit: int | None = None) -> None:
     logger.info(f"{len(articles)} articles to embed" + (f" (limit={limit})" if limit else ""))
 
     failed = []
-    for i, article in enumerate(articles, start=1):
+    for start in range(0, len(articles), BATCH_SIZE):
+        batch = articles[start : start + BATCH_SIZE]
         try:
-            article.embedding = embed_text(article.content)
-            article.save()
-            logger.info(f"[{i}/{len(articles)}] embedded article {article.id}")
+            embeddings = embed_texts([a.content for a in batch])
+            for article, embedding in zip(batch, embeddings, strict=True):
+                article.embedding = embedding
+                article.save()
+            logger.info(f"[{start + len(batch)}/{len(articles)}] embedded batch of {len(batch)}")
         except Exception:
-            logger.exception(f"[{i}/{len(articles)}] failed to embed article {article.id}, continuing")
-            failed.append(article.id)
+            # ponytail: whole-batch retry on failure, not per-article fallback -
+            # a failed batch just leaves those rows with embedding=NULL, and
+            # the script is already re-run-safe (WHERE embedding IS NULL), so
+            # rerunning picks them up in a smaller batch context next time.
+            logger.exception(f"batch at [{start}:{start + len(batch)}] failed, continuing")
+            failed.extend(a.id for a in batch)
 
     if failed:
         logger.warning(f"{len(failed)} articles failed: {failed}")
