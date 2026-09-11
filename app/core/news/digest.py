@@ -5,7 +5,14 @@ import sys
 import dspy
 
 from app.core.summarization.digest import generate_digest_markdown
-from app.core.utilities import DATA_DIR, TOGETHER_API_KEY, remove_think_tags, today_human_readable, today_iso_fmt
+from app.core.utilities import (
+    DATA_DIR,
+    TOGETHER_API_KEY,
+    remove_think_tags,
+    today_human_readable,
+    today_iso_fmt,
+    truncate,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -80,11 +87,8 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
             text = article["content"]
 
             # For the model input, prefer original article content to avoid layered summarization
-            original_excerpt = text.strip()
             # Clip very long articles to keep prompt within token limits
-            max_length = 2200
-            if len(original_excerpt) > max_length:
-                original_excerpt = original_excerpt[:max_length].rstrip() + "…"
+            original_excerpt = truncate(text.strip(), max_length=2200)
 
             counter += 1
 

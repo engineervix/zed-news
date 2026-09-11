@@ -76,6 +76,13 @@ def remove_think_tags(text: str) -> str:
     return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
 
 
+def truncate(text: str, max_length: int) -> str:
+    """Clip `text` to `max_length` characters, appending an ellipsis if it was cut."""
+    if len(text) <= max_length:
+        return text
+    return text[:max_length].rstrip() + "…"
+
+
 def suffix(d):
     return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
 
