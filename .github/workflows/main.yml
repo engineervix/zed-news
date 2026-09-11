@@ -171,13 +171,6 @@ jobs:
           POSTGRES_DB: ${{ env.POSTGRES_DB }}
         ports:
           - 5432:5432
-        # .github/pgvector-init/init.sql runs automatically on first startup -
-        # the postgres image's own entrypoint executes everything in
-        # /docker-entrypoint-initdb.d before the server opens for real
-        # connections, so CREATE EXTENSION is done before pg_isready below can
-        # ever succeed. No separate step/psql/postgresql-client needed.
-        volumes:
-          - ${{ github.workspace }}/.github/pgvector-init:/docker-entrypoint-initdb.d
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -187,6 +180,18 @@ jobs:
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v7
+
+      - name: Enable pgvector extension
+        # The postgres service container starts before this job's steps -
+        # including checkout - so a bind-mounted /docker-entrypoint-initdb.d
+        # sourced from this repo can't work: the source path doesn't exist yet
+        # when the container starts, and Docker just creates it empty. Run the
+        # extension setup as a real step instead, once the repo (and psql,
+        # preinstalled on this runner image) are actually available.
+        shell: bash
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "CREATE EXTENSION IF NOT EXISTS vector"
 
       - name: Set up Python
         id: setup-python
