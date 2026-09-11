@@ -114,11 +114,15 @@ def main() -> None:
     print(f"real continuity eval set: {len(real_continuity_set)} examples")
     if real_continuity_set:
         real_texts = [optimized(**example.inputs()).digest for example in real_continuity_set]
-        corroboration_scores = [exa_corroboration_score(example, None) for example in real_continuity_set]
-        print(
-            f"exa corroboration: {sum(corroboration_scores) / len(corroboration_scores):.2f} "
-            f"({sum(corroboration_scores):.0f}/{len(corroboration_scores)})"
-        )
+        all_scores = [exa_corroboration_score(example, None) for example in real_continuity_set]
+        corroboration_scores = [score for score in all_scores if score is not None]
+        if corroboration_scores:
+            print(
+                f"exa corroboration: {sum(corroboration_scores) / len(corroboration_scores):.2f} "
+                f"({sum(corroboration_scores):.0f}/{len(corroboration_scores)})"
+            )
+        else:
+            print("exa corroboration: skipped (EXA_API_KEY not configured)")
         report_continuity_faithfulness("real batches", real_continuity_set, real_texts)
 
 

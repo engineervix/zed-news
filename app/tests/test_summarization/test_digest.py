@@ -543,6 +543,7 @@ class TestExaCorroborationScore(unittest.TestCase):
 
         self.assertEqual(exa_corroboration_score(example, None), 1.0)
 
+    @patch("app.core.summarization.digest.EXA_API_KEY", "test-key")
     @patch("app.core.summarization.digest.exa_search")
     def test_returns_1_when_exa_finds_a_result(self, mock_exa_search):
         mock_exa_search.return_value = [{"title": "Independent corroborating story"}]
@@ -552,6 +553,7 @@ class TestExaCorroborationScore(unittest.TestCase):
 
         self.assertEqual(exa_corroboration_score(example, None), 1.0)
 
+    @patch("app.core.summarization.digest.EXA_API_KEY", "test-key")
     @patch("app.core.summarization.digest.exa_search")
     def test_returns_0_when_exa_finds_nothing(self, mock_exa_search):
         mock_exa_search.return_value = []
@@ -561,6 +563,7 @@ class TestExaCorroborationScore(unittest.TestCase):
 
         self.assertEqual(exa_corroboration_score(example, None), 0.0)
 
+    @patch("app.core.summarization.digest.EXA_API_KEY", "test-key")
     @patch("app.core.summarization.digest.exa_search")
     def test_search_window_pads_around_the_matched_dates(self, mock_exa_search):
         mock_exa_search.return_value = []
@@ -575,6 +578,18 @@ class TestExaCorroborationScore(unittest.TestCase):
         _, start, end = mock_exa_search.call_args[0]
         self.assertEqual(start, date(2026, 2, 26))
         self.assertEqual(end, date(2026, 5, 4))
+
+    @patch("app.core.summarization.digest.EXA_API_KEY", None)
+    @patch("app.core.summarization.digest.exa_search")
+    def test_returns_none_without_a_configured_exa_key(self, mock_exa_search):
+        # Missing config, not "checked and failed" - callers must exclude this from
+        # an average rather than counting it as a corroboration failure.
+        example = dspy.Example(
+            articles="a", related_context="r", continuity_topic={"title": "Fuel hikes", "dates": [date(2026, 9, 1)]}
+        ).with_inputs("articles", "related_context")
+
+        self.assertIsNone(exa_corroboration_score(example, None))
+        mock_exa_search.assert_not_called()
 
 
 class TestContinuityFaithfulnessScore(unittest.TestCase):

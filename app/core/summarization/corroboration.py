@@ -36,6 +36,11 @@ def exa_search(query: str, start_date: date, end_date: date, num_results: int = 
             "endPublishedDate": end_date.isoformat(),
         },
         timeout=30,
+        # requests strips Authorization on a cross-host redirect, but not custom
+        # headers - a redirect from Exa's own endpoint would otherwise carry
+        # EXA_API_KEY to wherever it points. No legitimate reason for this call
+        # to be redirected at all.
+        allow_redirects=False,
     )
     response.raise_for_status()
     return response.json()["results"]

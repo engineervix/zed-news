@@ -9,7 +9,7 @@ from typing import TypeVar
 import dspy
 
 from app.core.db.models import Article
-from app.core.summarization.corroboration import exa_search
+from app.core.summarization.corroboration import EXA_API_KEY, exa_search
 from app.core.summarization.retrieval import find_related_articles
 from app.core.utilities import DATA_DIR, truncate
 
@@ -415,7 +415,7 @@ def build_real_continuity_eval_set(
     return examples
 
 
-def exa_corroboration_score(example, pred, trace=None) -> float:
+def exa_corroboration_score(example, pred, trace=None) -> float | None:
     """Score whether an example's real continuity topic is independently corroborated on
     the real web, via one Exa search - an eval-time-only guard against a spurious embedding
     match masquerading as a real recurring story (see `build_real_continuity_eval_set`).
@@ -432,11 +432,15 @@ def exa_corroboration_score(example, pred, trace=None) -> float:
 
     Returns:
         1.0 if there is no continuity topic to check, or Exa independently returns at
-        least one result inside the topic's real date span; 0.0 otherwise.
+        least one result inside the topic's real date span; 0.0 if it returns none.
+        None when `EXA_API_KEY` isn't configured - nothing was actually checked, so
+        callers must exclude it from an average rather than counting it as a failure.
     """
     topic = getattr(example, "continuity_topic", None)
     if not topic:
         return 1.0
+    if not EXA_API_KEY:
+        return None
 
     buffer = timedelta(days=CORROBORATION_LOOKBACK_BUFFER_DAYS)
     results = exa_search(topic["title"], min(topic["dates"]) - buffer, max(topic["dates"]) + buffer)
