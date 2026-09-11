@@ -43,8 +43,7 @@ def main() -> None:
 
     # HNSW needs no training step, so this is safe even before the backfill runs.
     database.execute_sql(
-        "CREATE INDEX IF NOT EXISTS article_embedding_hnsw_idx "
-        "ON article USING hnsw (embedding vector_cosine_ops)"
+        "CREATE INDEX IF NOT EXISTS article_embedding_hnsw_idx ON article USING hnsw (embedding vector_cosine_ops)"
     )
     print("hnsw index: ok")
 
