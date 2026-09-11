@@ -8,6 +8,7 @@ from dspy.utils.dummies import DummyLM
 from app.core.summarization.digest import (
     EVAL_ARTICLES_PATH,
     DigestGenerator,
+    build_continuity_eval_set,
     build_eval_set,
     build_related_context,
     digest_compliance_score,
@@ -23,6 +24,7 @@ from app.core.summarization.digest import (
     has_numbered_main_stories,
     has_title_heading,
     has_why_this_matters_label,
+    load_continuity_eval_cases,
     load_eval_articles,
 )
 
@@ -387,6 +389,77 @@ class TestEvalSet(unittest.TestCase):
             self.assertIn("source", article)
             self.assertIn("title", article)
             self.assertIn("content", article)
+
+
+class TestContinuityEvalSet(unittest.TestCase):
+    """Test cases for the synthetic story-continuity eval fixtures (STORY_CONTINUITY_PLAN.md Phase 4)."""
+
+    def setUp(self):
+        self.reference = date(2026, 9, 11)
+
+    def test_load_continuity_eval_cases_returns_both_scenarios(self):
+        cases = load_continuity_eval_cases()
+
+        self.assertEqual({case["case"] for case in cases}, {"recent_follow_up", "old_recurring_match"})
+
+    def test_rejects_a_match_referencing_an_unknown_article_title(self):
+        cases = [
+            {
+                "case": "broken",
+                "articles": [{"source": "S", "url": "u", "title": "Real Title", "content": "C"}],
+                "matches": [{"article_title": "Typo'd Title", "title": "Old", "content": "C", "days_ago": 10}],
+            }
+        ]
+
+        with self.assertRaises(AssertionError):
+            build_continuity_eval_set(cases, self.reference)
+
+    def test_build_continuity_eval_set_returns_one_example_per_case(self):
+        cases = load_continuity_eval_cases()
+
+        examples = build_continuity_eval_set(cases, self.reference)
+
+        self.assertEqual(len(examples), len(cases))
+
+    def test_examples_mark_both_fields_as_inputs(self):
+        cases = load_continuity_eval_cases()
+
+        examples = build_continuity_eval_set(cases, self.reference)
+
+        for example in examples:
+            self.assertEqual(set(example.inputs().keys()), {"articles", "related_context"})
+
+    def test_recent_follow_up_case_frames_as_a_short_gap(self):
+        cases = load_continuity_eval_cases()
+
+        [example] = [
+            build_continuity_eval_set([case], self.reference)[0] for case in cases if case["case"] == "recent_follow_up"
+        ]
+
+        self.assertIn(
+            'Regarding "Government to Review Fuel Subsidy Formula After Public Outcry"', example.related_context
+        )
+        self.assertIn("Fuel Pump Prices Rise for Third Time This Year", example.related_context)
+        self.assertIn("6 days ago", example.related_context)
+        # The unrelated filler article in this case must not pick up a continuity claim
+        self.assertNotIn("Chipolopolo Under-20 Squad", example.related_context)
+
+    def test_old_recurring_match_case_frames_as_a_long_gap(self):
+        cases = load_continuity_eval_cases()
+
+        [example] = [
+            build_continuity_eval_set([case], self.reference)[0]
+            for case in cases
+            if case["case"] == "old_recurring_match"
+        ]
+
+        self.assertIn(
+            'Regarding "ZESCO Unveils New Load-Shedding Schedule as Kariba Water Levels Drop"', example.related_context
+        )
+        self.assertIn("ZESCO Implements Load-Shedding Amid Generation Deficit", example.related_context)
+        self.assertIn("7 months ago", example.related_context)
+        # The unrelated filler article in this case must not pick up a continuity claim
+        self.assertNotIn("Traders Count Losses", example.related_context)
 
 
 if __name__ == "__main__":

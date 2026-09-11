@@ -1,0 +1,56 @@
+[
+  {
+    "case": "recent_follow_up",
+    "articles": [
+      {
+        "source": "Daily Nation Zambia",
+        "url": "https://example.test/fuel-subsidy-review",
+        "title": "Government to Review Fuel Subsidy Formula After Public Outcry",
+        "content": "The Ministry of Energy says it will review the fuel pricing formula following a wave of public complaints over the latest pump price increase. Energy Minister spokesperson Chanda Mwila told reporters the review would look at the levies and margins built into the formula, but gave no timeline for its completion. Transport operators say the increase has already pushed up fares in Lusaka and the Copperbelt. Civil society groups have called for the review to be made public once complete.",
+        "category": "Business"
+      },
+      {
+        "source": "Times of Zambia",
+        "url": "https://example.test/national-under-20-squad",
+        "title": "Chipolopolo Under-20 Squad Named for Regional Qualifiers",
+        "content": "The Football Association of Zambia has named a 23-man squad for next month's COSAFA Under-20 qualifiers. Head coach Mwansa Mumba said the squad blends returning players from last year's campaign with new call-ups from the domestic league. The team begins camp in Lusaka on Monday ahead of its opening fixture.",
+        "category": "Sports"
+      }
+    ],
+    "matches": [
+      {
+        "article_title": "Government to Review Fuel Subsidy Formula After Public Outcry",
+        "title": "Fuel Pump Prices Rise for Third Time This Year",
+        "content": "Pump prices for petrol and diesel rose again this week, the third increase since January, as the Energy Regulation Board cited higher landed costs and exchange rate movements. The Board said the adjustment followed its standard pricing formula. Motorists and transporters criticised the frequency of the increases, and the Road Transport Operators Association warned of further fare hikes.",
+        "days_ago": 6
+      }
+    ]
+  },
+  {
+    "case": "old_recurring_match",
+    "articles": [
+      {
+        "source": "ZNBC",
+        "url": "https://example.test/zesco-load-shedding-schedule",
+        "title": "ZESCO Unveils New Load-Shedding Schedule as Kariba Water Levels Drop",
+        "content": "ZESCO has released a revised load-shedding schedule, citing falling water levels at Kariba Dam ahead of the rainy season. The utility said households and small businesses should expect up to eight hours without power daily under the new schedule, with industrial customers on a separate rotation. ZESCO said it was working with the Zambezi River Authority to monitor inflows and would adjust the schedule as conditions change.",
+        "category": "National"
+      },
+      {
+        "source": "Mwebantu",
+        "url": "https://example.test/lusaka-market-fire",
+        "title": "Traders Count Losses After Overnight Fire at Lusaka Market",
+        "content": "A fire that broke out overnight at a market in Lusaka's Kalingalinga area has destroyed dozens of stalls, according to local traders. The Zambia Police Service said the cause of the fire is still being investigated. Ward councillor Peter Banda said the local authority was assessing the damage and would engage affected traders on next steps.",
+        "category": "Local"
+      }
+    ],
+    "matches": [
+      {
+        "article_title": "ZESCO Unveils New Load-Shedding Schedule as Kariba Water Levels Drop",
+        "title": "ZESCO Implements Load-Shedding Amid Generation Deficit",
+        "content": "ZESCO has begun implementing load-shedding across the country, citing a generation deficit driven by low water levels at Kariba Dam. The utility said the measure was necessary to protect the national grid and pledged to review the schedule as the situation evolves. Business groups warned of the impact on productivity, particularly for manufacturers reliant on continuous power.",
+        "days_ago": 210
+      }
+    ]
+  }
+]

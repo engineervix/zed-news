@@ -2,7 +2,7 @@ import json
 import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import TypeVar
 
@@ -17,6 +17,10 @@ CANONICAL_SECTIONS = ("## Main Stories", "## Other Notable Stories", "## Key Tak
 # framing context, not primary content, and may include several matches per article.
 RELATED_CONTEXT_EXCERPT_LENGTH = 500
 EVAL_ARTICLES_PATH = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "eval_articles.json"
+# Hand-authored, not scraped - unlike eval_articles.json/eval_digests.json (gitignored real
+# content, regenerate locally), this is synthetic and committed: BootstrapFewShot needs at
+# least one case per continuity scenario to ever bootstrap a demo exercising related_context.
+CONTINUITY_EVAL_PATH = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "eval_continuity.json"
 COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_program.json"
 
 # Shared with post.py and eleventify.py: their signatures
@@ -287,6 +291,59 @@ def build_eval_set(articles: list[dict[str, str]], batch_size: int = 6) -> list[
     """Split articles into batches, each a DSPy example for optimization/eval."""
     batches = [articles[i : i + batch_size] for i in range(0, len(articles), batch_size)]
     return [dspy.Example(articles=_format_articles(batch)).with_inputs("articles") for batch in batches]
+
+
+def load_continuity_eval_cases() -> list[dict]:
+    """Load the hand-authored story-continuity eval cases (STORY_CONTINUITY_PLAN.md Phase 4).
+
+    Each case is `{"case": str, "articles": [...same shape as eval_articles.json...],
+    "matches": [{"article_title": str, "title": str, "content": str, "days_ago": int}]}`.
+    `article_title` must exactly match one of the case's own `articles[].title` -
+    `build_continuity_eval_set` asserts this so a typo or later title edit fails loudly
+    instead of silently dropping the match.
+    """
+    return json.loads(CONTINUITY_EVAL_PATH.read_text())
+
+
+def build_continuity_eval_set(cases: list[dict], reference_date: date) -> list[dspy.Example]:
+    """Turn `load_continuity_eval_cases` output into DSPy examples with `related_context` filled in.
+
+    One example per case, both `articles` and `related_context` marked as inputs - unlike
+    `build_eval_set`'s plain batches, these exist specifically to give BootstrapFewShot (and a
+    human eyeballing the output) something that exercises continuity framing. Each case's
+    matches are dated relative to `reference_date` via `days_ago` rather than a fixed calendar
+    date, so the elapsed-time framing this tests stays correct no matter when eval runs.
+    """
+    examples = []
+    for case in cases:
+        article_titles = {article["title"] for article in case["articles"]}
+        for match in case["matches"]:
+            assert match["article_title"] in article_titles, (
+                f"eval_continuity.json case {case['case']!r}: match references unknown article "
+                f"{match['article_title']!r}"
+            )
+
+        articles_with_matches = [
+            (
+                article,
+                [
+                    {
+                        "title": match["title"],
+                        "content": match["content"],
+                        "date": reference_date - timedelta(days=match["days_ago"]),
+                    }
+                    for match in case["matches"]
+                    if match["article_title"] == article["title"]
+                ],
+            )
+            for article in case["articles"]
+        ]
+        related_context = build_related_context(articles_with_matches, reference_date)
+        example = dspy.Example(
+            articles=_format_articles(case["articles"]), related_context=related_context
+        ).with_inputs("articles", "related_context")
+        examples.append(example)
+    return examples
 
 
 def load_compiled(module_cls: type[ModuleT], path: Path) -> ModuleT:
