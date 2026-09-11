@@ -52,7 +52,7 @@ def main():
     # Save news to the database
     saved_articles = save_news_to_db(news)
 
-    # Look up related past coverage for story continuity (STORY_CONTINUITY_PLAN.md Phase 4)
+    # Look up related past coverage for story continuity
     related_context = gather_related_context(news, saved_articles, reference_date=today)
 
     # Create news digest

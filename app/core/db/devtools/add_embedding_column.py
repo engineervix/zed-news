@@ -1,7 +1,7 @@
 """One-off schema migration: add `article.embedding` + its HNSW index.
 
-Run once per database (local now, then again against Neon at deploy time -
-see STORY_CONTINUITY_PLAN.md Phase 5) via `invoke add-embedding-column`.
+Run once per database (local now, then again against Neon at deploy time)
+via `invoke add-embedding-column`.
 `tasks.py`'s `migrate`/`upgrade` tasks shell out to `aerich` (a Tortoise ORM
 tool that isn't even a dependency here - this project uses peewee) and don't
 work, so this is a real one-off script instead.
