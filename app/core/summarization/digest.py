@@ -9,6 +9,7 @@ from typing import TypeVar
 import dspy
 
 from app.core.db.models import Article
+from app.core.summarization.corroboration import exa_search
 from app.core.summarization.retrieval import find_related_articles
 from app.core.utilities import DATA_DIR, truncate
 
@@ -21,7 +22,16 @@ EVAL_ARTICLES_PATH = Path(__file__).resolve().parents[2] / "tests" / "fixtures" 
 # content, regenerate locally), this is synthetic and committed: BootstrapFewShot needs at
 # least one case per continuity scenario to ever bootstrap a demo exercising related_context.
 CONTINUITY_EVAL_PATH = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "eval_continuity.json"
+# Real find_related_articles matches for eval_articles.json, keyed by article url - built
+# against the live DB (see fetch_eval_continuity_context.py). Gitignored, same policy as
+# eval_articles.json/eval_digests.json: real content, regenerate locally.
+EVAL_CONTINUITY_CONTEXT_PATH = (
+    Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "eval_continuity_context.json"
+)
 COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_program.json"
+# Padding around a matched topic's real date span for the Exa corroboration search window,
+# so the exact match date itself isn't clipped by an exclusive/inclusive boundary edge case.
+CORROBORATION_LOOKBACK_BUFFER_DAYS = 3
 
 # Shared with post.py and eleventify.py: their signatures
 # all take a generated digest (not raw articles) as input, so they build their eval
@@ -67,8 +77,10 @@ class DigestSignature(dspy.Signature):
     )
     digest: str = dspy.OutputField(
         desc=(
-            "Markdown digest with Main Stories, Other Notable Stories, and Key Takeaways & "
-            "Watchpoints sections. Start directly with the intro paragraph, with no title heading. "
+            "Markdown digest with exactly three level-2 headings, in this order and this exact "
+            "wording: `## Main Stories`, `## Other Notable Stories`, `## Key Takeaways & "
+            "Watchpoints` (two `#` characters, not three, and no other headings anywhere). Start "
+            "directly with the intro paragraph, with no title heading. "
             "Main Stories: a numbered list - `1. **Title**` followed by 1-2 sentences per item, "
             "flagging any unverified claims, missing timelines, or gaps in the reporting. Other "
             "Notable Stories: grouped under bold category labels (e.g. `**Sports:**`) with `*` "
@@ -125,9 +137,9 @@ def format_elapsed(article_date: date, reference_date: date) -> str:
 def format_related_context(matches: list[dict], reference_date: date) -> str:
     """Format `find_related_articles` matches into `DigestSignature`'s `related_context` input.
 
-    Each match is prefixed with its elapsed time relative to `reference_date`, per
-    STORY_CONTINUITY_PLAN.md's Phase 4 guard against misframing an old match as recent
-    - the model is told the real gap and must frame accordingly, not just given the content.
+    Each match is prefixed with its elapsed time relative to `reference_date` - a guard
+    against misframing an old match as recent: the model is told the real gap and must
+    frame accordingly, not just given the content.
     """
     if not matches:
         return ""
@@ -294,7 +306,7 @@ def build_eval_set(articles: list[dict[str, str]], batch_size: int = 6) -> list[
 
 
 def load_continuity_eval_cases() -> list[dict]:
-    """Load the hand-authored story-continuity eval cases (STORY_CONTINUITY_PLAN.md Phase 4).
+    """Load the hand-authored story-continuity eval cases.
 
     Each case is `{"case": str, "articles": [...same shape as eval_articles.json...],
     "matches": [{"article_title": str, "title": str, "content": str, "days_ago": int}]}`.
@@ -344,6 +356,139 @@ def build_continuity_eval_set(cases: list[dict], reference_date: date) -> list[d
         ).with_inputs("articles", "related_context")
         examples.append(example)
     return examples
+
+
+def load_eval_continuity_context() -> dict[str, list[dict]]:
+    """Load real `find_related_articles` matches for `eval_articles.json`, keyed by article url.
+
+    An article missing from this map, or present with an empty list, has no real past match.
+    """
+    raw = json.loads(EVAL_CONTINUITY_CONTEXT_PATH.read_text())
+    return {
+        url: [{**match, "date": date.fromisoformat(match["date"])} for match in matches] for url, matches in raw.items()
+    }
+
+
+def build_real_continuity_eval_set(
+    articles: list[dict[str, str]],
+    context: dict[str, list[dict]],
+    reference_date: date,
+    batch_size: int = 18,
+) -> list[dspy.Example]:
+    """Batch real eval articles the same way as `build_eval_set`, attaching each batch's
+    real `find_related_articles` matches (from `load_eval_continuity_context`) as
+    `related_context`.
+
+    Unlike the synthetic `eval_continuity.json` cases, these matches are real past coverage
+    from the live DB - what makes `exa_corroboration_score` meaningful: a claim about
+    fictional content can't be checked against the real web, only a claim about real
+    coverage can. Batches with no real match anywhere are dropped, nothing to exercise.
+    Each example also carries a non-input `continuity_topic` field - the first matched
+    article's title and real match dates, the one `exa_corroboration_score` checks - kept
+    structured rather than making the metric re-parse the formatted `related_context` string.
+    """
+    batches = [articles[i : i + batch_size] for i in range(0, len(articles), batch_size)]
+    examples = []
+    for batch in batches:
+        articles_with_matches = [
+            (article, [match for match in context.get(article["url"], []) if match["date"] < reference_date])
+            for article in batch
+        ]
+        related_context = build_related_context(articles_with_matches, reference_date)
+        if not related_context:
+            continue
+        # ponytail: one topic per batch (one Exa call per example, real cost), not every
+        # matched article - upgrade to scoring every match and averaging if a single
+        # representative topic proves too noisy against real data.
+        continuity_topic = next(
+            (
+                {"title": article["title"], "dates": [match["date"] for match in matches]}
+                for article, matches in articles_with_matches
+                if matches
+            ),
+            None,
+        )
+        example = dspy.Example(
+            articles=_format_articles(batch), related_context=related_context, continuity_topic=continuity_topic
+        ).with_inputs("articles", "related_context")
+        examples.append(example)
+    return examples
+
+
+def exa_corroboration_score(example, pred, trace=None) -> float:
+    """Score whether an example's real continuity topic is independently corroborated on
+    the real web, via one Exa search - an eval-time-only guard against a spurious embedding
+    match masquerading as a real recurring story (see `build_real_continuity_eval_set`).
+
+    Args:
+        example: An example built by `build_real_continuity_eval_set`, carrying a
+            `continuity_topic` field. Examples without one (e.g. from `build_eval_set` or
+            the synthetic `build_continuity_eval_set`) score 1.0 - nothing to check, not a
+            failure.
+        pred: Unused - this checks the retrieved input the model was given, not what it
+            wrote, since there's no reliable way to parse "was this claim about topic X"
+            out of free-form generated prose.
+        trace: Unused. Accepted for compatibility with DSPy's metric signature.
+
+    Returns:
+        1.0 if there is no continuity topic to check, or Exa independently returns at
+        least one result inside the topic's real date span; 0.0 otherwise.
+    """
+    topic = getattr(example, "continuity_topic", None)
+    if not topic:
+        return 1.0
+
+    buffer = timedelta(days=CORROBORATION_LOOKBACK_BUFFER_DAYS)
+    results = exa_search(topic["title"], min(topic["dates"]) - buffer, max(topic["dates"]) + buffer)
+    return 1.0 if results else 0.0
+
+
+class ContinuityFaithfulnessJudge(dspy.Signature):
+    """Judge whether a generated news digest's story-continuity framing, if any, is
+    faithful to the related_context it was given - not fabricated, not misdated relative
+    to the real elapsed time stated, and not forcing a connection to unrelated content.
+    """
+
+    related_context: str = dspy.InputField(
+        desc="Past coverage the digest generator was given, each match prefixed with its real elapsed time"
+    )
+    digest: str = dspy.InputField(desc="The generated news digest to check")
+    faithful: bool = dspy.OutputField(
+        desc="True if the digest makes no continuity claim, or makes one that accurately reflects the "
+        "elapsed time and content given in related_context. False if it fabricates a connection not "
+        "supported by related_context, or states a wrong/misleading elapsed time."
+    )
+
+
+def continuity_faithfulness_score(example, pred, trace=None) -> float:
+    """Score whether a generated digest's continuity framing (if any) is faithful to the
+    related_context it was given, via one LLM-judge call - an eval-time-only guard against
+    the model fabricating a connection or misstating how long ago a match ran.
+
+    Args:
+        example: An example carrying a `related_context` field (e.g. from
+            `build_continuity_eval_set` or `build_real_continuity_eval_set`). Examples
+            with an empty `related_context` score 1.0 without calling the judge - nothing
+            to fabricate.
+        pred: A prediction with a `digest` field holding the generated Markdown to check.
+        trace: Unused. Accepted for compatibility with DSPy's metric signature.
+
+    Returns:
+        1.0 if there is no related_context to check, or the judge finds the digest
+        faithful to it; 0.0 otherwise.
+    """
+    related_context = getattr(example, "related_context", "")
+    if not related_context:
+        return 1.0
+
+    # ChainOfThought, not bare Predict: verified against a real failure - DeepSeek-V4-Flash
+    # answered False with no reasoning step on a digest that made no continuity claim at all
+    # (should be True per the signature's own rule), then correctly answered True once asked
+    # to reason first. A bare bool judgment on this kind of "is X faithful to Y" question is
+    # unreliable without it.
+    judge = dspy.ChainOfThought(ContinuityFaithfulnessJudge)
+    verdict = judge(related_context=related_context, digest=pred.digest)
+    return 1.0 if verdict.faithful else 0.0
 
 
 def load_compiled(module_cls: type[ModuleT], path: Path) -> ModuleT:

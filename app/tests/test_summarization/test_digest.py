@@ -10,8 +10,11 @@ from app.core.summarization.digest import (
     DigestGenerator,
     build_continuity_eval_set,
     build_eval_set,
+    build_real_continuity_eval_set,
     build_related_context,
+    continuity_faithfulness_score,
     digest_compliance_score,
+    exa_corroboration_score,
     format_elapsed,
     format_related_context,
     gather_related_context,
@@ -392,7 +395,7 @@ class TestEvalSet(unittest.TestCase):
 
 
 class TestContinuityEvalSet(unittest.TestCase):
-    """Test cases for the synthetic story-continuity eval fixtures (STORY_CONTINUITY_PLAN.md Phase 4)."""
+    """Test cases for the synthetic story-continuity eval fixtures."""
 
     def setUp(self):
         self.reference = date(2026, 9, 11)
@@ -460,6 +463,167 @@ class TestContinuityEvalSet(unittest.TestCase):
         self.assertIn("7 months ago", example.related_context)
         # The unrelated filler article in this case must not pick up a continuity claim
         self.assertNotIn("Traders Count Losses", example.related_context)
+
+
+class TestBuildRealContinuityEvalSet(unittest.TestCase):
+    """`build_real_continuity_eval_set` batches real eval articles with real DB matches."""
+
+    def setUp(self):
+        self.reference = date(2026, 9, 11)
+        self.articles = [
+            {"source": "S", "url": "https://a.zm/1", "title": "Fuel Prices Rise Again", "content": "C1"},
+            {"source": "S", "url": "https://a.zm/2", "title": "Unrelated Sports Story", "content": "C2"},
+        ]
+
+    def test_drops_batches_with_no_real_match(self):
+        context = {}
+
+        examples = build_real_continuity_eval_set(self.articles, context, self.reference, batch_size=2)
+
+        self.assertEqual(examples, [])
+
+    def test_includes_batch_with_at_least_one_real_match(self):
+        context = {
+            "https://a.zm/1": [
+                {"title": "Fuel Prices Rise Third Time This Year", "content": "old", "date": date(2026, 9, 1)}
+            ]
+        }
+
+        examples = build_real_continuity_eval_set(self.articles, context, self.reference, batch_size=2)
+
+        self.assertEqual(len(examples), 1)
+        self.assertIn('Regarding "Fuel Prices Rise Again"', examples[0].related_context)
+
+    def test_examples_mark_both_fields_as_inputs(self):
+        context = {
+            "https://a.zm/1": [
+                {"title": "Fuel Prices Rise Third Time This Year", "content": "old", "date": date(2026, 9, 1)}
+            ]
+        }
+
+        [example] = build_real_continuity_eval_set(self.articles, context, self.reference, batch_size=2)
+
+        self.assertEqual(set(example.inputs().keys()), {"articles", "related_context"})
+
+    def test_continuity_topic_carries_the_real_match_dates(self):
+        context = {
+            "https://a.zm/1": [
+                {"title": "Fuel Prices Rise Third Time This Year", "content": "old", "date": date(2026, 9, 1)}
+            ]
+        }
+
+        [example] = build_real_continuity_eval_set(self.articles, context, self.reference, batch_size=2)
+
+        self.assertEqual(example.continuity_topic, {"title": "Fuel Prices Rise Again", "dates": [date(2026, 9, 1)]})
+
+    def test_continuity_topic_is_the_first_matched_article_when_several_have_matches(self):
+        context = {
+            "https://a.zm/1": [
+                {"title": "Fuel Prices Rise Third Time This Year", "content": "old", "date": date(2026, 9, 1)}
+            ],
+            "https://a.zm/2": [{"title": "Sports Rematch", "content": "old", "date": date(2026, 8, 1)}],
+        }
+
+        [example] = build_real_continuity_eval_set(self.articles, context, self.reference, batch_size=2)
+
+        self.assertEqual(example.continuity_topic["title"], "Fuel Prices Rise Again")
+
+    def test_ignores_matches_dated_on_or_after_the_reference_date(self):
+        # Same as build_related_context - a same-batch article isn't real continuity context.
+        context = {"https://a.zm/1": [{"title": "Today's other article", "content": "c", "date": self.reference}]}
+
+        examples = build_real_continuity_eval_set(self.articles, context, self.reference, batch_size=2)
+
+        self.assertEqual(examples, [])
+
+
+class TestExaCorroborationScore(unittest.TestCase):
+    def test_returns_1_when_example_has_no_continuity_topic(self):
+        example = dspy.Example(articles="a", related_context="").with_inputs("articles", "related_context")
+
+        self.assertEqual(exa_corroboration_score(example, None), 1.0)
+
+    @patch("app.core.summarization.digest.exa_search")
+    def test_returns_1_when_exa_finds_a_result(self, mock_exa_search):
+        mock_exa_search.return_value = [{"title": "Independent corroborating story"}]
+        example = dspy.Example(
+            articles="a", related_context="r", continuity_topic={"title": "Fuel hikes", "dates": [date(2026, 9, 1)]}
+        ).with_inputs("articles", "related_context")
+
+        self.assertEqual(exa_corroboration_score(example, None), 1.0)
+
+    @patch("app.core.summarization.digest.exa_search")
+    def test_returns_0_when_exa_finds_nothing(self, mock_exa_search):
+        mock_exa_search.return_value = []
+        example = dspy.Example(
+            articles="a", related_context="r", continuity_topic={"title": "Fuel hikes", "dates": [date(2026, 9, 1)]}
+        ).with_inputs("articles", "related_context")
+
+        self.assertEqual(exa_corroboration_score(example, None), 0.0)
+
+    @patch("app.core.summarization.digest.exa_search")
+    def test_search_window_pads_around_the_matched_dates(self, mock_exa_search):
+        mock_exa_search.return_value = []
+        example = dspy.Example(
+            articles="a",
+            related_context="r",
+            continuity_topic={"title": "Fuel hikes", "dates": [date(2026, 3, 1), date(2026, 5, 1)]},
+        ).with_inputs("articles", "related_context")
+
+        exa_corroboration_score(example, None)
+
+        _, start, end = mock_exa_search.call_args[0]
+        self.assertEqual(start, date(2026, 2, 26))
+        self.assertEqual(end, date(2026, 5, 4))
+
+
+class TestContinuityFaithfulnessScore(unittest.TestCase):
+    def test_returns_1_without_calling_the_judge_when_there_is_no_related_context(self):
+        example = dspy.Example(articles="a", related_context="").with_inputs("articles", "related_context")
+        pred = dspy.Prediction(digest="## Main Stories\n1. Something happened.")
+
+        # An empty DummyLM queue raises if the judge is called at all - proves this
+        # trivial case doesn't spend a real judge call on nothing to check.
+        with dspy.context(lm=DummyLM([])):
+            score = continuity_faithfulness_score(example, pred)
+
+        self.assertEqual(score, 1.0)
+
+    def test_returns_1_when_the_judge_says_faithful(self):
+        example = dspy.Example(articles="a", related_context="6 days ago: Old story").with_inputs(
+            "articles", "related_context"
+        )
+        pred = dspy.Prediction(digest="As flagged 6 days ago, the story continues.")
+
+        with dspy.context(lm=DummyLM([{"reasoning": "the framing matches the given gap", "faithful": True}])):
+            score = continuity_faithfulness_score(example, pred)
+
+        self.assertEqual(score, 1.0)
+
+    def test_returns_0_when_the_judge_says_not_faithful(self):
+        example = dspy.Example(articles="a", related_context="6 months ago: Old story").with_inputs(
+            "articles", "related_context"
+        )
+        pred = dspy.Prediction(digest="As flagged last week, the story continues.")
+
+        with dspy.context(lm=DummyLM([{"reasoning": "the framing implies false recency", "faithful": False}])):
+            score = continuity_faithfulness_score(example, pred)
+
+        self.assertEqual(score, 0.0)
+
+    def test_passes_related_context_and_digest_to_the_judge(self):
+        example = dspy.Example(articles="a", related_context="6 days ago: Old story").with_inputs(
+            "articles", "related_context"
+        )
+        pred = dspy.Prediction(digest="The generated digest text.")
+        dummy_lm = DummyLM([{"reasoning": "the framing matches the given gap", "faithful": True}])
+
+        with dspy.context(lm=dummy_lm):
+            continuity_faithfulness_score(example, pred)
+
+        prompt = dummy_lm.history[-1]["messages"][-1]["content"]
+        self.assertIn("6 days ago: Old story", prompt)
+        self.assertIn("The generated digest text.", prompt)
 
 
 if __name__ == "__main__":

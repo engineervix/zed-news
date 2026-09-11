@@ -376,6 +376,12 @@ def fetch_eval_articles(c):
 
 
 @task
+def fetch_eval_continuity_context(c):
+    """Find real find_related_articles matches for the eval fixture (not committed to git)"""
+    c.run("python -m app.core.summarization.devtools.fetch_eval_continuity_context", pty=True)
+
+
+@task
 def optimize_digest(c):
     """Run BootstrapFewShot against the DSPy eval set (hits the real model, costs API calls)"""
     c.run("python -m app.core.summarization.devtools.optimize_digest", pty=True)
