@@ -181,7 +181,7 @@ def gather_related_context(
     for the lookup itself and `build_related_context` for how matches are filtered and formatted.
     """
     articles_with_matches = [
-        (article, find_related_articles(saved_articles[article["url"]]))
+        (article, find_related_articles(saved_articles[article["url"]], reference_date=reference_date))
         for article in news
         if article["url"] in saved_articles
     ]

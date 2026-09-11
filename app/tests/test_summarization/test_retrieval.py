@@ -1,4 +1,5 @@
 import unittest
+from datetime import timedelta
 
 from app.core.db.config import close_database, initialize_database
 from app.core.db.models import Article
@@ -122,6 +123,43 @@ class TestFindRelatedArticles(unittest.TestCase):
     def test_returns_empty_list_when_the_query_article_has_no_embedding(self):
         results = find_related_articles(self.no_embedding_article, top_k=3)
         self.assertEqual(results, [])
+
+    def test_reference_date_excludes_same_day_matches_before_top_k_is_applied(self):
+        # today_duplicate is nearer to query_vec than older_match, so with no date
+        # filter it alone would fill a top_k=1 budget - the bug this guards against:
+        # filtering same-day matches out *after* limit() would still drop
+        # older_match here, since today_duplicate already took the only slot.
+        reference_date = self.query_article.date
+
+        today_duplicate_vec = [0.0] * 1024
+        today_duplicate_vec[0] = 0.999
+        today_duplicate = Article.create(
+            source="test",
+            url="https://test.example/today-duplicate",
+            title="Today duplicate",
+            content="today duplicate content",
+            embedding=today_duplicate_vec,
+            date=reference_date,
+        )
+        self.article_ids.append(today_duplicate.id)
+
+        older_match_vec = [0.0] * 1024
+        older_match_vec[0] = 0.99
+        older_match_vec[1] = 0.14
+        older_match = Article.create(
+            source="test",
+            url="https://test.example/older-match",
+            title="Older match",
+            content="older match content",
+            embedding=older_match_vec,
+            date=reference_date - timedelta(days=30),
+        )
+        self.article_ids.append(older_match.id)
+
+        results = find_related_articles(self.query_article, top_k=1, reference_date=reference_date)
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], older_match.id)
 
 
 if __name__ == "__main__":

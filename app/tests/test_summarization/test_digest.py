@@ -335,7 +335,7 @@ class TestGatherRelatedContext(unittest.TestCase):
 
         result = gather_related_context(news, {"https://example.com/1": saved_article}, self.reference)
 
-        mock_find_related.assert_called_once_with(saved_article)
+        mock_find_related.assert_called_once_with(saved_article, reference_date=self.reference)
         self.assertIn('Regarding "Title 1"', result)
         self.assertIn("Old Story", result)
 
