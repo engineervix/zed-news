@@ -1,9 +1,10 @@
 import unittest
 from datetime import datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from peewee import SqliteDatabase
 
+from app.core.db.config import database as real_database
 from app.core.db.models import Article
 from app.core.news.fetch import get_latest_news, save_news_to_db, save_news_to_file
 
@@ -29,14 +30,20 @@ class TestSaveToDB(unittest.TestCase):
         # Close connection to db.
         test_db.close()
 
-        # If we wanted, we could re-bind the models to their original
-        # database here. But for tests this is probably not necessary.
+        # Re-bind to the real database - unittest discover runs every test
+        # module in one process, and peewee's bind() mutates Article.Meta.database
+        # globally, so leaving it on test_db here breaks any later test module
+        # that needs the real Postgres connection (e.g. a pgvector integration test).
+        real_database.bind(MODELS, bind_refs=False, bind_backrefs=False)
 
     @patch("app.core.news.fetch.embed_text")
     @patch("app.core.news.fetch.logging")
-    def test_save_news_to_db(self, mock_logging, mock_embed_text):
-        mock_create = MagicMock()
-        Article.create = mock_create
+    @patch("app.core.db.models.Article.create")
+    def test_save_news_to_db(self, mock_create, mock_logging, mock_embed_text):
+        # @patch (not a raw `Article.create = ...` assignment) so this mock is
+        # torn down after the test - unittest discover runs every test module
+        # in one process, and a class-attribute assignment here would leave
+        # Article.create permanently mocked for every later test module.
         mock_embed_text.return_value = [0.1, 0.2, 0.3]
 
         news = [
