@@ -2,6 +2,8 @@ import json
 import logging
 from datetime import datetime, timedelta
 
+import requests
+
 from app.core.db.models import Article
 from app.core.news.historical import fetch_all
 from app.core.news.rss_sources import get_rss_feed_entries
@@ -39,11 +41,24 @@ def save_news_to_db(news: list[dict[str, str]]) -> dict[str, Article]:
     The URL keying lets callers look up each item's saved row afterwards (e.g. to run
     story-continuity retrieval against its embedding) without a second query or
     relying on list order surviving downstream regrouping.
+
+    An `embed_text` failure (OpenRouter down/timed out) is logged and saves that one
+    article with `embedding=None` rather than aborting the whole batch - story
+    continuity is a nice-to-have on top of the digest, not a reason to lose a day's
+    articles.
     """
 
     logging.info("Saving news to the database ...")
 
-    return {item["url"]: Article.create(**item, embedding=embed_text(item["content"])) for item in news}
+    saved: dict[str, Article] = {}
+    for item in news:
+        try:
+            embedding = embed_text(item["content"])
+        except requests.RequestException:
+            logging.exception(f"embed_text failed for {item['url']!r}, saving without an embedding")
+            embedding = None
+        saved[item["url"]] = Article.create(**item, embedding=embedding)
+    return saved
 
 
 def save_news_to_file(news: list[dict[str, str]], dest: str):

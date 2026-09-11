@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch
 
+import requests
 from peewee import SqliteDatabase
 
 from app.core.db.config import database as real_database
@@ -78,6 +79,35 @@ class TestSaveToDB(unittest.TestCase):
         mock_embed_text.assert_any_call(news[0]["content"])
 
         mock_logging.info.assert_called_once_with("Saving news to the database ...")
+
+    @patch("app.core.news.fetch.embed_text")
+    @patch("app.core.news.fetch.logging")
+    @patch("app.core.db.models.Article.create")
+    def test_save_news_to_db_saves_without_an_embedding_when_embed_text_fails(
+        self, mock_create, mock_logging, mock_embed_text
+    ):
+        mock_embed_text.side_effect = requests.exceptions.Timeout("OpenRouter timed out")
+
+        news = [
+            {
+                "source": "Example Site",
+                "url": "https://example.com/article-1",
+                "title": "News Article 1",
+                "content": "Here's the content for article 1",
+            }
+        ]
+
+        result = save_news_to_db(news)
+
+        self.assertEqual(set(result.keys()), {"https://example.com/article-1"})
+        mock_create.assert_called_once_with(
+            source="Example Site",
+            url="https://example.com/article-1",
+            title="News Article 1",
+            content="Here's the content for article 1",
+            embedding=None,
+        )
+        mock_logging.exception.assert_called_once()
 
 
 class TestSaveToFile(unittest.TestCase):
