@@ -58,8 +58,15 @@ def clean_digest_output(text: str) -> str:
     return text.strip()
 
 
-def create_news_digest(news: list[dict[str, str]], dest: str):
-    """Create a news digest from the news articles using the provided summarization function"""
+def create_news_digest(news: list[dict[str, str]], dest: str, related_context: str = ""):
+    """Create a news digest from the news articles using the provided summarization function.
+
+    Args:
+        news: The fetched articles to digest.
+        dest: File path to write the generated digest Markdown to.
+        related_context: Past coverage of a similar/recurring story, as built by
+            `gather_related_context`. Empty string when there is none.
+    """
 
     if not news:
         logger.info("No news to create digest from.")
@@ -110,7 +117,7 @@ def create_news_digest(news: list[dict[str, str]], dest: str):
     with open(f"{DATA_DIR}/{today_iso_fmt}_news_headlines.txt", "w") as f:
         f.write(metadata + "News Items:\n\n" + digest_content)
 
-    generated_digest = generate_digest_markdown(digest_content)
+    generated_digest = generate_digest_markdown(digest_content, related_context)
 
     if generated_digest := generated_digest.strip():
         # Clean the output

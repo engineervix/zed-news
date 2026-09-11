@@ -65,6 +65,29 @@ class TestDigest(unittest.TestCase):
     @patch("sys.exit")
     @patch("builtins.open", new_callable=mock_open)
     @patch("app.core.news.digest.logger")
+    def test_create_news_digest_passes_related_context_to_the_model(self, mock_logger, mock_open_file, mock_exit):
+        news = [
+            {
+                "source": "ZNBC",
+                "url": "http://znbc.co.zm/news/1",
+                "title": "Title 1",
+                "content": "Content 1",
+                "category": "National",
+            }
+        ]
+        dest = os.path.join(self.temp_dir, "digest.md")
+        dummy_lm = DummyLM([{"digest": "Generated Digest"}])
+
+        with dspy.context(lm=dummy_lm):
+            create_news_digest(news, dest, related_context='Regarding "Title 1":\n- 1 month ago: Old Story')
+
+        prompt = dummy_lm.history[-1]["messages"][-1]["content"]
+        self.assertIn('Regarding "Title 1"', prompt)
+        self.assertIn("Old Story", prompt)
+
+    @patch("sys.exit")
+    @patch("builtins.open", new_callable=mock_open)
+    @patch("app.core.news.digest.logger")
     def test_create_news_digest_empty_generation(self, mock_logger, mock_open_file, mock_exit):
         news = [
             {"source": "ZNBC", "title": "Title 1", "content": "Content 1", "url": "url1"},

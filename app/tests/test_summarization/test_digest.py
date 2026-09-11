@@ -1,5 +1,6 @@
 import unittest
 from datetime import date
+from unittest.mock import MagicMock, patch
 
 import dspy
 from dspy.utils.dummies import DummyLM
@@ -8,9 +9,11 @@ from app.core.summarization.digest import (
     EVAL_ARTICLES_PATH,
     DigestGenerator,
     build_eval_set,
+    build_related_context,
     digest_compliance_score,
     format_elapsed,
     format_related_context,
+    gather_related_context,
     generate_digest,
     has_canonical_sections,
     has_category_grouped_other_stories,
@@ -250,6 +253,102 @@ class TestFormatRelatedContext(unittest.TestCase):
 
         self.assertIn("…", result)
         self.assertNotIn("x" * 600, result)
+
+
+class TestBuildRelatedContext(unittest.TestCase):
+    """Test cases for combining multiple articles' related matches into one input block."""
+
+    def setUp(self):
+        self.reference = date(2026, 9, 11)
+
+    def test_no_articles_returns_empty_string(self):
+        self.assertEqual(build_related_context([], self.reference), "")
+
+    def test_article_with_no_matches_is_excluded(self):
+        articles_with_matches = [({"title": "Title 1"}, [])]
+
+        self.assertEqual(build_related_context(articles_with_matches, self.reference), "")
+
+    def test_same_day_matches_are_dropped(self):
+        """A same-day match is another article from today's own batch, not real continuity."""
+        articles_with_matches = [
+            ({"title": "Title 1"}, [{"title": "Sibling Story", "content": "C", "date": self.reference}])
+        ]
+
+        self.assertEqual(build_related_context(articles_with_matches, self.reference), "")
+
+    def test_past_match_is_included_and_labelled_by_article(self):
+        articles_with_matches = [
+            ({"title": "Title 1"}, [{"title": "Old Story", "content": "Old content", "date": date(2026, 8, 1)}])
+        ]
+
+        result = build_related_context(articles_with_matches, self.reference)
+
+        self.assertIn('Regarding "Title 1"', result)
+        self.assertIn("Old Story", result)
+        self.assertIn("1 month ago", result)
+
+    def test_mixes_past_and_same_day_matches_for_one_article(self):
+        articles_with_matches = [
+            (
+                {"title": "Title 1"},
+                [
+                    {"title": "Sibling Story", "content": "C", "date": self.reference},
+                    {"title": "Old Story", "content": "Old content", "date": date(2026, 8, 1)},
+                ],
+            )
+        ]
+
+        result = build_related_context(articles_with_matches, self.reference)
+
+        self.assertIn("Old Story", result)
+        self.assertNotIn("Sibling Story", result)
+
+    def test_only_articles_with_qualifying_matches_are_included(self):
+        articles_with_matches = [
+            ({"title": "Title 1"}, [{"title": "Old Story", "content": "Old content", "date": date(2026, 8, 1)}]),
+            ({"title": "Title 2"}, []),
+        ]
+
+        result = build_related_context(articles_with_matches, self.reference)
+
+        self.assertIn("Title 1", result)
+        self.assertNotIn("Title 2", result)
+
+
+class TestGatherRelatedContext(unittest.TestCase):
+    """Test cases for looking up and formatting related context for a batch of articles."""
+
+    def setUp(self):
+        self.reference = date(2026, 9, 11)
+
+    @patch("app.core.summarization.digest.find_related_articles")
+    def test_looks_up_and_formats_matches_for_a_saved_article(self, mock_find_related):
+        news = [{"url": "https://example.com/1", "title": "Title 1"}]
+        saved_article = MagicMock()
+        mock_find_related.return_value = [{"title": "Old Story", "content": "Old content", "date": date(2026, 8, 1)}]
+
+        result = gather_related_context(news, {"https://example.com/1": saved_article}, self.reference)
+
+        mock_find_related.assert_called_once_with(saved_article)
+        self.assertIn('Regarding "Title 1"', result)
+        self.assertIn("Old Story", result)
+
+    @patch("app.core.summarization.digest.find_related_articles")
+    def test_skips_articles_missing_from_saved_articles(self, mock_find_related):
+        news = [{"url": "https://example.com/1", "title": "Title 1"}]
+
+        result = gather_related_context(news, {}, self.reference)
+
+        mock_find_related.assert_not_called()
+        self.assertEqual(result, "")
+
+    @patch("app.core.summarization.digest.find_related_articles")
+    def test_no_news_returns_empty_string(self, mock_find_related):
+        result = gather_related_context([], {}, self.reference)
+
+        mock_find_related.assert_not_called()
+        self.assertEqual(result, "")
 
 
 class TestEvalSet(unittest.TestCase):

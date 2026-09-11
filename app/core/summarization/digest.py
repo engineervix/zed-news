@@ -1,6 +1,6 @@
 import json
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -8,6 +8,8 @@ from typing import TypeVar
 
 import dspy
 
+from app.core.db.models import Article
+from app.core.summarization.retrieval import find_related_articles
 from app.core.utilities import DATA_DIR, truncate
 
 CANONICAL_SECTIONS = ("## Main Stories", "## Other Notable Stories", "## Key Takeaways & Watchpoints")
@@ -50,10 +52,13 @@ class DigestSignature(dspy.Signature):
         desc=(
             "Past coverage of a similar or recurring story, if any, each prefixed with how long "
             "ago it ran (e.g. '12 days ago', '6 months ago'). Empty when there is none - do not "
-            "invent continuity that isn't given here. Tie framing language to the actual gap "
-            "stated: only call something a recent follow-up (e.g. 'as flagged last week...') when "
-            "the gap given is genuinely short; for an old match, frame it as a recurring pattern "
-            "(e.g. 'the fourth time this year...') rather than implying it just happened."
+            "invent continuity that isn't given here. These are the nearest past matches by topic "
+            "similarity, not guaranteed to be genuinely related - if an entry isn't actually about "
+            "the same story or a real recurring pattern, ignore it rather than forcing a connection. "
+            "For a genuine match, tie framing language to the actual gap stated: only call something "
+            "a recent follow-up (e.g. 'as flagged last week...') when the gap given is genuinely "
+            "short; for an old match, frame it as a recurring pattern (e.g. 'the fourth time this "
+            "year...') rather than implying it just happened."
         )
     )
     digest: str = dspy.OutputField(
@@ -129,6 +134,42 @@ def format_related_context(matches: list[dict], reference_date: date) -> str:
         elapsed = format_elapsed(match["date"], reference_date)
         lines.append(f"- {elapsed}: {match['title']}\n  {excerpt}")
     return "\n".join(lines)
+
+
+def build_related_context(articles_with_matches: list[tuple[dict[str, str], list[dict]]], reference_date: date) -> str:
+    """Combine each article's related past matches into one `related_context` block.
+
+    Matches dated `reference_date` or later are dropped - those are other articles from
+    today's own batch, already present in the main `articles` input, so treating them as
+    "related context" would just duplicate today's own digest content rather than surface
+    real continuity. Only articles with at least one genuinely past match are included,
+    each labelled with its title so the model can attach a continuity claim to the right
+    story. Returns "" when nothing qualifies.
+    """
+    blocks = []
+    for article, matches in articles_with_matches:
+        past_matches = [match for match in matches if match["date"] < reference_date]
+        formatted = format_related_context(past_matches, reference_date)
+        if formatted:
+            blocks.append(f'Regarding "{article["title"]}":\n{formatted}')
+    return "\n\n".join(blocks)
+
+
+def gather_related_context(
+    news: list[dict[str, str]], saved_articles: Mapping[str, Article], reference_date: date
+) -> str:
+    """Look up each article's related past coverage and format it into one `related_context` block.
+
+    An article whose URL isn't in `saved_articles` (e.g. not yet saved to the DB) is skipped -
+    its DB row is where the embedding retrieval runs against lives. See `find_related_articles`
+    for the lookup itself and `build_related_context` for how matches are filtered and formatted.
+    """
+    articles_with_matches = [
+        (article, find_related_articles(saved_articles[article["url"]]))
+        for article in news
+        if article["url"] in saved_articles
+    ]
+    return build_related_context(articles_with_matches, reference_date)
 
 
 def generate_digest(articles: list[dict[str, str]], related_context: str = "") -> Digest | None:

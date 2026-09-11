@@ -14,7 +14,8 @@ from app.core.db.config import close_database, initialize_database
 from app.core.news.digest import create_news_digest
 from app.core.news.eleventify import render_jinja_template
 from app.core.news.fetch import get_latest_news, save_news_to_db, save_news_to_file
-from app.core.utilities import DATA_DIR, configure_logging, today_iso_fmt
+from app.core.summarization.digest import gather_related_context
+from app.core.utilities import DATA_DIR, configure_logging, today, today_iso_fmt
 
 
 def _read_json_file(file):
@@ -49,11 +50,14 @@ def main():
     initialize_database()
 
     # Save news to the database
-    save_news_to_db(news)
+    saved_articles = save_news_to_db(news)
+
+    # Look up related past coverage for story continuity (STORY_CONTINUITY_PLAN.md Phase 4)
+    related_context = gather_related_context(news, saved_articles, reference_date=today)
 
     # Create news digest
     logging.info("Creating news digest...")
-    digest_data = create_news_digest(news, digest_content)
+    digest_data = create_news_digest(news, digest_content, related_context)
 
     if digest_data is None:
         logging.warning("No digest produced (no articles fetched). Exiting.")

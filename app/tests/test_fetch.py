@@ -56,7 +56,10 @@ class TestSaveToDB(unittest.TestCase):
             for i in range(1, 4)
         ]
 
-        save_news_to_db(news)
+        result = save_news_to_db(news)
+
+        self.assertEqual(set(result.keys()), {article["url"] for article in news})
+        self.assertTrue(all(saved is mock_create.return_value for saved in result.values()))
 
         expected_calls = []
         for article in news:

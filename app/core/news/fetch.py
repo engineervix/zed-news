@@ -33,13 +33,18 @@ def get_latest_news() -> list[dict[str, str]]:
     return feeds + news
 
 
-def save_news_to_db(news: list[dict[str, str]]):
-    """Saves the news to the database"""
+def save_news_to_db(news: list[dict[str, str]]) -> dict[str, Article]:
+    """Saves the news to the database, keyed by URL.
+
+    The URL keying lets callers look up each item's saved row afterwards (e.g. to run
+    story continuity retrieval against its embedding - see STORY_CONTINUITY_PLAN.md
+    Phase 4) without a second query or relying on list order surviving downstream
+    regrouping.
+    """
 
     logging.info("Saving news to the database ...")
 
-    for item in news:
-        Article.create(**item, embedding=embed_text(item["content"]))
+    return {item["url"]: Article.create(**item, embedding=embed_text(item["content"])) for item in news}
 
 
 def save_news_to_file(news: list[dict[str, str]], dest: str):
