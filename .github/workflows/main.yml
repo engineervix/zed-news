@@ -164,7 +164,7 @@ jobs:
 
     services:
       postgres:
-        image: pgvector/pgvector:0.8.1-pg15
+        image: pgvector/pgvector:0.8.6-pg15
         env:
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
