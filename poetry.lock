@@ -3982,14 +3982,14 @@ files = [
 
 [[package]]
 name = "together"
-version = "2.32.0"
+version = "2.36.0"
 description = "The official Python library for the together API"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "together-2.32.0-py3-none-any.whl", hash = "sha256:a4e33cd66aa5bcbd046d84ae4914b6b1418759590235115ce20c69ab9e0966f3"},
-    {file = "together-2.32.0.tar.gz", hash = "sha256:3be2fcdc06f0f410b88defc1065ea49f75f40f82a4c209bb6e415e4650f9e7d1"},
+    {file = "together-2.36.0-py3-none-any.whl", hash = "sha256:8b3d1216aeb0e5121c2d723453a3aa4c764ca77a8db29858409f9016baccf41d"},
+    {file = "together-2.36.0.tar.gz", hash = "sha256:a1b1c0d7a74d590935ebfa05d6611293bef5abdd33a12295796decb1f872b0e4"},
 ]
 
 [package.dependencies]
