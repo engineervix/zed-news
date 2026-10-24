@@ -1091,14 +1091,14 @@ psycopg2-binary = ["psycopg2-binary (>=2.9.3,<3.0.0)"]
 
 [[package]]
 name = "dspy"
-version = "3.3.1"
+version = "3.4.1"
 description = "DSPy"
 optional = false
-python-versions = "<3.15,>=3.10"
+python-versions = "<3.16,>=3.10"
 groups = ["main"]
 files = [
-    {file = "dspy-3.3.1-py3-none-any.whl", hash = "sha256:250049f565f52c014609ce2d3ca0de17a6c9449ac961492d61a009aa30dceabf"},
-    {file = "dspy-3.3.1.tar.gz", hash = "sha256:ca53a428ac6a30984a894cf3847cf623b7dd7e8aadf8a63620b1f1f6155e4eaf"},
+    {file = "dspy-3.4.1-py3-none-any.whl", hash = "sha256:afda9e7f8b3d46be0829af19ac1153a6feaa6db5923f2b1011eef547fb15ce2d"},
+    {file = "dspy-3.4.1.tar.gz", hash = "sha256:6803449c11818efd10537da22e509a87af1bd30796053d1a6c82421f2afaa461"},
 ]
 
 [package.dependencies]
@@ -1106,12 +1106,14 @@ anyio = "*"
 cachetools = ">=5.5.0"
 cloudpickle = ">=3.1.2"
 diskcache = ">=5.6.0"
-gepa = {version = "0.1.4", extras = ["dspy"]}
+gepa = {version = "0.1.4", extras = ["dspy"], markers = "python_version < \"3.15\""}
 json-repair = ">=0.54.2"
-litellm = ">=1.65.8"
+jsonschema = ">=4.0.0"
+litellm = {version = ">=1.65.8", markers = "python_version < \"3.15\""}
 openai = ">=1.66.2"
 orjson = ">=3.9.0"
-pydantic = ">=2.0"
+pydantic = ">=2.11.0"
+pyyaml = ">=6.0.1"
 regex = ">=2023.10.3"
 requests = ">=2.31.0"
 tenacity = ">=8.2.3"
@@ -1120,13 +1122,14 @@ tqdm = ">=4.66.1"
 [package.extras]
 anthropic = ["anthropic (>=0.18.0,<1.0.0)"]
 deno = ["deno (>=2.4.5,<3.0.0)"]
-dev = ["build (>=1.0.3)", "datamodel_code_generator (>=0.26.3)", "fastapi (<0.140.7) ; sys_platform != \"win32\" and python_version < \"3.14\"", "litellm (>=1.65.8) ; sys_platform == \"win32\" or python_version == \"3.14\"", "litellm[proxy] (>=1.65.8) ; sys_platform != \"win32\" and python_version < \"3.14\"", "numpy (>=1.26.0)", "pillow (>=10.1.0)", "pre-commit (>=3.7.0)", "pytest (>=6.2.5)", "pytest-asyncio (>=0.26.0)", "pytest-mock (>=3.12.0)", "pytest-xdist (>=3.5.0)", "ruff (>=0.3.0)"]
+dev = ["build (>=1.0.3)", "datamodel_code_generator (>=0.26.3)", "fastapi (<0.140.7) ; sys_platform != \"win32\" and python_version < \"3.14\"", "gepa[dspy] (==0.1.4)", "litellm (>=1.65.8) ; sys_platform == \"win32\" or python_version >= \"3.14\"", "litellm[proxy] (>=1.65.8) ; sys_platform != \"win32\" and python_version < \"3.14\"", "numpy (>=1.26.0)", "pillow (>=10.1.0)", "pre-commit (>=3.7.0)", "pytest (>=6.2.5)", "pytest-asyncio (>=0.26.0)", "pytest-mock (>=3.12.0)", "pytest-xdist (>=3.5.0)", "ruff (>=0.3.0)"]
 langchain = ["langchain_core (>=0.3.0)"]
 litellm = ["litellm (>=1.65.8)"]
 mcp = ["mcp ; python_version >= \"3.10\""]
 numpy = ["numpy (>=1.26.0)"]
 optuna = ["optuna (>=3.4.0)"]
 test-extras = ["datasets (>=2.14.6)", "langchain_core (>=0.3.0)", "mcp ; python_version >= \"3.10\"", "numpy (>=1.26.0)", "optuna (>=3.4.0)", "pandas (>=2.1.1)"]
+typesafe = ["typesafe-sdk (>=0.6.0,<1.0.0)"]
 weaviate = ["weaviate-client (>=4.5.4,<4.22.0)"]
 
 [[package]]
