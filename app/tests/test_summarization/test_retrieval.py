@@ -1,8 +1,9 @@
 import unittest
-from datetime import timedelta
+from datetime import date, timedelta
 
 from app.core.db.config import close_database, initialize_database
 from app.core.db.models import Article
+from app.core.summarization.digest import gather_related_context
 from app.core.summarization.retrieval import find_related_articles
 
 
@@ -160,6 +161,98 @@ class TestFindRelatedArticles(unittest.TestCase):
 
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["id"], older_match.id)
+
+    def _create_near_article(self, slug: str, days_before: int, reference_date):
+        near_vec = [0.0] * 1024
+        near_vec[0] = 0.99
+        near_vec[1] = 0.14
+        article = Article.create(
+            source="test",
+            url=f"https://test.example/{slug}",
+            title=slug,
+            content=f"{slug} content",
+            embedding=near_vec,
+            date=reference_date - timedelta(days=days_before),
+        )
+        self.article_ids.append(article.id)
+        return article
+
+    def test_max_age_days_drops_matches_older_than_the_window_before_top_k_is_applied(self):
+        # stale_match is as near as recent_match, so with no window it ties for the only
+        # top_k=1 slot - the window must filter in the query, not trim after limit().
+        reference_date = self.query_article.date
+        self._create_near_article("stale-match", days_before=100, reference_date=reference_date)
+        recent_match = self._create_near_article("recent-match", days_before=10, reference_date=reference_date)
+
+        results = find_related_articles(self.query_article, top_k=10, reference_date=reference_date, max_age_days=45)
+
+        result_ids = [r["id"] for r in results]
+        self.assertIn(recent_match.id, result_ids)
+        self.assertEqual(result_ids.count(recent_match.id), 1)
+        self.assertNotIn("stale-match", [r["title"] for r in results])
+
+    def test_max_age_days_without_reference_date_is_rejected(self):
+        # "Within N days of when?" has no answer without a reference date - fail loudly
+        # rather than silently returning unfiltered matches.
+        with self.assertRaises(ValueError):
+            find_related_articles(self.query_article, max_age_days=45)
+
+
+class TestGatherRelatedContextGating(unittest.TestCase):
+    """What actually reaches the digest model: only recent, close matches. Real
+    Postgres for the same reason as `TestFindRelatedArticles`.
+    """
+
+    reference_date = date(2026, 10, 23)
+
+    @classmethod
+    def setUpClass(cls):
+        initialize_database()
+
+    @classmethod
+    def tearDownClass(cls):
+        close_database()
+
+    def setUp(self):
+        self.article_ids = []
+        self.today_article = self._create("today", direction=(1.0, 0.0), days_ago=0)
+        self.news = [{"url": self.today_article.url, "title": "Today story", "content": "x"}]
+
+    def tearDown(self):
+        Article.delete().where(Article.id.in_(self.article_ids)).execute()
+
+    def _create(self, slug: str, direction: tuple[float, float], days_ago: int) -> Article:
+        vec = [0.0] * 1024
+        vec[0], vec[1] = direction
+        article = Article.create(
+            source="test",
+            url=f"https://test.example/{slug}",
+            title=slug,
+            content=f"{slug} content",
+            embedding=vec,
+            date=self.reference_date - timedelta(days=days_ago),
+        )
+        self.article_ids.append(article.id)
+        return article
+
+    def _gather(self) -> str:
+        return gather_related_context(self.news, {self.today_article.url: self.today_article}, self.reference_date)
+
+    def test_keeps_a_close_recent_match(self):
+        self._create("recent-near", direction=(0.99, 0.14), days_ago=10)
+
+        self.assertIn("recent-near", self._gather())
+
+    def test_drops_a_close_match_from_long_ago(self):
+        self._create("stale-near", direction=(0.99, 0.14), days_ago=100)
+
+        self.assertEqual(self._gather(), "")
+
+    def test_drops_a_recent_match_that_is_about_something_else(self):
+        # Orthogonal to today's article: cosine distance exactly 1.0.
+        self._create("recent-far", direction=(0.0, 1.0), days_ago=10)
+
+        self.assertEqual(self._gather(), "")
 
 
 if __name__ == "__main__":

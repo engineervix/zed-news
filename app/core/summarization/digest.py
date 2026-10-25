@@ -17,6 +17,10 @@ CANONICAL_SECTIONS = ("## Main Stories", "## Other Notable Stories", "## Key Tak
 # Shorter than news/digest.py's 2200-char main-article clip - this is supplementary
 # framing context, not primary content, and may include several matches per article.
 RELATED_CONTEXT_EXCERPT_LENGTH = 500
+# Retrieval gate: real follow-ups are recent and close; older/farther matches were noise (see
+# STORY_CONTINUITY_PLAN.md, "Post-deploy review").
+RELATED_MAX_AGE_DAYS = 45
+RELATED_MAX_DISTANCE = 0.25
 EVAL_ARTICLES_PATH = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "eval_articles.json"
 # Hand-authored, not scraped - unlike eval_articles.json/eval_digests.json (gitignored real
 # content, regenerate locally), this is synthetic and committed: BootstrapFewShot needs at
@@ -176,12 +180,23 @@ def gather_related_context(
 ) -> str:
     """Look up each article's related past coverage and format it into one `related_context` block.
 
+    Only recent, close matches are kept (`RELATED_MAX_AGE_DAYS`, `RELATED_MAX_DISTANCE`); an
+    article with none contributes nothing, so a quiet day yields an empty string.
+
     An article whose URL isn't in `saved_articles` (e.g. not yet saved to the DB) is skipped -
     its DB row is where the embedding retrieval runs against lives. See `find_related_articles`
     for the lookup itself and `build_related_context` for how matches are filtered and formatted.
     """
     articles_with_matches = [
-        (article, find_related_articles(saved_articles[article["url"]], reference_date=reference_date))
+        (
+            article,
+            find_related_articles(
+                saved_articles[article["url"]],
+                max_distance=RELATED_MAX_DISTANCE,
+                reference_date=reference_date,
+                max_age_days=RELATED_MAX_AGE_DAYS,
+            ),
+        )
         for article in news
         if article["url"] in saved_articles
     ]
