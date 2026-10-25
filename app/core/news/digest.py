@@ -7,6 +7,7 @@ import dspy
 from app.core.summarization.digest import generate_digest_markdown
 from app.core.utilities import (
     DATA_DIR,
+    TEXT_MODEL,
     TOGETHER_API_KEY,
     remove_think_tags,
     today_human_readable,
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 dspy.configure(
     lm=dspy.LM(
-        "together_ai/deepseek-ai/DeepSeek-V4-Flash-0731",
+        f"together_ai/{TEXT_MODEL}",
         api_key=TOGETHER_API_KEY,
         temperature=0.6,
         max_tokens=16384,

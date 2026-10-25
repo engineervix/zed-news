@@ -21,7 +21,7 @@ from app.core.summarization.post import (
     image_concept_compliance_score,
     load_eval_digests,
 )
-from app.core.utilities import TOGETHER_API_KEY
+from app.core.utilities import TEXT_MODEL, TOGETHER_API_KEY
 
 
 def evaluate(module: dspy.Module, eval_set: list[dspy.Example], score, rules: dict, output_field: str):
@@ -58,7 +58,7 @@ def run(name: str, module_cls, eval_set, score, rules, output_field, program_pat
 
 
 def main() -> None:
-    lm = dspy.LM("together_ai/deepseek-ai/DeepSeek-V4-Flash-0731", api_key=TOGETHER_API_KEY, max_tokens=4096)
+    lm = dspy.LM(f"together_ai/{TEXT_MODEL}", api_key=TOGETHER_API_KEY, max_tokens=4096, reasoning={"enabled": False})
     dspy.configure(lm=lm)
 
     digests = load_eval_digests()

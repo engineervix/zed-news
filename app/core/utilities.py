@@ -28,6 +28,9 @@ DATABASE_HOST = os.getenv("DATABASE_HOST")
 DATABASE_USER = os.getenv("DATABASE_USER")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
+# Floating alias on purpose: the dated snapshot this replaced (DeepSeek-V4-Flash-0731) was retired
+# on Together within ~3 months and broke the unattended cron; a drifting alias beats a dead pin.
+TEXT_MODEL = "deepseek-ai/DeepSeek-V4.1-Flash"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 EXA_API_KEY = os.getenv("EXA_API_KEY")
 

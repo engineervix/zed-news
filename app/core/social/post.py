@@ -26,6 +26,7 @@ from app.core.summarization.post import generate_facebook_post, generate_image_c
 from app.core.utilities import (
     ASSETS_DIR,  # noqa: F401
     DATA_DIR,
+    TEXT_MODEL,
     configure_logging,
     remove_think_tags,
     timezone,
@@ -45,7 +46,6 @@ FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 
 # --- Model Configuration ---
-TEXT_MODEL = "deepseek-ai/DeepSeek-V4-Flash-0731"
 IMAGE_MODEL = "black-forest-labs/FLUX.2-pro"
 IMAGE_CONCEPT_TEMP = 0.8
 FACEBOOK_POST_TEMP = 0.7

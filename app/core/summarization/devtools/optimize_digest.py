@@ -25,7 +25,7 @@ from app.core.summarization.digest import (
     load_eval_articles,
     load_eval_continuity_context,
 )
-from app.core.utilities import DATA_DIR, TOGETHER_API_KEY
+from app.core.utilities import DATA_DIR, TEXT_MODEL, TOGETHER_API_KEY
 
 
 def evaluate(module: dspy.Module, eval_set: list[dspy.Example]) -> tuple[float, dict[str, int], list[str]]:
@@ -66,7 +66,7 @@ def report_continuity_faithfulness(label: str, examples: list[dspy.Example], tex
 
 def main() -> None:
     """Score the baseline module, run BootstrapFewShot, score the result, then save it."""
-    lm = dspy.LM("together_ai/deepseek-ai/DeepSeek-V4-Flash-0731", api_key=TOGETHER_API_KEY, max_tokens=4096)
+    lm = dspy.LM(f"together_ai/{TEXT_MODEL}", api_key=TOGETHER_API_KEY, max_tokens=4096, reasoning={"enabled": False})
     dspy.configure(lm=lm)
 
     eval_set = build_eval_set(load_eval_articles(), batch_size=18) + build_continuity_eval_set(

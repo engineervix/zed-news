@@ -16,14 +16,14 @@ from app.core.summarization.digest import (
     generate_digest_markdown,
     load_eval_articles,
 )
-from app.core.utilities import TOGETHER_API_KEY
+from app.core.utilities import TEXT_MODEL, TOGETHER_API_KEY
 
 
 def main() -> None:
     """Generate one real digest per eval batch, save them as the shared downstream eval fixture."""
     dspy.configure(
         lm=dspy.LM(
-            "together_ai/deepseek-ai/DeepSeek-V4-Flash-0731",
+            f"together_ai/{TEXT_MODEL}",
             api_key=TOGETHER_API_KEY,
             temperature=0.6,
             max_tokens=16384,
