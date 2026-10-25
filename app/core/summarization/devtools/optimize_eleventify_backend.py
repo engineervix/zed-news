@@ -16,7 +16,7 @@ from app.core.summarization.eleventify import (
     digest_description_compliance_score,
     load_eval_digests,
 )
-from app.core.utilities import TOGETHER_API_KEY
+from app.core.utilities import TEXT_MODEL, TOGETHER_API_KEY
 
 
 def evaluate(module: dspy.Module, eval_set: list[dspy.Example]) -> tuple[float, dict[str, int]]:
@@ -28,7 +28,7 @@ def evaluate(module: dspy.Module, eval_set: list[dspy.Example]) -> tuple[float, 
 
 
 def main() -> None:
-    lm = dspy.LM("together_ai/Qwen/Qwen3.5-9B", api_key=TOGETHER_API_KEY, max_tokens=300, reasoning={"enabled": False})
+    lm = dspy.LM(f"together_ai/{TEXT_MODEL}", api_key=TOGETHER_API_KEY, max_tokens=400, reasoning={"enabled": False})
     dspy.configure(lm=lm)
 
     eval_set = build_digest_description_eval_set(load_eval_digests())

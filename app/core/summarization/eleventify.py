@@ -7,6 +7,8 @@ import dspy
 from app.core.summarization.digest import EVAL_DIGESTS_PATH, compliance_score, load_compiled
 from app.core.utilities import DATA_DIR
 
+# Search and social previews cut a meta description off at about this many characters.
+MAX_SNIPPET_CHARS = 160
 DESCRIPTION_COMPILED_PROGRAM_PATH = DATA_DIR / "optimized_digest_description_program.json"
 
 
@@ -14,11 +16,14 @@ class DigestDescriptionSignature(dspy.Signature):
     """Write a very brief description of a daily Zambian news digest.
 
     Capture the main themes and most significant stories of the day. Focus on what
-    readers will find most valuable.
+    readers will find most valuable. Lead with the stories themselves and never refer to
+    "the digest" or "this digest" - this text is a search-result snippet, so every word counts.
     """
 
     digest: str = dspy.InputField(desc="The daily news digest content to describe")
-    description: str = dspy.OutputField(desc="A very brief (1-2 sentence) description of the digest's main themes")
+    description: str = dspy.OutputField(
+        desc="A very brief (1-2 sentence) description of the day's main themes, at most 160 characters"
+    )
 
 
 class DigestDescriptionGenerator(dspy.Module):
@@ -65,11 +70,23 @@ def has_newline(text: str) -> bool:
     return "\n" in text.strip()
 
 
+def mentions_digest(text: str) -> bool:
+    """Check for the word 'digest', e.g. 'The digest highlights...' - filler, the reader is already on the digest."""
+    return "digest" in text.lower()
+
+
+def has_snippet_length(text: str) -> bool:
+    """Check that the description fits a search-result snippet without being cut off."""
+    return len(text.strip()) <= MAX_SNIPPET_CHARS
+
+
 DIGEST_DESCRIPTION_COMPLIANCE_RULES: dict[str, Callable[[str], bool]] = {
     "brief": has_brief_length,
     "no_preamble": lambda text: not has_unwanted_preamble(text),
     "no_code_fence": lambda text: not has_code_fence(text),
     "single_line": lambda text: not has_newline(text),
+    "snippet_length": has_snippet_length,
+    "no_digest_filler": lambda text: not mentions_digest(text),
 }
 
 

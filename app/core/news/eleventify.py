@@ -9,7 +9,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from together import Together
 
 from app.core.summarization.eleventify import generate_digest_description
-from app.core.utilities import DATA_DIR, is_backfill, today, today_human_readable, today_iso_fmt
+from app.core.utilities import DATA_DIR, TEXT_MODEL, is_backfill, today, today_human_readable, today_iso_fmt
 
 env = Environment(
     loader=PackageLoader("app", "core/news/template"),
@@ -19,11 +19,10 @@ base_template = env.get_template("digest.njk.jinja")
 dist_file = f"app/web/_pages/news/{today_iso_fmt}.njk"
 
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-DESCRIPTION_MODEL = "Qwen/Qwen3.5-9B"
 
 client = Together(api_key=TOGETHER_API_KEY)
 DESCRIPTION_LM = dspy.LM(
-    f"together_ai/{DESCRIPTION_MODEL}",
+    f"together_ai/{TEXT_MODEL}",
     api_key=TOGETHER_API_KEY,
     max_tokens=400,
     reasoning={"enabled": False},
@@ -53,7 +52,7 @@ def create_digest_description(content: str, date: str) -> str:
 
     try:
         with dspy.context(lm=DESCRIPTION_LM):
-            result = generate_digest_description(content).strip()
+            result = generate_digest_description(content).lstrip(" \n.,;:").strip()
 
         logger.info(f"result={result!r}")
 

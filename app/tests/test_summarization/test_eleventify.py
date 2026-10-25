@@ -10,7 +10,9 @@ from app.core.summarization.eleventify import (
     generate_digest_description,
     has_brief_length,
     has_code_fence,
+    mentions_digest,
     has_newline,
+    has_snippet_length,
     has_unwanted_preamble,
 )
 
@@ -54,6 +56,19 @@ class TestDigestDescriptionComplianceRules(unittest.TestCase):
     def test_has_newline_false_when_single_line(self):
         self.assertFalse(has_newline(COMPLIANT_DESCRIPTION))
 
+    def test_has_snippet_length_true_at_the_limit(self):
+        self.assertTrue(has_snippet_length("a" * 160))
+
+    def test_has_snippet_length_false_when_a_search_snippet_would_cut_it_off(self):
+        self.assertFalse(has_snippet_length("a" * 161))
+
+    def test_mentions_digest_true_for_the_digest_highlights_opener(self):
+        self.assertTrue(mentions_digest("The digest highlights a K19.9bn budget."))
+        self.assertTrue(mentions_digest("This news digest covers the budget."))
+
+    def test_mentions_digest_false_when_it_leads_with_the_stories(self):
+        self.assertFalse(mentions_digest(COMPLIANT_DESCRIPTION))
+
 
 class TestDigestDescriptionComplianceScore(unittest.TestCase):
     def test_full_score_for_compliant_description(self):
@@ -64,7 +79,9 @@ class TestDigestDescriptionComplianceScore(unittest.TestCase):
         self.assertEqual(score, 1.0)
 
     def test_reduced_score_for_violations(self):
-        pred = dspy.Prediction(description="Here's the description:\n```\nOne. Two. Three.\n```")
+        pred = dspy.Prediction(
+            description="Here's the description:\n```\nOne. Two. Three. Digest." + " long" * 40 + "\n```"
+        )
 
         score = digest_description_compliance_score(None, pred)
 

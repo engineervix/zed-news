@@ -125,6 +125,13 @@ class TestEleventify(unittest.TestCase):
 
     @patch("app.core.news.eleventify.TOGETHER_API_KEY", "test_key")
     @patch("app.core.news.eleventify.generate_digest_description")
+    def test_create_digest_description_strips_stray_leading_punctuation(self, mock_generate):
+        # Seen in production: a description that began with ".\n" ahead of the real text.
+        mock_generate.return_value = ".\nBudget passes, Banda in court."
+        self.assertEqual(create_digest_description("content", "date"), "Budget passes, Banda in court.")
+
+    @patch("app.core.news.eleventify.TOGETHER_API_KEY", "test_key")
+    @patch("app.core.news.eleventify.generate_digest_description")
     @patch("app.core.news.eleventify.logger")
     def test_create_digest_description_failure_returns_fallback(self, mock_logger, mock_generate):
         mock_generate.side_effect = Exception("API Error")
